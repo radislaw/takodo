@@ -3,21 +3,21 @@ import "@typespec/http";
 using Http;
 
 /**
- * tootoo API — единый контракт (источник правды).
- * Объём: Phase 0.4 — single-user, без auth.
- * Меняется только здесь → regen OpenAPI/типы. Руками сгенерированное не править.
+ * tootoo API — the single source of truth contract.
+ * Scope: Phase 0.4 — single-user, no auth.
+ * Changes happen only here → regen OpenAPI/types. Do not edit generated output by hand.
  */
 @service(#{ title: "tootoo API" })
 namespace Tootoo;
 
-// ─── Перечисления ───────────────────────────────────────────────
+// ─── Enums ──────────────────────────────────────────────────────
 
 enum TaskStatus {
   open,
   done,
 }
 
-// ─── Ошибки ─────────────────────────────────────────────────────
+// ─── Errors ─────────────────────────────────────────────────────
 
 @error
 model ApiError {
@@ -25,35 +25,35 @@ model ApiError {
   message: string;
 }
 
-// ─── Задачи ─────────────────────────────────────────────────────
+// ─── Tasks ──────────────────────────────────────────────────────
 
-/** Задача (read-форма). Поля без клиентской записи проставляет сервер. */
+/** Task (read shape). Fields not client-writable are set by the server. */
 model Task {
   id: string;
 
-  /** Родитель в дереве; null = корень. */
+  /** Parent in the tree; null = root. */
   parentId: string | null;
 
   title: string;
   note?: string;
 
-  /** Пользователь нажал «могу сделать» → задача стала исполняемым листом. */
+  /** User pressed "I can do this" → task became an executable leaf. */
   resistanceResolved: boolean;
 
-  /** Оценка времени, мин (КПТ: externalize time). */
+  /** Time estimate, minutes (CBT: externalize time). */
   estimateMinutes?: int32;
 
   status: TaskStatus;
 
   completedAt: utcDateTime | null;
 
-  /** lower+trim заголовка — матчинг «частых невыполненных». */
+  /** lower+trim of the title — used to match "frequently undone" tasks. */
   normalizedTitle: string;
 
   createdAt: utcDateTime;
 }
 
-/** Задача с рекурсивным поддеревом (неограниченная глубина). */
+/** Task with its recursive subtree (unbounded depth). */
 model TaskNode {
   ...Task;
   children: TaskNode[];
@@ -63,7 +63,7 @@ model TaskCreate {
   title: string;
   note?: string;
 
-  /** Родитель при дроблении; отсутствует = корневая задача дня. */
+  /** Parent when splitting; absent = root task of the day. */
   parentId?: string;
   estimateMinutes?: int32;
 }
@@ -83,26 +83,26 @@ interface Tasks {
   @patch update(@path id: string, @body body: TaskUpdate): Task | ApiError;
   @delete del(@path id: string): void | ApiError;
 
-  /** Полное поддерево задачи. */
+  /** Full subtree of the task. */
   @route("/{id}/tree") @get tree(@path id: string): TaskNode | ApiError;
 
-  /** Отметить выполненной; сервер авто-bubble вверх (все дети done → родитель done). */
+  /** Mark as done; the server bubbles up (all children done → parent done). */
   @route("/{id}/complete") @post complete(@path id: string): Task | ApiError;
 
-  /** Вернуть в open (рекурсивно вниз/вверх по необходимости — поведение сервера). */
+  /** Return to open (server handles recursive down/up as needed). */
   @route("/{id}/reopen") @post reopen(@path id: string): Task | ApiError;
 
-  /** «Сопротивления нет, могу сделать» → resistanceResolved = true. */
+  /** "No resistance, I can do it" → resistanceResolved = true. */
   @route("/{id}/resolve-resistance") @post resolveResistance(@path id: string): Task | ApiError;
 }
 
-// ─── Дневной лист ───────────────────────────────────────────────
+// ─── Daily list ─────────────────────────────────────────────────
 
 model DailyEntry {
   id: string;
   taskId: string;
 
-  /** Одна из «3 главных на сегодня» (MIT). Лимит 3 — поведение сервера. */
+  /** One of the "3 most important tasks today" (MIT). Limit of 3 is server behavior. */
   isMIT: boolean;
 
   order: int32;
@@ -137,7 +137,7 @@ model EntryUpdate {
 interface Daily {
   @post create(@body body: DailyListCreate): DailyList;
 
-  /** Лист на дату с записями (история = прошлые даты). */
+  /** List for a date with its entries (history = past dates). */
   @route("/{date}") @get getByDate(@path date: plainDate): DailyListDetail | ApiError;
 
   @route("/{date}/entries") @post addEntry(
@@ -157,19 +157,19 @@ interface Daily {
   ): void | ApiError;
 }
 
-// ─── Частые невыполненные ───────────────────────────────────────
+// ─── Frequently undone ──────────────────────────────────────────
 
 model FrequentTask {
   normalizedTitle: string;
   title: string;
 
-  /** В скольких прошлых днях задача осталась невыполненной. */
+  /** In how many past days the task stayed undone. */
   undoneDays: int32;
 }
 
 @route("/frequent")
 @tag("Frequent")
 interface Frequent {
-  /** Задачи, повторявшиеся невыполненными ≥ minDays дней (матч по normalizedTitle). */
+  /** Tasks that stayed undone in >= minDays days (matched by normalizedTitle). */
   @get list(@query minDays?: int32): FrequentTask[];
 }
