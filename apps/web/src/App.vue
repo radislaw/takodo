@@ -6,7 +6,7 @@ const stack = ['Vue 3', 'Vite', 'TypeScript', 'Fastify', 'pnpm monorepo']
   <main class="hello">
     <h1>👋 Hello World</h1>
     <p class="subtitle">tootoo — ADHD-friendly todo</p>
-    <p class="note">Скаффолд работает. Дальше — Phase 0: дизайн-токены, компоненты, контракт.</p>
+    <p class="note">Scaffold is working. Next — Phase 0: design tokens, components, contract.</p>
     <ul class="stack">
       <li v-for="item in stack" :key="item">{{ item }}</li>
     </ul>

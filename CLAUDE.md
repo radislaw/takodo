@@ -1,70 +1,82 @@
 # CLAUDE.md — tootoo
 
-Правила проекта для агентов. Полный план: `~/.claude/plans/todo-stateful-lynx.md`.
+Project rules for agents. Full plan: `~/.claude/plans/todo-stateful-lynx.md`.
 
-## Назначение продукта
+## Language convention
 
-Todo-приложение для людей с СДВГ. Ключевые идеи: **ежедневная выгрузка из головы** +
-**рекурсивное дробление задачи** до уровня, где мозг не сопротивляется. Обёрнуто в КПТ-механики
-(externalization, task chunking, cognitive restructuring) и дофаминовую обратную связь
-(gain-framing — хвалим за сделанное, не наказываем за несделанное).
+- **All development artifacts in English:** code, comments, identifiers, commit messages,
+  CLAUDE.md, README, TypeSpec doc-comments, in-repo docs.
+- **Product UI copy is Russian** (MVP language) — but only in i18n locale files
+  (`apps/web/src/locales/*.json`), never hardcoded.
+- Chat with the user is in Russian; the repo is English.
 
-## Архитектура (монорепо, pnpm workspaces)
+## Product purpose
 
-- `apps/web` — фронтенд: Vue 3 (`<script setup>`) + Vite + TypeScript. Позже: Pinia Colada
+Todo app for people with ADHD. Core ideas: **daily brain dump** + **recursive task splitting**
+down to a level where the brain stops resisting. Wrapped in CBT mechanics (externalization,
+task chunking, cognitive restructuring) and dopamine feedback (gain-framing — praise what's done,
+never punish what isn't).
+
+## Architecture (monorepo, pnpm workspaces)
+
+- `apps/web` — frontend: Vue 3 (`<script setup>`) + Vite + TypeScript. Later: Pinia Colada
   (server-state), Pinia (UI-state), Tailwind, vue-i18n.
-- `apps/api` — бэкенд: TypeScript + Fastify. Позже: Prisma → PostgreSQL.
-- `packages/contract` — TypeSpec-контракт (источник правды API) → `openapi/openapi.yaml` (закоммичен). Кодеген-обвязка консьюмеров (ajv на api, openapi-fetch на web) — при сборке роутов/запросов.
+- `apps/api` — backend: TypeScript + Fastify. Later: Prisma → PostgreSQL.
+- `packages/contract` — TypeSpec contract (single source of truth for the API) →
+  `openapi/openapi.yaml` (committed). Consumer codegen wiring (ajv on api, openapi-fetch on web)
+  happens when routes/queries are built.
 
-TypeScript сквозной, `strict: true` везде. `typecheck` входит в `verify`.
+TypeScript everywhere, `strict: true`. `typecheck` is part of `verify`.
 
-## Правило единого контракта (когда появится `packages/contract`)
+## Single-contract rule
 
-API меняется **только** через TypeSpec (`.tsp`) → regen OpenAPI + типы.
-Сгенерированные артефакты руками **не править**. **Ручных Zod-схем нет** — валидация из контракта
-(родной ajv Fastify на бэке; `openapi-typescript` + `openapi-fetch` на фронте).
+The API changes **only** through TypeSpec (`.tsp`) → regen OpenAPI + types.
+Generated artifacts must **not** be edited by hand. **No manual Zod schemas** — validation comes
+from the contract (native Fastify ajv on the backend; `openapi-typescript` + `openapi-fetch` on the
+frontend).
 
-## TDD (обязателен)
+## TDD (mandatory)
 
-Цикл на каждую задачу: тест первым → падает по правильной причине → минимальная реализация →
-зелёный → рефактор. Раннер — **Vitest** (фронт + бэк), E2E — **Playwright**.
+Cycle per task: test first → fails for the right reason → minimal implementation → green →
+refactor. Runner — **Vitest** (web + api), E2E — **Playwright**.
 
 ## Git flow
 
-- `main` — только оттестированный функционал (стабильные релизы).
-- `develop` — основная ветка разработки; вся работа вливается сюда.
-- Каждая задача = отдельная ветка от `develop`: `feature/*`, `chore/*`, `fix/*`, `refactor/*`.
-  Мёрдж в `develop` только при зелёном `verify`.
-- `hotfix/*` — от `main` для срочного фикса; после — мёрдж в `main` и обратно в `develop`.
-- Коммиты — **conventional commits** (`feat`, `fix`, `chore`, `refactor`, `docs`, `test`, ...).
+- `main` — only tested functionality (stable releases).
+- `develop` — main development branch; all work merges here.
+- Each task = its own branch off `develop`: `feature/*`, `chore/*`, `fix/*`, `refactor/*`.
+  Merge into `develop` only on green `verify`.
+- `hotfix/*` — off `main` for urgent fixes; afterwards merge into `main` and back into `develop`.
+- Commits — **conventional commits** (`feat`, `fix`, `chore`, `refactor`, `docs`, `test`, ...).
 
 ## i18n
 
-**vue-i18n** на фронте. Все строки UI — только в файлах локали (`apps/web/src/locales/*.json`).
-**Хардкод строк запрещён.** MVP — русский; структура готова к доп. локалям. Серверные тексты
-(push, email) — тоже через ключи. _(Инфраструктура — Phase 0.)_
+**vue-i18n** on the frontend. All UI strings live only in locale files
+(`apps/web/src/locales/*.json`). **Hardcoded strings are forbidden.** MVP is Russian; the structure
+is ready for more locales. Server texts (push, email) also go through keys. _(Infra — Phase 0.)_
 
-## Команды
+## Commands
 
-- `pnpm dev` — запуск web + api параллельно.
-- `pnpm dev:web` / `pnpm dev:api` — по отдельности (web → http://localhost:5173, api → http://localhost:3001).
-- `pnpm build` — сборка всех пакетов.
-- _(Phase 0 добавит:)_ `pnpm verify` (`contract:build` → `lint` → `format:check` → `typecheck` → `test`),
+- `pnpm dev` — run web + api in parallel.
+- `pnpm dev:web` / `pnpm dev:api` — individually (web → http://localhost:5173, api → http://localhost:3001).
+- `pnpm contract:build` — compile the TypeSpec contract → `openapi/openapi.yaml`.
+- `pnpm build` — build all packages.
+- _(Phase 0 will add:)_ `pnpm verify` (`contract:build` → `lint` → `format:check` → `typecheck` → `test`),
   `pnpm contract:gen`, `pnpm test:e2e`.
 
-## Стек и доки
+## Stack and docs
 
 - Vue 3 + Vite + TypeScript.
 - Fastify + Prisma + PostgreSQL.
 - Pinia Colada — ctx7 ID `/posva/pinia-colada`.
 - TypeSpec — ctx7 ID `/microsoft/typespec`.
-- Доки тянуть через `ctx7` перед реализацией (см. `~/.claude/rules/context7.md`).
+- Pull docs via `ctx7` before implementing (see `~/.claude/rules/context7.md`).
 
-## Текущее состояние
+## Current state
 
-Скаффолд + контракт. Сделано: git flow (`main`/`develop`), pnpm-монорепо, Vue-страница,
-минимальный Fastify (`/health`, `/api/hello`), CLAUDE.md, **TypeSpec-контракт** (`packages/contract`,
-Phase 0.4 surface: Task-дерево, DailyList/Entry, Frequent → `openapi/openapi.yaml`).
-**Отложено в Phase 0:** Prisma/Postgres/docker-compose, обвязка кодегена консьюмеров (ajv на api,
-openapi-fetch/openapi-typescript на web), Tailwind + `tokens.css` + 11 тем, UI-компоненты,
-Pinia Colada, i18n, Vitest/Playwright, Stop-хук `verify`, analytics seam.
+Scaffold + contract. Done: git flow (`main`/`develop`), pnpm monorepo, Vue page,
+minimal Fastify (`/health`, `/api/hello`), CLAUDE.md, **TypeSpec contract** (`packages/contract`,
+Phase 0.4 surface: Task tree, DailyList/Entry, Frequent → `openapi/openapi.yaml`).
+**Deferred in Phase 0:** Prisma/Postgres/docker-compose, consumer codegen wiring (ajv on api,
+openapi-fetch/openapi-typescript on web), Tailwind + `tokens.css` + 11 themes, UI components,
+Pinia Colada, i18n, Vitest/Playwright, `verify` Stop-hook, analytics seam.

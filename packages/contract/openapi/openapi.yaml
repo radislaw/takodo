@@ -2,9 +2,9 @@ openapi: 3.0.0
 info:
   title: tootoo API
   description: |-
-    tootoo API — единый контракт (источник правды).
-    Объём: Phase 0.4 — single-user, без auth.
-    Меняется только здесь → regen OpenAPI/типы. Руками сгенерированное не править.
+    tootoo API — the single source of truth contract.
+    Scope: Phase 0.4 — single-user, no auth.
+    Changes happen only here → regen OpenAPI/types. Do not edit generated output by hand.
   version: 0.0.0
 tags:
   - name: Tasks
@@ -33,7 +33,7 @@ paths:
   /daily/{date}:
     get:
       operationId: Daily_getByDate
-      description: Лист на дату с записями (история = прошлые даты).
+      description: List for a date with its entries (history = past dates).
       parameters:
         - name: date
           in: path
@@ -151,7 +151,7 @@ paths:
   /frequent:
     get:
       operationId: Frequent_list
-      description: Задачи, повторявшиеся невыполненными ≥ minDays дней (матч по normalizedTitle).
+      description: Tasks that stayed undone in >= minDays days (matched by normalizedTitle).
       parameters:
         - name: minDays
           in: query
@@ -279,7 +279,7 @@ paths:
   /tasks/{id}/complete:
     post:
       operationId: Tasks_complete
-      description: Отметить выполненной; сервер авто-bubble вверх (все дети done → родитель done).
+      description: Mark as done; the server bubbles up (all children done → parent done).
       parameters:
         - name: id
           in: path
@@ -304,7 +304,7 @@ paths:
   /tasks/{id}/reopen:
     post:
       operationId: Tasks_reopen
-      description: Вернуть в open (рекурсивно вниз/вверх по необходимости — поведение сервера).
+      description: Return to open (server handles recursive down/up as needed).
       parameters:
         - name: id
           in: path
@@ -329,7 +329,7 @@ paths:
   /tasks/{id}/resolve-resistance:
     post:
       operationId: Tasks_resolveResistance
-      description: «Сопротивления нет, могу сделать» → resistanceResolved = true.
+      description: '"No resistance, I can do it" → resistanceResolved = true.'
       parameters:
         - name: id
           in: path
@@ -354,7 +354,7 @@ paths:
   /tasks/{id}/tree:
     get:
       operationId: Tasks_tree
-      description: Полное поддерево задачи.
+      description: Full subtree of the task.
       parameters:
         - name: id
           in: path
@@ -409,7 +409,7 @@ components:
           type: string
         isMIT:
           type: boolean
-          description: Одна из «3 главных на сегодня» (MIT). Лимит 3 — поведение сервера.
+          description: One of the "3 most important tasks today" (MIT). Limit of 3 is server behavior.
         order:
           type: integer
           format: int32
@@ -478,7 +478,7 @@ components:
         undoneDays:
           type: integer
           format: int32
-          description: В скольких прошлых днях задача осталась невыполненной.
+          description: In how many past days the task stayed undone.
     Task:
       type: object
       required:
@@ -496,18 +496,18 @@ components:
         parentId:
           type: string
           nullable: true
-          description: Родитель в дереве; null = корень.
+          description: Parent in the tree; null = root.
         title:
           type: string
         note:
           type: string
         resistanceResolved:
           type: boolean
-          description: Пользователь нажал «могу сделать» → задача стала исполняемым листом.
+          description: User pressed "I can do this" → task became an executable leaf.
         estimateMinutes:
           type: integer
           format: int32
-          description: 'Оценка времени, мин (КПТ: externalize time).'
+          description: 'Time estimate, minutes (CBT: externalize time).'
         status:
           $ref: '#/components/schemas/TaskStatus'
         completedAt:
@@ -516,11 +516,11 @@ components:
           nullable: true
         normalizedTitle:
           type: string
-          description: lower+trim заголовка — матчинг «частых невыполненных».
+          description: lower+trim of the title — used to match "frequently undone" tasks.
         createdAt:
           type: string
           format: date-time
-      description: Задача (read-форма). Поля без клиентской записи проставляет сервер.
+      description: Task (read shape). Fields not client-writable are set by the server.
     TaskCreate:
       type: object
       required:
@@ -532,7 +532,7 @@ components:
           type: string
         parentId:
           type: string
-          description: Родитель при дроблении; отсутствует = корневая задача дня.
+          description: Parent when splitting; absent = root task of the day.
         estimateMinutes:
           type: integer
           format: int32
@@ -554,18 +554,18 @@ components:
         parentId:
           type: string
           nullable: true
-          description: Родитель в дереве; null = корень.
+          description: Parent in the tree; null = root.
         title:
           type: string
         note:
           type: string
         resistanceResolved:
           type: boolean
-          description: Пользователь нажал «могу сделать» → задача стала исполняемым листом.
+          description: User pressed "I can do this" → task became an executable leaf.
         estimateMinutes:
           type: integer
           format: int32
-          description: 'Оценка времени, мин (КПТ: externalize time).'
+          description: 'Time estimate, minutes (CBT: externalize time).'
         status:
           $ref: '#/components/schemas/TaskStatus'
         completedAt:
@@ -574,7 +574,7 @@ components:
           nullable: true
         normalizedTitle:
           type: string
-          description: lower+trim заголовка — матчинг «частых невыполненных».
+          description: lower+trim of the title — used to match "frequently undone" tasks.
         createdAt:
           type: string
           format: date-time
@@ -582,7 +582,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaskNode'
-      description: Задача с рекурсивным поддеревом (неограниченная глубина).
+      description: Task with its recursive subtree (unbounded depth).
     TaskStatus:
       type: string
       enum:
