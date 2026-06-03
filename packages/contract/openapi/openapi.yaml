@@ -1,0 +1,600 @@
+openapi: 3.0.0
+info:
+  title: tootoo API
+  description: |-
+    tootoo API — единый контракт (источник правды).
+    Объём: Phase 0.4 — single-user, без auth.
+    Меняется только здесь → regen OpenAPI/типы. Руками сгенерированное не править.
+  version: 0.0.0
+tags:
+  - name: Tasks
+  - name: Daily
+  - name: Frequent
+paths:
+  /daily:
+    post:
+      operationId: Daily_create
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyList'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DailyListCreate'
+  /daily/{date}:
+    get:
+      operationId: Daily_getByDate
+      description: Лист на дату с записями (история = прошлые даты).
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyListDetail'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+  /daily/{date}/entries:
+    post:
+      operationId: Daily_addEntry
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyEntry'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddEntry'
+  /daily/{date}/entries/{entryId}:
+    patch:
+      operationId: Daily_updateEntry
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyEntry'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntryUpdate'
+    delete:
+      operationId: Daily_removeEntry
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+  /frequent:
+    get:
+      operationId: Frequent_list
+      description: Задачи, повторявшиеся невыполненными ≥ minDays дней (матч по normalizedTitle).
+      parameters:
+        - name: minDays
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FrequentTask'
+      tags:
+        - Frequent
+  /tasks:
+    get:
+      operationId: Tasks_list
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+      tags:
+        - Tasks
+    post:
+      operationId: Tasks_create
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+  /tasks/{id}:
+    get:
+      operationId: Tasks_read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+    patch:
+      operationId: Tasks_update
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+    delete:
+      operationId: Tasks_del
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+  /tasks/{id}/complete:
+    post:
+      operationId: Tasks_complete
+      description: Отметить выполненной; сервер авто-bubble вверх (все дети done → родитель done).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+  /tasks/{id}/reopen:
+    post:
+      operationId: Tasks_reopen
+      description: Вернуть в open (рекурсивно вниз/вверх по необходимости — поведение сервера).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+  /tasks/{id}/resolve-resistance:
+    post:
+      operationId: Tasks_resolveResistance
+      description: «Сопротивления нет, могу сделать» → resistanceResolved = true.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+  /tasks/{id}/tree:
+    get:
+      operationId: Tasks_tree
+      description: Полное поддерево задачи.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskNode'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+components:
+  schemas:
+    AddEntry:
+      type: object
+      required:
+        - taskId
+      properties:
+        taskId:
+          type: string
+    ApiError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    DailyEntry:
+      type: object
+      required:
+        - id
+        - taskId
+        - isMIT
+        - order
+      properties:
+        id:
+          type: string
+        taskId:
+          type: string
+        isMIT:
+          type: boolean
+          description: Одна из «3 главных на сегодня» (MIT). Лимит 3 — поведение сервера.
+        order:
+          type: integer
+          format: int32
+    DailyList:
+      type: object
+      required:
+        - id
+        - date
+        - createdAt
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+    DailyListCreate:
+      type: object
+      required:
+        - date
+      properties:
+        date:
+          type: string
+          format: date
+    DailyListDetail:
+      type: object
+      required:
+        - id
+        - date
+        - createdAt
+        - entries
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyEntry'
+    EntryUpdate:
+      type: object
+      properties:
+        isMIT:
+          type: boolean
+        order:
+          type: integer
+          format: int32
+    FrequentTask:
+      type: object
+      required:
+        - normalizedTitle
+        - title
+        - undoneDays
+      properties:
+        normalizedTitle:
+          type: string
+        title:
+          type: string
+        undoneDays:
+          type: integer
+          format: int32
+          description: В скольких прошлых днях задача осталась невыполненной.
+    Task:
+      type: object
+      required:
+        - id
+        - parentId
+        - title
+        - resistanceResolved
+        - status
+        - completedAt
+        - normalizedTitle
+        - createdAt
+      properties:
+        id:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+          description: Родитель в дереве; null = корень.
+        title:
+          type: string
+        note:
+          type: string
+        resistanceResolved:
+          type: boolean
+          description: Пользователь нажал «могу сделать» → задача стала исполняемым листом.
+        estimateMinutes:
+          type: integer
+          format: int32
+          description: 'Оценка времени, мин (КПТ: externalize time).'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        normalizedTitle:
+          type: string
+          description: lower+trim заголовка — матчинг «частых невыполненных».
+        createdAt:
+          type: string
+          format: date-time
+      description: Задача (read-форма). Поля без клиентской записи проставляет сервер.
+    TaskCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        note:
+          type: string
+        parentId:
+          type: string
+          description: Родитель при дроблении; отсутствует = корневая задача дня.
+        estimateMinutes:
+          type: integer
+          format: int32
+    TaskNode:
+      type: object
+      required:
+        - id
+        - parentId
+        - title
+        - resistanceResolved
+        - status
+        - completedAt
+        - normalizedTitle
+        - createdAt
+        - children
+      properties:
+        id:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+          description: Родитель в дереве; null = корень.
+        title:
+          type: string
+        note:
+          type: string
+        resistanceResolved:
+          type: boolean
+          description: Пользователь нажал «могу сделать» → задача стала исполняемым листом.
+        estimateMinutes:
+          type: integer
+          format: int32
+          description: 'Оценка времени, мин (КПТ: externalize time).'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        normalizedTitle:
+          type: string
+          description: lower+trim заголовка — матчинг «частых невыполненных».
+        createdAt:
+          type: string
+          format: date-time
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskNode'
+      description: Задача с рекурсивным поддеревом (неограниченная глубина).
+    TaskStatus:
+      type: string
+      enum:
+        - open
+        - done
+    TaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        note:
+          type: string
+        estimateMinutes:
+          type: integer
+          format: int32

@@ -11,6 +11,8 @@
     "dev": "pnpm -r --parallel dev",
     "dev:web": "pnpm --filter @tootoo/web dev",
     "dev:api": "pnpm --filter @tootoo/api dev",
+    "contract:build": "pnpm --filter @tootoo/contract build",
+    "contract:watch": "pnpm --filter @tootoo/contract watch",
     "build": "pnpm -r build"
   }
 }
