@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AddyDo — Экраны по фазам</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #f0eee9; }
+  #root { height: 100vh; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="app-components.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="phase0.jsx"></script>
+<script type="text/babel" src="phase123.jsx"></script>
+<script type="text/babel" src="backlog.jsx"></script>
+<script type="text/babel" src="desktop-screens.jsx"></script>
+<script type="text/babel" src="tablet-screens.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<script type="text/babel">
+const { createElement: h } = React;
+
+// Called directly (not via h) so the returned element's type IS DCArtboard —
+// DCSection filters its children by type === DCArtboard.
+function board(id, label, screen, theme, height) {
+  return h(DCArtboard, { key: id, id, label, width: 402, height: height || 874 },
+    h(Phone, { theme, height: height || 874 }, screen));
+}
+
+/* десктоп — 1280×820 включая хром браузера */
+function boardDesk(id, label, screen) {
+  return h(DCArtboard, { key: id, id, label, width: 1280, height: 820 },
+    h(DesktopFrame, null, screen));
+}
+
+/* планшет — iPad 768×1024, рамка 816×1136 */
+function boardTab(id, label, screen, dark) {
+  return h(DCArtboard, { key: id, id, label, width: 816, height: 1136 },
+    h(TabletFrame, { dark: dark || false }, screen));
+}
+
+function App() {
+  return h(DesignCanvas, null, [
+
+    /* ───────── ФАЗА 0 · MVP — светлая тема ───────── */
+    h(DCSection, { key: 'p0l', id: 'p0-light', title: 'Фаза 0 · MVP-ядро', subtitle: 'Светлая тема · нужно сейчас' }, [
+      board('p0l-s1', 'S1 · Пустое состояние', h(S1Empty)),
+      board('p0l-s2', 'S2 · Сегодня / выгрузка', h(S2Today)),
+      board('p0l-s3', 'S3 · Вопрос сопротивления', h(S3Resistance)),
+      board('p0l-s4', 'S4 · Дерево подзадач', h(S4Tree), null, 952),
+      board('p0l-s5', 'S5 · Reward-оверлей', h(S5Reward)),
+      board('p0l-s6', 'S6 · История', h(S6History), null, 900),
+      board('p0l-s7', 'S7 · Давно ждут', h(S7Stuck)),
+      board('p0l-s9', 'S9 · Настройки', h(S9Settings, { dark: false })),
+    ]),
+
+    /* ───────── ФАЗА 0 · MVP — тёмная тема ───────── */
+    h(DCSection, { key: 'p0d', id: 'p0-dark', title: 'Фаза 0 · MVP-ядро', subtitle: 'Тёмная тема · «вечерний шалфей»' }, [
+      board('p0d-s1', 'S1 · Пустое состояние', h(S1Empty), 'dark'),
+      board('p0d-s2', 'S2 · Сегодня / выгрузка', h(S2Today), 'dark'),
+      board('p0d-s3', 'S3 · Вопрос сопротивления', h(S3Resistance), 'dark'),
+      board('p0d-s4', 'S4 · Дерево подзадач', h(S4Tree), 'dark', 952),
+      board('p0d-s5', 'S5 · Reward-оверлей', h(S5Reward), 'dark'),
+      board('p0d-s6', 'S6 · История', h(S6History), 'dark', 900),
+      board('p0d-s7', 'S7 · Давно ждут', h(S7Stuck), 'dark'),
+      board('p0d-s9', 'S9 · Настройки', h(S9Settings, { dark: true }), 'dark'),
+    ]),
+
+    /* ───────── ФАЗА 1 · Авторизация ───────── */
+    h(DCSection, { key: 'p1', id: 'p1', title: 'Фаза 1 · Авторизация', subtitle: 'Magic-link + Google · минимально' }, [
+      board('p1-s10l', 'S10 · Вход (светлая)', h(S10Auth, { dark: false })),
+      board('p1-s10d', 'S10 · Вход (тёмная)', h(S10Auth, { dark: true }), 'dark'),
+    ]),
+
+    /* ───────── ФАЗА 2 · PWA + Фокус ───────── */
+    h(DCSection, { key: 'p2', id: 'p2', title: 'Фаза 2 · PWA + Фокус-режим', subtitle: 'Pomodoro, lo-fi и мягкие пуши' }, [
+      board('p2-s8', 'S8 · Фокус · Pomodoro + lo-fi', h(S8Focus)),
+      board('p2-push', 'Запрос на уведомления', h(PushBanner)),
+    ]),
+
+    /* ───────── ФАЗА 3 · Проекты + AI ───────── */
+    h(DCSection, { key: 'p3', id: 'p3', title: 'Фаза 3 · Проекты + AI', subtitle: 'Проекты и AI-разбивка на подзадачи' }, [
+      board('p3-list', 'Проекты', h(ProjectsScreen)),
+      board('p3-detail', 'Проект · AI-предложение', h(ProjectDetail)),
+    ]),
+
+    /* ───────── Десктоп · Веб-приложение ───────── */
+    h(DCSection, { key: 'desk', id: 'desktop', title: 'Десктоп · Веб-приложение', subtitle: '1280 × 820 · браузер · боковое меню' }, [
+      boardDesk('desk-today',    'D1 · Сегодня',       h(DeskToday)),
+      boardDesk('desk-focus',    'D2 · Фокус-режим',   h(DeskFocus)),
+      boardDesk('desk-projects', 'D3 · Проекты + AI',  h(DeskProjects)),
+      boardDesk('desk-history',  'D4 · История',       h(DeskHistory)),
+    ]),
+
+    /* ───────── Планшет · iPad ───────── */
+    h(DCSection, { key: 'tab', id: 'tablet', title: 'Планшет · iPad', subtitle: '768 × 1024 · Portrait · адаптивный макет' }, [
+      boardTab('tab-today',    'T1 · Сегодня',          h(TabToday)),
+      boardTab('tab-tree',     'T2 · Дерево подзадач',  h(TabTree)),
+      boardTab('tab-focus',    'T3 · Фокус-режим',      h(TabFocus)),
+      boardTab('tab-projects', 'T4 · Проекты',          h(TabProjects)),
+    ]),
+
+    /* ───────── Backlog · Монетизация ───────── */
+    h(DCSection, { key: 'bl', id: 'backlog', title: 'Backlog · Монетизация', subtitle: 'Магазин тем, значки, heatmap, Plus' }, [
+      board('bl-store', 'S11 · Магазин тем', h(S11ThemeStore), null, 1320),
+      board('bl-badges', 'Значки достижений', h(BadgesScreen)),
+      board('bl-heat', 'Heatmap активности', h(HeatmapScreen)),
+      board('bl-plus', 'AddyDo Plus · paywall', h(PlusScreen)),
+    ]),
+
+  ]);
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>
