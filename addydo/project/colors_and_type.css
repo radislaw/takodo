@@ -1,0 +1,794 @@
+/* ============================================================
+   AddyDo — Foundations: Color + Type
+   "Спокойный шалфей и сливки" — calm sage & cream
+   A low-stimulation, guilt-free system for ADHD minds.
+   ============================================================ */
+
+/* Fonts loaded from Google Fonts (full Cyrillic + Latin).
+   Self-host from /fonts for production — see README. */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;1,6..12,400&display=swap');
+
+:root {
+  /* ---------- BASE PALETTE ---------------------------------- */
+  /* Surfaces */
+  --cream:        #F5F3F0;   /* app background — warm off-white */
+  --cream-deep:   #EDEAE5;   /* recessed wells, pressed bg      */
+  --card:         #FFFFFF;   /* cards & sheets                  */
+
+  /* Ink (text) */
+  --ink:          #2C3A33;   /* primary text — deep pine        */
+  --ink-soft:     #8A9A8F;   /* secondary / muted sage-grey     */
+  --ink-faint:    #B4BEB8;   /* placeholders, disabled          */
+
+  /* Accent — sage (primary brand) */
+  --sage:         #7C9A92;   /* primary accent                  */
+  --sage-press:   #6A8780;   /* hover/pressed accent            */
+  --sage-deep:    #5A746D;   /* accent text on light            */
+  --sage-tint:    #E8EFEC;   /* selected bg, sage wash          */
+  --sage-tint-2:  #D6E3DE;   /* stronger wash, progress track   */
+
+  /* Reward — apricot (celebration / streaks / done) */
+  --apricot:      #E0A87E;   /* reward accent                   */
+  --apricot-press:#D2956A;   /* pressed reward                  */
+  --apricot-deep: #B97C53;   /* reward text on light            */
+  --apricot-tint: #F7E9DC;   /* reward wash, badge bg           */
+
+  /* Solid/gradient FILL tokens — used for filled buttons, FAB,
+     checkbox, etc. Default to the flat accent/reward; a theme may
+     re-point these to a gradient without touching any component.  */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+
+  /* Soft semantic — kept low-saturation to stay calm */
+  --done:         #84A98C;   /* completed / positive            */
+  --done-tint:    #E6EFE7;
+  --gentle:       #D9B36A;   /* soft "heads up" (never alarming)*/
+  --gentle-tint:  #F4EBD6;
+  --softrose:     #C99A9A;   /* overdue, handled tenderly       */
+  --softrose-tint:#F2E4E2;
+
+  /* Category dots — muted, harmonious, never loud */
+  --cat-sage:     #7C9A92;
+  --cat-apricot:  #E0A87E;
+  --cat-blue:     #93A8B5;
+  --cat-clay:     #C49A8A;
+  --cat-gold:     #D4B483;
+  --cat-mauve:    #B59CB0;
+
+  /* Lines & edges */
+  --line:         #E7E3DE;   /* hairline borders on cream       */
+  --line-card:    #EFECE7;   /* divider inside cards            */
+  --line-strong:  #D8D2CA;
+
+  /* ---------- ELEVATION (soft, warm-tinted, barely there) --- */
+  --shadow-sm:  0 1px 2px rgba(44,58,51,.05), 0 1px 1px rgba(44,58,51,.03);
+  --shadow-md:  0 2px 6px rgba(44,58,51,.05), 0 4px 12px rgba(44,58,51,.04);
+  --shadow-lg:  0 6px 16px rgba(44,58,51,.06), 0 12px 32px rgba(44,58,51,.06);
+  --shadow-pop: 0 12px 40px rgba(44,58,51,.12);
+  /* focus ring — sage, generous, calm */
+  --ring:       0 0 0 3px rgba(124,154,146,.30);
+  --ring-apr:   0 0 0 3px rgba(224,168,126,.32);
+
+  /* ---------- RADII (generous, rounded, friendly) ----------- */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;     /* default card radius */
+  --r-xl: 28px;     /* sheets, large cards */
+  --r-pill: 999px;
+
+  /* ---------- SPACING (4px base) ---------------------------- */
+  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;  --s-4: 16px;
+  --s-5: 20px;  --s-6: 24px;  --s-7: 32px;  --s-8: 40px;
+  --s-9: 48px;  --s-10: 64px; --s-12: 80px;
+
+  /* ---------- TYPE FAMILIES --------------------------------- */
+  --font-display: 'Nunito', ui-rounded, 'Segoe UI', sans-serif;       /* warm, rounded headings */
+  --font-body:    'Nunito Sans', ui-sans-serif, 'Segoe UI', sans-serif;/* clean, calm body/UI    */
+  --font-num:     'Nunito Sans', ui-sans-serif, sans-serif;           /* tabular numerals       */
+
+  /* ---------- TYPE SCALE (px / line-height / weight) -------- */
+  /* Display & headings use Nunito (display); set in semantic block */
+  --fs-display: 40px;   --lh-display: 1.12;
+  --fs-h1:      32px;   --lh-h1:      1.18;
+  --fs-h2:      26px;   --lh-h2:      1.22;
+  --fs-h3:      21px;   --lh-h3:      1.3;
+  --fs-h4:      18px;   --lh-h4:      1.35;
+  --fs-body-lg: 18px;   --lh-body-lg: 1.55;
+  --fs-body:    16px;   --lh-body:    1.55;
+  --fs-sm:      14px;   --lh-sm:      1.5;
+  --fs-cap:     13px;   --lh-cap:     1.4;
+  --fs-micro:   11px;   --lh-micro:   1.3;
+
+  --w-reg: 400; --w-med: 500; --w-semi: 600; --w-bold: 700; --w-x: 800;
+  --tracking-tight: -0.01em;
+  --tracking-caps:  0.06em;
+}
+
+/* ============================================================
+   DARK THEME — "вечерний шалфей"
+   Warm dark pine, never pure black. Opt in with
+   <element data-theme="dark"> (cascades to all descendants).
+   ============================================================ */
+[data-theme="dark"] {
+  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  /* Surfaces — warm dark green-charcoal */
+  --cream:        #1A211D;   /* app background */
+  --cream-deep:   #131915;   /* recessed wells, pressed bg */
+  --card:         #242E29;   /* cards & sheets */
+
+  /* Ink — warm off-white, calm greys */
+  --ink:          #ECEEE9;
+  --ink-soft:     #9CAAA0;
+  --ink-faint:    #66726B;
+
+  /* Accent — sage, lifted for contrast on dark */
+  --sage:         #8FAEA5;
+  --sage-press:   #7E9C93;
+  --sage-deep:    #AAC4BB;   /* links / accent text on dark */
+  --sage-tint:    #283430;   /* selected bg, sage wash */
+  --sage-tint-2:  #33433C;   /* stronger wash, progress track */
+
+  /* Reward — apricot, lifted */
+  --apricot:      #E6B088;
+  --apricot-press:#D89E72;
+  --apricot-deep: #ECBE9A;   /* reward text on dark */
+  --apricot-tint: #3A2F25;   /* reward wash, badge bg */
+
+  /* Soft semantic — dark washes */
+  --done:         #8FB596;
+  --done-tint:    #243029;
+  --gentle:       #DBB872;
+  --gentle-tint:  #342D1E;
+  --softrose:     #CFA1A1;
+  --softrose-tint:#352727;
+
+  /* Category dots — unchanged (read well on dark) */
+
+  /* Lines & edges */
+  --line:         #313B35;
+  --line-card:    #2D3832;
+  --line-strong:  #415048;
+
+  /* Elevation — deeper, since warm-tint shadows vanish on dark */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,.30);
+  --shadow-md:  0 2px 8px rgba(0,0,0,.32), 0 1px 2px rgba(0,0,0,.24);
+  --shadow-lg:  0 8px 22px rgba(0,0,0,.40);
+  --shadow-pop: 0 16px 44px rgba(0,0,0,.50);
+  --ring:       0 0 0 3px rgba(143,174,165,.40);
+  --ring-apr:   0 0 0 3px rgba(230,176,136,.40);
+}
+
+/* ============================================================
+   LAVENDER THEME — "лавандовое поле"
+   A calm light variant: soft lavender-tinted surfaces, muted
+   plum ink, lavender as the everyday accent. Apricot is kept
+   as the warm reward complement. Opt in with
+   <element data-theme="lavender"> (cascades to descendants).
+   Stays true to the low-stimulation ethos — nothing vibrates.
+   ============================================================ */
+[data-theme="lavender"] {
+  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  /* Surfaces — soft lavender-tinted off-white */
+  --cream:        #F4F1F8;   /* app background */
+  --cream-deep:   #ECE7F2;   /* recessed wells, pressed bg */
+  --card:         #FFFFFF;   /* cards & sheets */
+
+  /* Ink — deep muted plum, calm lavender-greys */
+  --ink:          #353048;
+  --ink-soft:     #8C86A2;
+  --ink-faint:    #BBB6CB;
+
+  /* Accent — lavender (everyday primary) */
+  --sage:         #8E84B8;
+  --sage-press:   #7C71A7;
+  --sage-deep:    #685D92;   /* accent text on light */
+  --sage-tint:    #ECE8F5;   /* selected bg, lavender wash */
+  --sage-tint-2:  #DBD4EC;   /* stronger wash, progress track */
+
+  /* Reward — apricot, warm complement to lavender (unchanged warmth) */
+  --apricot:      #E0A87E;
+  --apricot-press:#D2956A;
+  --apricot-deep: #B97C53;
+  --apricot-tint: #F7E7DA;
+
+  /* Soft semantic — kept low-saturation, harmonised to lavender */
+  --done:         #84A98C;
+  --done-tint:    #E6EFE7;
+  --gentle:       #D4B07A;
+  --gentle-tint:  #F3ECD9;
+  --softrose:     #C99AB4;   /* overdue — tender mauve-rose */
+  --softrose-tint:#F1E4EE;
+
+  /* Category dots — unchanged (read well on lavender) */
+
+  /* Lines & edges */
+  --line:         #E5E0EE;
+  --line-card:    #EDE9F3;
+  --line-strong:  #D5CEE3;
+
+  /* Elevation — tinted with the plum ink so shadows read soft & cool */
+  --shadow-sm:  0 1px 2px rgba(53,48,72,.05), 0 1px 1px rgba(53,48,72,.03);
+  --shadow-md:  0 2px 6px rgba(53,48,72,.05), 0 4px 12px rgba(53,48,72,.04);
+  --shadow-lg:  0 6px 16px rgba(53,48,72,.06), 0 12px 32px rgba(53,48,72,.06);
+  --shadow-pop: 0 12px 40px rgba(53,48,72,.12);
+  --ring:       0 0 0 3px rgba(142,132,184,.32);
+  --ring-apr:   0 0 0 3px rgba(224,168,126,.32);
+}
+
+/* ============================================================
+   LAVENDER DARK THEME — "ночное поле"
+   Deep purple-plum surfaces (never cold/blue-black), lifted
+   lavender accent, plum-tinted off-white ink. Apricot stays
+   the warm reward complement — untouched.
+   Opt in with <element data-theme="lavender-dark">.
+   ============================================================ */
+[data-theme="lavender-dark"] {
+  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  /* Surfaces — deep warm purple-plum, never pure black */
+  --cream:        #1D1A28;   /* app background */
+  --cream-deep:   #161320;   /* recessed wells, pressed bg */
+  --card:         #27233A;   /* cards & sheets */
+
+  /* Ink — lavender-tinted off-white, calm purple-greys */
+  --ink:          #EDE9F8;
+  --ink-soft:     #9E98B8;
+  --ink-faint:    #635D7A;
+
+  /* Accent — lavender, lifted for contrast on dark */
+  --sage:         #A49AD4;
+  --sage-press:   #9088C4;
+  --sage-deep:    #BEB4E8;   /* accent text on dark */
+  --sage-tint:    #2C2844;   /* selected bg, lavender wash */
+  --sage-tint-2:  #373255;   /* stronger wash, progress track */
+
+  /* Reward — apricot, lifted (same warmth as dark sage theme) */
+  --apricot:      #E6B088;
+  --apricot-press:#D89E72;
+  --apricot-deep: #ECBE9A;   /* reward text on dark */
+  --apricot-tint: #3A2F25;   /* reward wash, badge bg */
+
+  /* Soft semantic — purple-tinted dark washes */
+  --done:         #8FB596;
+  --done-tint:    #1F2D24;
+  --gentle:       #DBB872;
+  --gentle-tint:  #2E2616;
+  --softrose:     #CFA8C0;   /* overdue — mauve-rose on dark */
+  --softrose-tint:#332231;
+
+  /* Category dots — unchanged (read well on dark purple) */
+
+  /* Lines & edges */
+  --line:         #2E2943;
+  --line-card:    #2A2540;
+  --line-strong:  #3D3660;
+
+  /* Elevation — deep plum-tinted shadows */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,.36);
+  --shadow-md:  0 2px 8px rgba(0,0,0,.38), 0 1px 2px rgba(0,0,0,.28);
+  --shadow-lg:  0 8px 22px rgba(0,0,0,.46);
+  --shadow-pop: 0 16px 44px rgba(0,0,0,.56);
+  --ring:       0 0 0 3px rgba(164,154,212,.40);
+  --ring-apr:   0 0 0 3px rgba(230,176,136,.40);
+}
+
+/* ============================================================
+   CYBERPUNK THEME — "неоновый город" (v2 · градиенты)
+   Deep blue-violet void, gradient fills that sweep across
+   electric blue → violet → hot red. Neon-glow shadows.
+   Filled elements use --accent-fill / --reward-fill (gradients);
+   solid --sage / --apricot back text, dots & borders.
+   Opt in with <element data-theme="cyberpunk">.
+   ============================================================ */
+[data-theme="cyberpunk"] {
+  /* Surfaces — deep blue-violet void with a vertical gradient */
+  --cream:        radial-gradient(120% 90% at 15% -5%, #14082A 0%, #0A0820 45%, #06050F 100%);
+  --cream-deep:   #050410;   /* recessed wells, pressed bg */
+  --card:         linear-gradient(160deg, #161334 0%, #120E29 100%);
+
+  /* Ink — cool blue-white */
+  --ink:          #E4E6FF;
+  --ink-soft:     #7E7FC8;
+  --ink-faint:    #3B3A78;
+
+  /* Accent solids — electric blue (text, dots, borders) */
+  --sage:         #4D7CFF;
+  --sage-press:   #3D66E6;
+  --sage-deep:    #8AA6FF;   /* accent text / links on dark */
+  --sage-tint:    #14163C;   /* selected bg wash */
+  --sage-tint-2:  #20214F;   /* stronger wash, progress track */
+
+  /* Reward solids — hot magenta-red */
+  --apricot:      #FF2D6E;
+  --apricot-press:#E61F5C;
+  --apricot-deep: #FF6C9C;   /* reward text */
+  --apricot-tint: #2A0A1E;   /* reward wash */
+
+  /* GRADIENT FILLS — the signature of this theme */
+  --accent-fill:  linear-gradient(135deg, #2F6BFF 0%, #8A3DFF 100%);   /* blue → violet */
+  --reward-fill:  linear-gradient(135deg, #9D3DFF 0%, #FF2D5E 100%);   /* violet → red  */
+
+  /* Soft semantic */
+  --done:         #00E0B8;
+  --done-tint:    #04261F;
+  --gentle:       #FFC23D;   /* electric amber heads-up */
+  --gentle-tint:  #2A2008;
+  --softrose:     #FF4D86;   /* overdue — neon red-pink */
+  --softrose-tint:#2D0A18;
+
+  /* Category dots — neon spectrum */
+  --cat-sage:     #4D7CFF;
+  --cat-apricot:  #FF2D6E;
+  --cat-blue:     #2FB8FF;
+  --cat-clay:     #FF6A3D;
+  --cat-gold:     #FFC23D;
+  --cat-mauve:    #B14DFF;
+
+  /* Lines & edges */
+  --line:         #1E1C46;
+  --line-card:    #181638;
+  --line-strong:  #2E2B63;
+
+  /* Neon glow shadows — blue + violet bloom */
+  --shadow-sm:  0 0 7px  rgba(77,124,255,.16), 0 2px 4px  rgba(0,0,0,.6);
+  --shadow-md:  0 0 20px rgba(98,77,255,.24),  0 4px 14px rgba(0,0,0,.7);
+  --shadow-lg:  0 0 40px rgba(138,61,255,.28), 0 8px 28px rgba(0,0,0,.8);
+  --shadow-pop: 0 0 64px rgba(157,61,255,.34), 0 16px 48px rgba(0,0,0,.88);
+  --ring:       0 0 0 2px #4D7CFF, 0 0 16px rgba(77,124,255,.6);
+  --ring-apr:   0 0 0 2px #FF2D6E, 0 0 16px rgba(255,45,110,.6);
+}
+
+/* ============================================================
+   HIGH-CONTRAST THEME — "высокий контраст"
+   Built for low vision: pure black ink on white, saturated
+   accents that pass WCAG AAA, visible borders on every card
+   (via shadow outlines) and a thick double focus ring.
+   Opt in with <element data-theme="high-contrast">.
+   ============================================================ */
+[data-theme="high-contrast"] {
+  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  /* Surfaces — pure white, light recess */
+  --cream:        #FFFFFF;
+  --cream-deep:   #EDEDED;
+  --card:         #FFFFFF;
+
+  /* Ink — pure black, dark greys that still pass AA */
+  --ink:          #000000;
+  --ink-soft:     #2B2B2B;
+  --ink-faint:    #545454;
+
+  /* Accent — strong blue (AAA on white) */
+  --sage:         #0B5FD4;
+  --sage-press:   #084BAA;
+  --sage-deep:    #073E8C;
+  --sage-tint:    #D6E6FB;
+  --sage-tint-2:  #B4D2F7;
+
+  /* Reward — strong dark orange (AA on white) */
+  --apricot:      #B85000;
+  --apricot-press:#9A4300;
+  --apricot-deep: #7E3800;
+  --apricot-tint: #FBE3D0;
+
+  /* Semantic — fully saturated, high contrast */
+  --done:         #0A7D2C;
+  --done-tint:    #D4F0DC;
+  --gentle:       #8A6A00;
+  --gentle-tint:  #F5EBC2;
+  --softrose:     #C20A2E;
+  --softrose-tint:#FBD8DE;
+
+  /* Category dots — saturated, distinguishable */
+  --cat-sage:     #0B5FD4;
+  --cat-apricot:  #B85000;
+  --cat-blue:     #0A6CC2;
+  --cat-clay:     #A8431E;
+  --cat-gold:     #8A6A00;
+  --cat-mauve:    #7B2FA0;
+
+  /* Lines & edges — visible, never faint */
+  --line:         #6B6B6B;
+  --line-card:    #8F8F8F;
+  --line-strong:  #000000;
+
+  /* Elevation — solid black outlines so cards are clearly bounded */
+  --shadow-sm:  0 0 0 1.5px #000000;
+  --shadow-md:  0 0 0 2px   #000000;
+  --shadow-lg:  0 0 0 2.5px #000000, 0 8px 22px rgba(0,0,0,.25);
+  --shadow-pop: 0 0 0 3px   #000000, 0 16px 44px rgba(0,0,0,.4);
+  /* Focus — thick double ring (white halo + amber), unmissable */
+  --ring:       0 0 0 3px #FFFFFF, 0 0 0 6px #0B5FD4;
+  --ring-apr:   0 0 0 3px #FFFFFF, 0 0 0 6px #B85000;
+}
+
+/* ============================================================
+   CLOUD DANCER THEME — "облачный танец"
+   Airy, matte, off-white — soft greys, warm beige, sandstone
+   and clay. Built around Pantone-ish Cloud Dancer #F0EEE9.
+   Calm, papery, low-contrast-but-readable.
+   Opt in with <element data-theme="cloud">.
+   ============================================================ */
+[data-theme="cloud"] {
+  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  /* Surfaces — matte cream, sandstone recess */
+  --cream:        #F0EEE9;   /* Cloud Dancer */
+  --cream-deep:   #E5E1D8;   /* warm beige well */
+  --card:         #FAF8F3;   /* lifted matte cream */
+
+  /* Ink — warm taupe-brown, soft greys (never black) */
+  --ink:          #4A453D;
+  --ink-soft:     #948C7E;
+  --ink-faint:    #BEB7A9;
+
+  /* Accent — warm clay */
+  --sage:         #B08968;
+  --sage-press:   #9C785A;
+  --sage-deep:    #7C5E45;   /* accent text on cream */
+  --sage-tint:    #EAE2D7;
+  --sage-tint-2:  #DCD1C1;
+
+  /* Reward — soft sandstone-apricot */
+  --apricot:      #C8A07E;
+  --apricot-press:#B88E6B;
+  --apricot-deep: #8C6648;
+  --apricot-tint: #EFE5D8;
+
+  /* Soft semantic — muted earth */
+  --done:         #9CA88E;
+  --done-tint:    #E5E8DC;
+  --gentle:       #C9A86E;
+  --gentle-tint:  #EFE6D1;
+  --softrose:     #C49B95;
+  --softrose-tint:#EEE2DF;
+
+  /* Category dots — quiet earth tones */
+  --cat-sage:     #9CA88E;
+  --cat-apricot:  #C8A07E;
+  --cat-blue:     #93A0A5;
+  --cat-clay:     #B08968;
+  --cat-gold:     #C9A86E;
+  --cat-mauve:    #AE9BA4;
+
+  /* Lines & edges */
+  --line:         #E0DACE;
+  --line-card:    #E8E2D7;
+  --line-strong:  #CEC6B7;
+
+  /* Elevation — warm, papery, barely there */
+  --shadow-sm:  0 1px 2px rgba(74,69,61,.04), 0 1px 1px rgba(74,69,61,.03);
+  --shadow-md:  0 2px 6px rgba(74,69,61,.05), 0 4px 12px rgba(74,69,61,.04);
+  --shadow-lg:  0 6px 16px rgba(74,69,61,.06), 0 12px 32px rgba(74,69,61,.05);
+  --shadow-pop: 0 12px 40px rgba(74,69,61,.12);
+  --ring:       0 0 0 3px rgba(176,137,104,.32);
+  --ring-apr:   0 0 0 3px rgba(200,160,126,.34);
+}
+
+/* ============================================================
+   ECO THEME — "природа"
+   Natural palette: moss, ocean, terracotta, warm ochre and
+   copper over a soft botanical paper. Grounded and organic.
+   Opt in with <element data-theme="eco">.
+   ============================================================ */
+[data-theme="eco"] {
+  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  /* Surfaces — soft botanical paper */
+  --cream:        #F0F1E9;
+  --cream-deep:   #E3E6DA;
+  --card:         #FAFBF5;
+
+  /* Ink — deep forest moss */
+  --ink:          #2E3A2B;
+  --ink-soft:     #74806B;
+  --ink-faint:    #A6AE9A;
+
+  /* Accent — living moss green */
+  --sage:         #6B8A56;
+  --sage-press:   #5B7848;
+  --sage-deep:    #455E38;
+  --sage-tint:    #E2EAD7;
+  --sage-tint-2:  #CFDABF;
+
+  /* Reward — warm terracotta */
+  --apricot:      #C57043;
+  --apricot-press:#B05E33;
+  --apricot-deep: #8C4A28;
+  --apricot-tint: #F2E0D4;
+
+  /* Soft semantic — ocean, ochre, copper */
+  --done:         #4F8A6B;
+  --done-tint:    #DBEDE3;
+  --gentle:       #C99A3E;
+  --gentle-tint:  #F2E8CD;
+  --softrose:     #BC6A4A;
+  --softrose-tint:#F0DCD2;
+
+  /* Category dots — full nature spectrum */
+  --cat-sage:     #6B8A56;
+  --cat-apricot:  #C57043;
+  --cat-blue:     #3E7C8C;   /* ocean */
+  --cat-clay:     #B5703F;   /* copper */
+  --cat-gold:     #C99A3E;   /* ochre */
+  --cat-mauve:    #88A06E;   /* sage-leaf */
+
+  /* Lines & edges */
+  --line:         #DEE2D4;
+  --line-card:    #E6E9DD;
+  --line-strong:  #C7CDBA;
+
+  /* Elevation — soft green-tinted */
+  --shadow-sm:  0 1px 2px rgba(46,58,43,.05), 0 1px 1px rgba(46,58,43,.03);
+  --shadow-md:  0 2px 6px rgba(46,58,43,.06), 0 4px 12px rgba(46,58,43,.04);
+  --shadow-lg:  0 6px 16px rgba(46,58,43,.07), 0 12px 32px rgba(46,58,43,.06);
+  --shadow-pop: 0 12px 40px rgba(46,58,43,.14);
+  --ring:       0 0 0 3px rgba(107,138,86,.34);
+  --ring-apr:   0 0 0 3px rgba(197,112,67,.34);
+}
+
+/* ============================================================
+   SILENT THEME — "тихий режим"
+   Near-monochrome. For moments of overwhelm: colour is drained
+   almost to zero so nothing vibrates. Accent is a warm grey,
+   category dots blend into the background, reward is a barely-
+   there dusty tan. On-brand with AddyDo's anti-stimulation ethos.
+   Opt in with <element data-theme="silent">.
+   ============================================================ */
+[data-theme="silent"] {
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+
+  /* Surfaces — warm off-white, barely perceptible warmth */
+  --cream:        #F2F1EF;
+  --cream-deep:   #E8E7E3;
+  --card:         #F9F8F6;
+
+  /* Ink — warm soft graphite, never black */
+  --ink:          #3D3C3A;
+  --ink-soft:     #888480;
+  --ink-faint:    #BAB7B3;
+
+  /* Accent — quiet blue-grey, almost colourless */
+  --sage:         #8E9090;
+  --sage-press:   #7C7E7E;
+  --sage-deep:    #626464;
+  --sage-tint:    #EDECEB;
+  --sage-tint-2:  #E0DEDC;
+
+  /* Reward — dusty tan, barely warm */
+  --apricot:      #C4A78A;
+  --apricot-press:#B09476;
+  --apricot-deep: #8B7058;
+  --apricot-tint: #F0E9E1;
+
+  /* Soft semantic — all desaturated */
+  --done:         #8FA494;
+  --done-tint:    #E8EDE9;
+  --gentle:       #BBA880;
+  --gentle-tint:  #EDE6D5;
+  --softrose:     #C0A5A5;
+  --softrose-tint:#EDE5E5;
+
+  /* Category dots — muted grey tones, nothing vibrates */
+  --cat-sage:     #8A9090;
+  --cat-apricot:  #B8A28A;
+  --cat-blue:     #8A9AA5;
+  --cat-clay:     #A89A8A;
+  --cat-gold:     #B8B090;
+  --cat-mauve:    #A89AAA;
+
+  /* Lines & edges */
+  --line:         #E5E3DF;
+  --line-card:    #ECEAE7;
+  --line-strong:  #CCCAC5;
+
+  /* Elevation — barely there */
+  --shadow-sm:  0 1px 2px rgba(50,49,46,.04), 0 1px 1px rgba(50,49,46,.03);
+  --shadow-md:  0 2px 6px rgba(50,49,46,.05), 0 4px 12px rgba(50,49,46,.04);
+  --shadow-lg:  0 6px 16px rgba(50,49,46,.05), 0 12px 32px rgba(50,49,46,.04);
+  --shadow-pop: 0 12px 40px rgba(50,49,46,.10);
+  --ring:       0 0 0 3px rgba(142,144,144,.22);
+  --ring-apr:   0 0 0 3px rgba(196,167,138,.26);
+}
+
+/* ============================================================
+   AMBER THEME — "янтарь" (low-blue-light, evening)
+   Warm dark brown void, amber accent, rust reward. No blue.
+   Designed for wind-down: minimum blue-channel stimulation
+   so the app can be used right before sleep without disruption.
+   Opt in with <element data-theme="amber">.
+   ============================================================ */
+[data-theme="amber"] {
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+
+  /* Surfaces — very dark warm brown-black */
+  --cream:        #1C1610;
+  --cream-deep:   #140F0A;
+  --card:         #241C14;
+
+  /* Ink — warm cream-amber */
+  --ink:          #F0DEB8;
+  --ink-soft:     #9C8C6C;
+  --ink-faint:    #5C5040;
+
+  /* Accent — warm amber (no blue at all) */
+  --sage:         #C89018;
+  --sage-press:   #B07A10;
+  --sage-deep:    #E0A828;
+  --sage-tint:    #2A1E06;
+  --sage-tint-2:  #362808;
+
+  /* Reward — warm rust-copper */
+  --apricot:      #C85A28;
+  --apricot-press:#AA4A1E;
+  --apricot-deep: #E07A46;
+  --apricot-tint: #2A1408;
+
+  /* Soft semantic — warm, no cool tones */
+  --done:         #7A9A60;
+  --done-tint:    #1C2A12;
+  --gentle:       #C89018;
+  --gentle-tint:  #2A1E06;
+  --softrose:     #B84A40;
+  --softrose-tint:#2A1212;
+
+  /* Category dots — warm amber spectrum */
+  --cat-sage:     #C89018;
+  --cat-apricot:  #C85A28;
+  --cat-blue:     #7A9A60;   /* no blue — use warm green instead */
+  --cat-clay:     #A07848;
+  --cat-gold:     #D0B040;
+  --cat-mauve:    #A07870;
+
+  /* Lines & edges */
+  --line:         #2A2018;
+  --line-card:    #241C10;
+  --line-strong:  #3A2E1C;
+
+  /* Elevation — deep warm shadows */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,.40);
+  --shadow-md:  0 2px 8px rgba(0,0,0,.44), 0 1px 2px rgba(0,0,0,.36);
+  --shadow-lg:  0 8px 22px rgba(0,0,0,.50);
+  --shadow-pop: 0 16px 44px rgba(0,0,0,.60);
+  --ring:       0 0 0 3px rgba(200,144,24,.38);
+  --ring-apr:   0 0 0 3px rgba(200,90,40,.38);
+}
+
+/* ============================================================
+   AMOLED THEME — "чёрный экран"
+   True #000000 backgrounds for OLED/AMOLED displays — every
+   pure-black pixel is off, saving battery. Cards lift to
+   near-black so they're still distinguishable. Crisp clean
+   sage-teal accent, nothing extra.
+   Opt in with <element data-theme="amoled">.
+   ============================================================ */
+[data-theme="amoled"] {
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+
+  /* Surfaces — true black + near-black cards */
+  --cream:        #000000;
+  --cream-deep:   #000000;
+  --card:         #0C0C0C;
+
+  /* Ink — pure white, clean greys */
+  --ink:          #FFFFFF;
+  --ink-soft:     #999999;
+  --ink-faint:    #444444;
+
+  /* Accent — crisp bright sage-teal (pops on black) */
+  --sage:         #5AB4A0;
+  --sage-press:   #48A08C;
+  --sage-deep:    #7CC4B4;
+  --sage-tint:    #0A1E1A;
+  --sage-tint-2:  #0E2A24;
+
+  /* Reward — warm peach-orange */
+  --apricot:      #E09A64;
+  --apricot-press:#C88450;
+  --apricot-deep: #F0B07A;
+  --apricot-tint: #1E1008;
+
+  /* Soft semantic */
+  --done:         #5AB4A0;
+  --done-tint:    #0A1E1A;
+  --gentle:       #E0C050;
+  --gentle-tint:  #1E1A00;
+  --softrose:     #E07878;
+  --softrose-tint:#1E0808;
+
+  /* Category dots — clean, vivid on black */
+  --cat-sage:     #5AB4A0;
+  --cat-apricot:  #E09A64;
+  --cat-blue:     #60A0E0;
+  --cat-clay:     #C08060;
+  --cat-gold:     #E0C050;
+  --cat-mauve:    #A080D0;
+
+  /* Lines — ultra-subtle on true black */
+  --line:         #1A1A1A;
+  --line-card:    #141414;
+  --line-strong:  #2A2A2A;
+
+  /* Elevation — card borders (shadow on black = invisible) */
+  --shadow-sm:  0 0 0 1px #1A1A1A;
+  --shadow-md:  0 0 0 1px #222222, 0 2px 10px rgba(0,0,0,.95);
+  --shadow-lg:  0 0 0 1px #2A2A2A, 0 8px 24px rgba(0,0,0,1);
+  --shadow-pop: 0 0 0 1px #333333, 0 16px 48px rgba(0,0,0,1);
+  --ring:       0 0 0 3px rgba(90,180,160,.45);
+  --ring-apr:   0 0 0 3px rgba(224,154,100,.45);
+}
+
+/* ============================================================
+   SEMANTIC TYPE CLASSES
+   ============================================================ */
+.ad-display {
+  font-family: var(--font-display);
+  font-size: var(--fs-display); line-height: var(--lh-display);
+  font-weight: var(--w-x); letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+.ad-h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h1); line-height: var(--lh-h1);
+  font-weight: var(--w-x); letter-spacing: var(--tracking-tight); color: var(--ink);
+}
+.ad-h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2); line-height: var(--lh-h2);
+  font-weight: var(--w-bold); letter-spacing: var(--tracking-tight); color: var(--ink);
+}
+.ad-h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3); line-height: var(--lh-h3);
+  font-weight: var(--w-bold); color: var(--ink);
+}
+.ad-h4 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h4); line-height: var(--lh-h4);
+  font-weight: var(--w-bold); color: var(--ink);
+}
+.ad-body-lg {
+  font-family: var(--font-body);
+  font-size: var(--fs-body-lg); line-height: var(--lh-body-lg);
+  font-weight: var(--w-reg); color: var(--ink);
+}
+.ad-body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body); line-height: var(--lh-body);
+  font-weight: var(--w-reg); color: var(--ink);
+}
+.ad-sm {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm); line-height: var(--lh-sm);
+  font-weight: var(--w-reg); color: var(--ink-soft);
+}
+.ad-cap {
+  font-family: var(--font-body);
+  font-size: var(--fs-cap); line-height: var(--lh-cap);
+  font-weight: var(--w-semi); color: var(--ink-soft);
+}
+.ad-overline {
+  font-family: var(--font-body);
+  font-size: var(--fs-micro); line-height: var(--lh-micro);
+  font-weight: var(--w-bold); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--ink-soft);
+}
+.ad-num { font-variant-numeric: tabular-nums; font-family: var(--font-num); }
+
+/* Helpers */
+.ad-ink   { color: var(--ink); }
+.ad-soft  { color: var(--ink-soft); }
+.ad-sage  { color: var(--sage-deep); }
+.ad-apr   { color: var(--apricot-deep); }
