@@ -14,7 +14,7 @@ Todo-приложение для людей с СДВГ. Ключевые иде
 - `apps/web` — фронтенд: Vue 3 (`<script setup>`) + Vite + TypeScript. Позже: Pinia Colada
   (server-state), Pinia (UI-state), Tailwind, vue-i18n.
 - `apps/api` — бэкенд: TypeScript + Fastify. Позже: Prisma → PostgreSQL.
-- `packages/contract` — TypeSpec-контракт (источник правды API) + сгенерённые OpenAPI/типы. _(Phase 0)_
+- `packages/contract` — TypeSpec-контракт (источник правды API) → `openapi/openapi.yaml` (закоммичен). Кодеген-обвязка консьюмеров (ajv на api, openapi-fetch на web) — при сборке роутов/запросов.
 
 TypeScript сквозной, `strict: true` везде. `typecheck` входит в `verify`.
 
@@ -62,8 +62,9 @@ API меняется **только** через TypeSpec (`.tsp`) → regen Ope
 
 ## Текущее состояние
 
-Скаффолд (Hello World). Сделано: git flow (`main`/`develop`), pnpm-монорепо, Vue-страница,
-минимальный Fastify (`/health`, `/api/hello`), CLAUDE.md.
-**Отложено в Phase 0:** Prisma/Postgres/docker-compose, TypeSpec-контракт + кодеген, Tailwind +
-`tokens.css` + 11 тем, UI-компоненты, Pinia Colada, i18n, Vitest/Playwright, Stop-хук `verify`,
-analytics seam.
+Скаффолд + контракт. Сделано: git flow (`main`/`develop`), pnpm-монорепо, Vue-страница,
+минимальный Fastify (`/health`, `/api/hello`), CLAUDE.md, **TypeSpec-контракт** (`packages/contract`,
+Phase 0.4 surface: Task-дерево, DailyList/Entry, Frequent → `openapi/openapi.yaml`).
+**Отложено в Phase 0:** Prisma/Postgres/docker-compose, обвязка кодегена консьюмеров (ajv на api,
+openapi-fetch/openapi-typescript на web), Tailwind + `tokens.css` + 11 тем, UI-компоненты,
+Pinia Colada, i18n, Vitest/Playwright, Stop-хук `verify`, analytics seam.

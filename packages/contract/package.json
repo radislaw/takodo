@@ -1,0 +1,16 @@
+{
+  "name": "@tootoo/contract",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "main.tsp",
+  "scripts": {
+    "build": "tsp compile .",
+    "watch": "tsp compile . --watch"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "^1.12.0",
+    "@typespec/http": "^1.12.0",
+    "@typespec/openapi3": "^1.12.0"
+  }
+}
