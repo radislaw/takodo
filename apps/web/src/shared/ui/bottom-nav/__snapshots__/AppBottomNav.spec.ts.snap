@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AppBottomNav > matches snapshot 1`] = `
+"<nav aria-label="Основная навигация" class="flex justify-around surface-card border-t border-line pt-2.5 pb-4 rounded-b-3xl"><button type="button" aria-current="page" class="flex flex-col items-center gap-0.5 px-3 py-1 font-body text-[10px] font-bold border-none bg-transparent cursor-pointer text-sage-deep"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <!--v-if-->
+      <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8 M3 10a2 2 0 0 1 .71-1.53l7-6a2 2 0 0 1 2.58 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <!--v-if-->
+    </svg><span>Сегодня</span></button><button type="button" class="flex flex-col items-center gap-0.5 px-3 py-1 font-body text-[10px] font-bold border-none bg-transparent cursor-pointer text-ink-faint"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <!--v-if-->
+      <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12 M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path>
+      <!--v-if-->
+    </svg><span>Задачи</span></button><button type="button" class="flex flex-col items-center gap-0.5 px-3 py-1 font-body text-[10px] font-bold border-none bg-transparent cursor-pointer text-ink-faint"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <!--v-if-->
+      <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
+      <circle cx="12" cy="8" r="6"></circle>
+    </svg><span>Награды</span></button></nav>"
+`;

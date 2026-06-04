@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AppBadge > matches snapshot 1`] = `"<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full font-body text-xs font-bold bg-apricot-tint text-apricot-deep">7 дн.</span>"`;

@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AppButton > matches snapshot 1`] = `"<button type="button" class="inline-flex items-center justify-center gap-2 cursor-pointer border-none font-body font-bold outline-none focus-visible:shadow-ring disabled:opacity-40 disabled:cursor-not-allowed fill-accent text-white rounded-2xl px-5 shadow-[0_4px_14px_rgba(124,154,146,0.28)] text-sm py-3">OK</button>"`;

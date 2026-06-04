@@ -10,6 +10,10 @@ const routes: RouteRecordRaw[] = [
     path: '/design/tokens',
     component: () => import('@/pages/design-tokens').then((m) => m.DesignTokensPage),
   },
+  {
+    path: '/design/ui',
+    component: () => import('@/pages/design-ui').then((m) => m.DesignUiPage),
+  },
 ]
 
 export const router = createRouter({

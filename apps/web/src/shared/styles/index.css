@@ -70,3 +70,22 @@
 @utility fill-reward {
   background: var(--reward-fill);
 }
+
+/* ── Bridge extension: warm shadows, ring, press colors, font families ── */
+@theme inline {
+  /* Shadows: warm token values, NOT stock Tailwind neutrals */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-pop: var(--shadow-pop);
+  --shadow-ring: var(--ring);
+  --shadow-ring-apr: var(--ring-apr);
+
+  /* Press/hover states */
+  --color-sage-press: var(--sage-press);
+  --color-apricot-press: var(--apricot-press);
+
+  /* Font families */
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
