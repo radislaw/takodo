@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(
   defineProps<{
@@ -13,6 +14,8 @@ const props = withDefaults(
     label: undefined,
   },
 )
+
+const { t } = useI18n()
 
 const pct = computed(() => (props.total ? Math.round((props.done / props.total) * 100) : 0))
 const isReward = computed(() => props.reward || pct.value >= 100)
@@ -29,7 +32,7 @@ const conicGradient = computed(
     :aria-valuenow="done"
     aria-valuemin="0"
     :aria-valuemax="total"
-    :aria-label="label ?? `${done} из ${total}`"
+    :aria-label="label ?? t('progressRing.aria', { done, total })"
     class="flex h-[68px] w-[68px] flex-shrink-0 items-center justify-center rounded-full"
     :style="{ background: conicGradient }"
   >
@@ -40,7 +43,7 @@ const conicGradient = computed(
         {{ done }}/{{ total }}
       </span>
       <span class="text-ink-soft mt-px text-[8.5px] font-semibold">
-        <slot>сегодня</slot>
+        <slot>{{ t('progressRing.default') }}</slot>
       </span>
     </div>
   </div>

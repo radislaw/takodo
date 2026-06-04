@@ -3,6 +3,7 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 import eslintPluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
+import vueI18nPlugin from '@intlify/eslint-plugin-vue-i18n'
 
 export default tseslint.config(
   {
@@ -28,6 +29,20 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+  {
+    files: ['**/*.vue'],
+    plugins: {
+      '@intlify/vue-i18n': vueI18nPlugin,
+    },
+    settings: {
+      'vue-i18n': {
+        localeDir: './apps/web/src/locales/*.json',
+      },
+    },
+    rules: {
+      '@intlify/vue-i18n/no-raw-text': ['error', { ignorePattern: '^[%/]$' }],
     },
   },
   eslintConfigPrettier,

@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`AppProgressRing > matches snapshot 1`] = `
-"<div role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="6" aria-label="4 из 6" class="w-[68px] h-[68px] rounded-full flex-shrink-0 flex items-center justify-center" style="background: conic-gradient(var(--sage) 67%, var(--sage-tint-2) 67% 100%);">
-  <div class="w-[50px] h-[50px] rounded-full surface-card flex flex-col items-center justify-center"><span class="font-display font-extrabold text-sm text-ink leading-none">4/6</span><span class="text-[8.5px] text-ink-soft font-semibold mt-px">сегодня</span></div>
+"<div role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="6" aria-label="4 из 6" class="flex h-[68px] w-[68px] flex-shrink-0 items-center justify-center rounded-full" style="background: conic-gradient(var(--sage) 67%, var(--sage-tint-2) 67% 100%);">
+  <div class="surface-card flex h-[50px] w-[50px] flex-col items-center justify-center rounded-full"><span class="font-display text-ink text-sm leading-none font-extrabold">4/6</span><span class="text-ink-soft mt-px text-[8.5px] font-semibold">сегодня</span></div>
 </div>"
 `;

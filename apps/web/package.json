@@ -20,9 +20,11 @@
     "@fontsource/nunito": "^5.2.7",
     "@fontsource/nunito-sans": "^5.2.7",
     "vue": "^3.5.32",
+    "vue-i18n": "^11.4.4",
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
+    "@intlify/unplugin-vue-i18n": "^11.2.3",
     "@tailwindcss/vite": "^4.3.0",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.12.2",

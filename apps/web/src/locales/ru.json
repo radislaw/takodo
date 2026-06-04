@@ -1,0 +1,116 @@
+{
+  "app": {
+    "name": "TooToo"
+  },
+  "a11y": {
+    "mainNav": "Основная навигация"
+  },
+  "progressRing": {
+    "aria": "{done} из {total}",
+    "default": "сегодня"
+  },
+  "task": {
+    "count": "нет задач | {n} задача | {n} задачи | {n} задач"
+  },
+  "design": {
+    "tokens": {
+      "pageTitle": "Design Tokens",
+      "pangram": "Съешь же ещё этих мягких булок",
+      "pangramFull": "Съешь же ещё этих мягких французских булок",
+      "section": {
+        "surfaces": "Surfaces",
+        "fills": "Fills (accent & reward)",
+        "ink": "Ink (text)",
+        "sage": "Sage (primary accent)",
+        "apricot": "Apricot (reward)",
+        "semantic": "Semantic",
+        "categories": "Category dots",
+        "lines": "Lines & edges",
+        "shadows": "Shadows & rings",
+        "radii": "Radii",
+        "spacing": "Spacing (4px base)",
+        "typography": "Typography scale (.ad-*)"
+      },
+      "note": {
+        "surfaces": "Use <code>surface-app</code> / <code>surface-deep</code> / <code>surface-card</code> utilities (gradient-safe; cyberpunk uses radial/linear gradients here).",
+        "fills": "Use <code>fill-accent</code> / <code>fill-reward</code> utilities. May be gradients in some themes."
+      }
+    },
+    "ui": {
+      "header": {
+        "subtitle": "UI Kit — Phase 0.2"
+      },
+      "section": {
+        "buttons": "Кнопки",
+        "inputs": "Поля ввода",
+        "checkboxes": "Чекбоксы",
+        "chips": "Чипы и значки",
+        "progress": "Прогресс",
+        "icons": "Иконки + лого",
+        "toasts": "Уведомления",
+        "sheetNav": "Лист и навигация"
+      },
+      "btn": {
+        "done": "Готово",
+        "postpone": "Отложить",
+        "skip": "Пропустить",
+        "delete": "Удалить",
+        "start": "Начать",
+        "later": "Позже",
+        "remove": "Убрать",
+        "addTask": "Добавить задачу",
+        "notifications": "Уведомления",
+        "settings": "Настройки",
+        "theme": "Тема",
+        "addToList": "Добавить в список"
+      },
+      "input": {
+        "titleLabel": "Название дела",
+        "titlePlaceholder": "Налить себе воды",
+        "titleHint": "Опиши одним коротким шагом",
+        "filledLabel": "Заполненное",
+        "filledValue": "Позвонить маме вечером",
+        "errorLabel": "С ошибкой",
+        "errorMsg": "Название слишком длинное — сократи",
+        "errorValue": "текст задачи слишком длинный",
+        "noteLabel": "Заметка",
+        "notePlaceholder": "Контекст или напоминание...",
+        "sheetPlaceholder": "Например: налить себе воды"
+      },
+      "checkbox": {
+        "empty": "Пусто",
+        "done": "Готово",
+        "reward": "Награда",
+        "large": "Большой"
+      },
+      "cat": {
+        "home": "Дом",
+        "health": "Здоровье",
+        "work": "Работа",
+        "self": "Себе",
+        "sport": "Спорт"
+      },
+      "badge": {
+        "streak": "Серия 7 дн.",
+        "done": "Выполнено",
+        "gentle": "Скоро срок",
+        "softrose": "Перенесено"
+      },
+      "toast": {
+        "win": "Маленькая победа засчитана!",
+        "taskDone": "Задача выполнена",
+        "deadline": "Скоро срок задачи"
+      },
+      "nav": {
+        "today": "Сегодня",
+        "tasks": "Задачи",
+        "rewards": "Награды",
+        "me": "Я"
+      },
+      "sheet": {
+        "title": "Новое дело",
+        "subtitle": "Опиши одним коротким шагом"
+      }
+    }
+  }
+}

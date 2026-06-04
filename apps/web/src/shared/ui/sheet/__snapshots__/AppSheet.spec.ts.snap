@@ -2,9 +2,9 @@
 
 exports[`AppSheet > matches snapshot 1`] = `
 "<!-- dialog semantics (aria-modal, focus-trap) deferred until overlay behavior is added -->
-<div class="surface-card rounded-t-[22px] px-4 pt-3 pb-6 shadow-pop">
-  <div class="w-9 h-1 rounded-full bg-line-strong mx-auto mb-4" aria-hidden="true"></div>
-  <h2 class="font-display font-extrabold text-lg text-ink leading-tight">Тест</h2>
+<div class="surface-card shadow-pop rounded-t-[22px] px-4 pt-3 pb-6">
+  <div class="bg-line-strong mx-auto mb-4 h-1 w-9 rounded-full" aria-hidden="true"></div>
+  <h2 class="font-display text-ink text-lg leading-tight font-extrabold">Тест</h2>
   <!--v-if-->
 </div>"
 `;

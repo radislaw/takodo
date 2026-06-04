@@ -2,5 +2,6 @@ import '@/shared/styles/index.css'
 import { createApp } from 'vue'
 import App from './app/App.vue'
 import { router } from './app/router'
+import { i18n } from './app/i18n'
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(router).use(i18n).mount('#app')

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps<{
   name: string
   cssVar: string
@@ -23,7 +27,7 @@ defineProps<{
     />
     <div v-else-if="kind === 'spacing'" class="swatch-bar" :style="{ width: `var(${cssVar})` }" />
     <div v-else-if="kind === 'text'" class="swatch-text ad-body">
-      Съешь же ещё этих мягких французских булок
+      {{ t('design.tokens.pangramFull') }}
     </div>
     <div
       v-else

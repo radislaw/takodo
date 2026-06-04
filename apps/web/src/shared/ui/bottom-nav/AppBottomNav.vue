@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import AppIcon from '../icon/AppIcon.vue'
 import type { IconName } from '../icon/icons'
 
+const { t } = useI18n()
 const model = defineModel<string>({ required: true })
 
 defineProps<{
@@ -11,7 +13,7 @@ defineProps<{
 
 <template>
   <nav
-    aria-label="Основная навигация"
+    :aria-label="t('a11y.mainNav')"
     class="surface-card border-line flex justify-around rounded-b-3xl border-t pt-2.5 pb-4"
   >
     <button

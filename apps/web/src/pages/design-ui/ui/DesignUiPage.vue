@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   AppButton,
   AppInput,
@@ -14,6 +15,8 @@ import {
   AppSheet,
   AppBottomNav,
 } from '@/shared/ui'
+
+const { t } = useI18n()
 
 const themes = [
   { id: '', label: 'Sage' },
@@ -33,28 +36,28 @@ const themes = [
 const activeTheme = ref('')
 
 const inputVal = ref('')
-const inputFilled = ref('Позвонить маме вечером')
-const inputError = ref('текст задачи слишком длинный')
+const inputFilled = ref(t('design.ui.input.filledValue'))
+const inputError = ref(t('design.ui.input.errorValue'))
 const inputNote = ref('')
 
 const checked = ref([false, true, true, false])
 const activeChip = ref(1)
 const activeNav = ref('home')
 
-const cats = [
-  { label: 'Дом', color: 'var(--cat-sage)' },
-  { label: 'Здоровье', color: 'var(--cat-blue)' },
-  { label: 'Работа', color: 'var(--cat-apricot)' },
-  { label: 'Себе', color: 'var(--cat-mauve)' },
-  { label: 'Спорт', color: 'var(--cat-gold)' },
-]
+const cats = computed(() => [
+  { label: t('design.ui.cat.home'), color: 'var(--cat-sage)' },
+  { label: t('design.ui.cat.health'), color: 'var(--cat-blue)' },
+  { label: t('design.ui.cat.work'), color: 'var(--cat-apricot)' },
+  { label: t('design.ui.cat.self'), color: 'var(--cat-mauve)' },
+  { label: t('design.ui.cat.sport'), color: 'var(--cat-gold)' },
+])
 
-const navItems = [
-  { id: 'home', icon: 'home' as const, label: 'Сегодня' },
-  { id: 'tasks', icon: 'layers' as const, label: 'Задачи' },
-  { id: 'rewards', icon: 'award' as const, label: 'Награды' },
-  { id: 'me', icon: 'sun' as const, label: 'Я' },
-]
+const navItems = computed(() => [
+  { id: 'home', icon: 'home' as const, label: t('design.ui.nav.today') },
+  { id: 'tasks', icon: 'layers' as const, label: t('design.ui.nav.tasks') },
+  { id: 'rewards', icon: 'award' as const, label: t('design.ui.nav.rewards') },
+  { id: 'me', icon: 'sun' as const, label: t('design.ui.nav.me') },
+])
 
 const iconNames = [
   'check',
@@ -85,25 +88,27 @@ const iconNames = [
       <div class="flex items-center gap-3 px-5 py-3">
         <AppLogoMark :size="28" />
         <div>
-          <h1 class="font-display text-ink text-xl leading-tight font-extrabold">TooToo</h1>
-          <p class="text-ink-soft font-body text-xs">UI Kit — Phase 0.2</p>
+          <h1 class="font-display text-ink text-xl leading-tight font-extrabold">
+            {{ t('app.name') }}
+          </h1>
+          <p class="text-ink-soft font-body text-xs">{{ t('design.ui.header.subtitle') }}</p>
         </div>
       </div>
       <!-- Theme bar -->
       <div class="border-line flex scrollbar-none gap-2 overflow-x-auto border-t px-4 py-2">
         <button
-          v-for="t in themes"
-          :key="t.id"
-          :data-theme="t.id || undefined"
+          v-for="theme in themes"
+          :key="theme.id"
+          :data-theme="theme.id || undefined"
           class="font-body flex-shrink-0 cursor-pointer rounded-full border-[1.5px] px-3 py-1 text-xs font-semibold whitespace-nowrap transition-colors"
           :class="
-            activeTheme === t.id
+            activeTheme === theme.id
               ? 'bg-sage-tint text-sage-deep border-sage'
               : 'bg-cream-deep text-ink-soft border-transparent'
           "
-          @click="activeTheme = t.id"
+          @click="activeTheme = theme.id"
         >
-          {{ t.label }}
+          {{ theme.label }}
         </button>
       </div>
     </header>
@@ -115,36 +120,38 @@ const iconNames = [
         <h2
           class="text-ink-faint font-body border-line-card border-b pb-3 text-[10px] font-bold tracking-widest uppercase"
         >
-          Кнопки
+          {{ t('design.ui.section.buttons') }}
         </h2>
         <div class="flex flex-wrap items-center gap-2">
-          <AppButton variant="primary">Готово</AppButton>
-          <AppButton variant="secondary">Отложить</AppButton>
-          <AppButton variant="ghost">Пропустить</AppButton>
-          <AppButton variant="danger">Удалить</AppButton>
+          <AppButton variant="primary">{{ t('design.ui.btn.done') }}</AppButton>
+          <AppButton variant="secondary">{{ t('design.ui.btn.postpone') }}</AppButton>
+          <AppButton variant="ghost">{{ t('design.ui.btn.skip') }}</AppButton>
+          <AppButton variant="danger">{{ t('design.ui.btn.delete') }}</AppButton>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <AppButton variant="primary" size="sm">Начать</AppButton>
-          <AppButton variant="secondary" size="sm">Отложить</AppButton>
-          <AppButton variant="ghost" size="sm">Позже</AppButton>
-          <AppButton variant="danger" size="sm">Убрать</AppButton>
+          <AppButton variant="primary" size="sm">{{ t('design.ui.btn.start') }}</AppButton>
+          <AppButton variant="secondary" size="sm">{{ t('design.ui.btn.postpone') }}</AppButton>
+          <AppButton variant="ghost" size="sm">{{ t('design.ui.btn.later') }}</AppButton>
+          <AppButton variant="danger" size="sm">{{ t('design.ui.btn.remove') }}</AppButton>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <AppButton variant="primary" :disabled="true">Готово</AppButton>
-          <AppButton variant="secondary" :disabled="true">Отложить</AppButton>
-          <AppButton variant="danger" :disabled="true">Удалить</AppButton>
+          <AppButton variant="primary" :disabled="true">{{ t('design.ui.btn.done') }}</AppButton>
+          <AppButton variant="secondary" :disabled="true">{{
+            t('design.ui.btn.postpone')
+          }}</AppButton>
+          <AppButton variant="danger" :disabled="true">{{ t('design.ui.btn.delete') }}</AppButton>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <AppButton shape="fab" aria-label="Добавить задачу">
+          <AppButton shape="fab" :aria-label="t('design.ui.btn.addTask')">
             <AppIcon name="plus" :size="24" color="#fff" :stroke-width="2.4" />
           </AppButton>
-          <AppButton shape="icon" aria-label="Уведомления">
+          <AppButton shape="icon" :aria-label="t('design.ui.btn.notifications')">
             <AppIcon name="bell" :size="18" />
           </AppButton>
-          <AppButton shape="icon" aria-label="Настройки">
+          <AppButton shape="icon" :aria-label="t('design.ui.btn.settings')">
             <AppIcon name="settings" :size="18" />
           </AppButton>
-          <AppButton shape="icon-round" aria-label="Тема">
+          <AppButton shape="icon-round" :aria-label="t('design.ui.btn.theme')">
             <AppIcon name="moon" :size="18" />
           </AppButton>
         </div>
@@ -155,26 +162,26 @@ const iconNames = [
         <h2
           class="text-ink-faint font-body border-line-card border-b pb-3 text-[10px] font-bold tracking-widest uppercase"
         >
-          Поля ввода
+          {{ t('design.ui.section.inputs') }}
         </h2>
         <AppInput
           v-model="inputVal"
-          label="Название дела"
-          placeholder="Налить себе воды"
-          hint="Опиши одним коротким шагом"
+          :label="t('design.ui.input.titleLabel')"
+          :placeholder="t('design.ui.input.titlePlaceholder')"
+          :hint="t('design.ui.input.titleHint')"
         />
-        <AppInput v-model="inputFilled" label="Заполненное" />
+        <AppInput v-model="inputFilled" :label="t('design.ui.input.filledLabel')" />
         <AppInput
           v-model="inputError"
-          label="С ошибкой"
-          error="Название слишком длинное — сократи"
+          :label="t('design.ui.input.errorLabel')"
+          :error="t('design.ui.input.errorMsg')"
         />
         <AppInput
           v-model="inputNote"
-          label="Заметка"
+          :label="t('design.ui.input.noteLabel')"
           multiline
           :rows="3"
-          placeholder="Контекст или напоминание..."
+          :placeholder="t('design.ui.input.notePlaceholder')"
         />
       </section>
 
@@ -183,13 +190,17 @@ const iconNames = [
         <h2
           class="text-ink-faint font-body border-line-card border-b pb-3 text-[10px] font-bold tracking-widest uppercase"
         >
-          Чекбоксы
+          {{ t('design.ui.section.checkboxes') }}
         </h2>
         <div class="flex flex-wrap items-center gap-4">
-          <AppCheckbox v-model="checked[0]" label="Пусто" />
-          <AppCheckbox v-model="checked[1]" label="Готово" />
-          <AppCheckbox v-model="checked[2]" :reward="true" label="Награда" />
-          <AppCheckbox v-model="checked[3]" :size="38" label="Большой" />
+          <AppCheckbox v-model="checked[0]" :label="t('design.ui.checkbox.empty')" />
+          <AppCheckbox v-model="checked[1]" :label="t('design.ui.checkbox.done')" />
+          <AppCheckbox
+            v-model="checked[2]"
+            :reward="true"
+            :label="t('design.ui.checkbox.reward')"
+          />
+          <AppCheckbox v-model="checked[3]" :size="38" :label="t('design.ui.checkbox.large')" />
         </div>
       </section>
 
@@ -198,7 +209,7 @@ const iconNames = [
         <h2
           class="text-ink-faint font-body border-line-card border-b pb-3 text-[10px] font-bold tracking-widest uppercase"
         >
-          Чипы и значки
+          {{ t('design.ui.section.chips') }}
         </h2>
         <div class="flex flex-wrap gap-2">
           <AppChip
@@ -213,14 +224,14 @@ const iconNames = [
         <div class="flex flex-wrap items-center gap-2">
           <AppBadge variant="streak">
             <template #icon><AppIcon name="flame" :size="13" /></template>
-            Серия 7 дн.
+            {{ t('design.ui.badge.streak') }}
           </AppBadge>
           <AppBadge variant="done">
             <template #icon><AppIcon name="check" :size="12" /></template>
-            Выполнено
+            {{ t('design.ui.badge.done') }}
           </AppBadge>
-          <AppBadge variant="gentle">Скоро срок</AppBadge>
-          <AppBadge variant="softrose">Перенесено</AppBadge>
+          <AppBadge variant="gentle">{{ t('design.ui.badge.gentle') }}</AppBadge>
+          <AppBadge variant="softrose">{{ t('design.ui.badge.softrose') }}</AppBadge>
         </div>
       </section>
 
@@ -229,11 +240,11 @@ const iconNames = [
         <h2
           class="text-ink-faint font-body border-line-card border-b pb-3 text-[10px] font-bold tracking-widest uppercase"
         >
-          Прогресс
+          {{ t('design.ui.section.progress') }}
         </h2>
         <div class="flex flex-wrap items-end gap-4">
           <AppProgressRing
-            v-for="[d, t] in [
+            v-for="[d, total] in [
               [0, 6],
               [2, 6],
               [4, 6],
@@ -241,7 +252,7 @@ const iconNames = [
             ]"
             :key="d"
             :done="d"
-            :total="t"
+            :total="total"
           />
         </div>
         <div class="mt-2 flex flex-col gap-3">
@@ -258,7 +269,7 @@ const iconNames = [
         <h2
           class="text-ink-faint font-body border-line-card border-b pb-3 text-[10px] font-bold tracking-widest uppercase"
         >
-          Иконки + лого
+          {{ t('design.ui.section.icons') }}
         </h2>
         <div class="flex flex-wrap gap-2">
           <div
@@ -283,24 +294,24 @@ const iconNames = [
         <h2
           class="text-ink-faint font-body border-line-card border-b pb-3 text-[10px] font-bold tracking-widest uppercase"
         >
-          Уведомления
+          {{ t('design.ui.section.toasts') }}
         </h2>
         <div class="flex flex-col gap-3">
           <AppToast>
             <template #icon>
               <AppIcon name="sparkles" :size="16" color="var(--apricot)" />
             </template>
-            Маленькая победа засчитана!
+            {{ t('design.ui.toast.win') }}
           </AppToast>
           <AppToast variant="sage">
             <template #icon
               ><AppIcon name="check" :size="16" color="#fff" :stroke-width="2.5"
             /></template>
-            Задача выполнена
+            {{ t('design.ui.toast.taskDone') }}
           </AppToast>
           <AppToast variant="gentle">
             <template #icon><AppIcon name="bell" :size="15" /></template>
-            Скоро срок задачи
+            {{ t('design.ui.toast.deadline') }}
           </AppToast>
         </div>
       </section>
@@ -310,10 +321,14 @@ const iconNames = [
         <h2
           class="text-ink-faint font-body border-line-card border-b pb-3 text-[10px] font-bold tracking-widest uppercase"
         >
-          Лист и навигация
+          {{ t('design.ui.section.sheetNav') }}
         </h2>
-        <AppSheet title="Новое дело" subtitle="Опиши одним коротким шагом">
-          <AppInput v-model="inputVal" placeholder="Например: налить себе воды" class="mb-3" />
+        <AppSheet :title="t('design.ui.sheet.title')" :subtitle="t('design.ui.sheet.subtitle')">
+          <AppInput
+            v-model="inputVal"
+            :placeholder="t('design.ui.input.sheetPlaceholder')"
+            class="mb-3"
+          />
           <div class="mb-3 flex flex-wrap gap-2">
             <AppChip
               v-for="(cat, i) in cats.slice(0, 3)"
@@ -326,7 +341,7 @@ const iconNames = [
           </div>
           <AppButton variant="primary" class="w-full justify-center">
             <AppIcon name="plus" :size="17" color="#fff" />
-            Добавить в список
+            {{ t('design.ui.btn.addToList') }}
           </AppButton>
         </AppSheet>
         <AppBottomNav v-model="activeNav" :items="navItems" />

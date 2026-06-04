@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import TokenSwatch from './TokenSwatch.vue'
+
+const { t } = useI18n()
+
+const pangram = computed(() => t('design.tokens.pangram'))
 
 const themes = [
   { id: '', label: 'Sage' },
@@ -124,17 +129,17 @@ const typeClasses = [
 <template>
   <div class="page surface-app" :data-theme="activeTheme || undefined">
     <header class="page-header surface-card">
-      <h1 class="ad-h2">Design Tokens</h1>
+      <h1 class="ad-h2">{{ t('design.tokens.pageTitle') }}</h1>
       <div class="theme-switcher">
         <button
-          v-for="t in themes"
-          :key="t.id"
+          v-for="thm in themes"
+          :key="thm.id"
           class="theme-btn"
-          :class="{ active: activeTheme === t.id }"
-          :data-theme="t.id || undefined"
-          @click="activeTheme = t.id"
+          :class="{ active: activeTheme === thm.id }"
+          :data-theme="thm.id || undefined"
+          @click="activeTheme = thm.id"
         >
-          {{ t.label }}
+          {{ thm.label }}
         </button>
       </div>
     </header>
@@ -142,54 +147,49 @@ const typeClasses = [
     <main class="page-content">
       <!-- Surfaces -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Surfaces</h2>
-        <p class="ad-sm section-note">
-          Use <code>surface-app</code> / <code>surface-deep</code> /
-          <code>surface-card</code> utilities (gradient-safe; cyberpunk uses radial/linear gradients
-          here).
-        </p>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.surfaces') }}</h2>
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <p class="ad-sm section-note" v-html="t('design.tokens.note.surfaces')" />
         <div class="swatch-grid">
-          <div v-for="t in surfaces" :key="t.name" class="token-swatch">
+          <div v-for="tok in surfaces" :key="tok.name" class="token-swatch">
             <div
               class="swatch-box surface-preview"
-              :class="`surface-${t.name.replace('--cream', 'deep').replace('--card', 'card')}`"
+              :class="`surface-${tok.name.replace('--cream', 'deep').replace('--card', 'card')}`"
               :style="{
-                background: `var(${t.cssVar})`,
+                background: `var(${tok.cssVar})`,
                 border: '1px solid var(--line)',
               }"
             />
-            <code class="swatch-label">{{ t.name }}</code>
+            <code class="swatch-label">{{ tok.name }}</code>
           </div>
         </div>
       </section>
 
       <!-- Fills -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Fills (accent &amp; reward)</h2>
-        <p class="ad-sm section-note">
-          Use <code>fill-accent</code> / <code>fill-reward</code> utilities. May be gradients in
-          some themes.
-        </p>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.fills') }}</h2>
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <p class="ad-sm section-note" v-html="t('design.tokens.note.fills')" />
         <div class="swatch-grid">
-          <div v-for="t in fills" :key="t.name" class="token-swatch">
+          <div v-for="tok in fills" :key="tok.name" class="token-swatch">
             <div
               class="swatch-box"
-              :class="t.cssVar === '--accent-fill' ? 'fill-accent' : 'fill-reward'"
+              :class="tok.cssVar === '--accent-fill' ? 'fill-accent' : 'fill-reward'"
             />
-            <code class="swatch-label">{{ t.name }}</code>
+            <code class="swatch-label">{{ tok.name }}</code>
           </div>
         </div>
       </section>
 
       <!-- Ink -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Ink (text)</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.ink') }}</h2>
         <div class="swatch-grid">
           <TokenSwatch
-            v-for="t in ink"
-            :key="t.name"
-            :name="t.name"
-            :css-var="t.cssVar"
+            v-for="tok in ink"
+            :key="tok.name"
+            :name="tok.name"
+            :css-var="tok.cssVar"
             kind="color"
           />
         </div>
@@ -197,13 +197,13 @@ const typeClasses = [
 
       <!-- Sage accent -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Sage (primary accent)</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.sage') }}</h2>
         <div class="swatch-grid">
           <TokenSwatch
-            v-for="t in sage"
-            :key="t.name"
-            :name="t.name"
-            :css-var="t.cssVar"
+            v-for="tok in sage"
+            :key="tok.name"
+            :name="tok.name"
+            :css-var="tok.cssVar"
             kind="color"
           />
         </div>
@@ -211,13 +211,13 @@ const typeClasses = [
 
       <!-- Apricot reward -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Apricot (reward)</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.apricot') }}</h2>
         <div class="swatch-grid">
           <TokenSwatch
-            v-for="t in apricot"
-            :key="t.name"
-            :name="t.name"
-            :css-var="t.cssVar"
+            v-for="tok in apricot"
+            :key="tok.name"
+            :name="tok.name"
+            :css-var="tok.cssVar"
             kind="color"
           />
         </div>
@@ -225,13 +225,13 @@ const typeClasses = [
 
       <!-- Semantic -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Semantic</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.semantic') }}</h2>
         <div class="swatch-grid">
           <TokenSwatch
-            v-for="t in semantic"
-            :key="t.name"
-            :name="t.name"
-            :css-var="t.cssVar"
+            v-for="tok in semantic"
+            :key="tok.name"
+            :name="tok.name"
+            :css-var="tok.cssVar"
             kind="color"
           />
         </div>
@@ -239,13 +239,13 @@ const typeClasses = [
 
       <!-- Category dots -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Category dots</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.categories') }}</h2>
         <div class="swatch-grid">
           <TokenSwatch
-            v-for="t in categories"
-            :key="t.name"
-            :name="t.name"
-            :css-var="t.cssVar"
+            v-for="tok in categories"
+            :key="tok.name"
+            :name="tok.name"
+            :css-var="tok.cssVar"
             kind="color"
           />
         </div>
@@ -253,13 +253,13 @@ const typeClasses = [
 
       <!-- Lines -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Lines &amp; edges</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.lines') }}</h2>
         <div class="swatch-grid">
           <TokenSwatch
-            v-for="t in lines"
-            :key="t.name"
-            :name="t.name"
-            :css-var="t.cssVar"
+            v-for="tok in lines"
+            :key="tok.name"
+            :name="tok.name"
+            :css-var="tok.cssVar"
             kind="color"
           />
         </div>
@@ -267,13 +267,13 @@ const typeClasses = [
 
       <!-- Shadows -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Shadows &amp; rings</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.shadows') }}</h2>
         <div class="swatch-grid">
           <TokenSwatch
-            v-for="t in shadows"
-            :key="t.name"
-            :name="t.name"
-            :css-var="t.cssVar"
+            v-for="tok in shadows"
+            :key="tok.name"
+            :name="tok.name"
+            :css-var="tok.cssVar"
             kind="shadow"
           />
         </div>
@@ -281,13 +281,13 @@ const typeClasses = [
 
       <!-- Radii -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Radii</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.radii') }}</h2>
         <div class="swatch-grid">
           <TokenSwatch
-            v-for="t in radii"
-            :key="t.name"
-            :name="t.name"
-            :css-var="t.cssVar"
+            v-for="tok in radii"
+            :key="tok.name"
+            :name="tok.name"
+            :css-var="tok.cssVar"
             kind="radius"
           />
         </div>
@@ -295,22 +295,22 @@ const typeClasses = [
 
       <!-- Spacing -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Spacing (4px base)</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.spacing') }}</h2>
         <div class="spacing-list">
-          <div v-for="t in spacing" :key="t.name" class="spacing-row">
-            <div class="spacing-bar" :style="{ width: `var(${t.cssVar})` }" />
-            <code class="swatch-label">{{ t.name }}</code>
+          <div v-for="tok in spacing" :key="tok.name" class="spacing-row">
+            <div class="spacing-bar" :style="{ width: `var(${tok.cssVar})` }" />
+            <code class="swatch-label">{{ tok.name }}</code>
           </div>
         </div>
       </section>
 
       <!-- Typography -->
       <section class="token-section">
-        <h2 class="ad-h4 section-title">Typography scale (.ad-*)</h2>
+        <h2 class="ad-h4 section-title">{{ t('design.tokens.section.typography') }}</h2>
         <div class="type-list">
-          <div v-for="t in typeClasses" :key="t.name" class="type-row">
-            <code class="type-label">{{ t.name }}</code>
-            <span :class="t.cls">Съешь же ещё этих мягких булок</span>
+          <div v-for="tok in typeClasses" :key="tok.name" class="type-row">
+            <code class="type-label">{{ tok.name }}</code>
+            <span :class="tok.cls">{{ pangram }}</span>
           </div>
         </div>
       </section>

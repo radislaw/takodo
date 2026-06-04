@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`AppChip > matches snapshot 1`] = `
-"<button type="button" aria-pressed="false" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full font-body text-sm font-semibold cursor-pointer border-[1.5px] transition-colors bg-cream-deep text-ink-soft border-line">
+"<button type="button" aria-pressed="false" class="font-body inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-3 py-2 text-sm font-semibold transition-colors bg-cream-deep text-ink-soft border-line">
   <!--v-if-->Дом
 </button>"
 `;
