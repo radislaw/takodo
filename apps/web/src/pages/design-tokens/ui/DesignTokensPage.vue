@@ -1,5 +1,23 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import TokenSwatch from './TokenSwatch.vue'
+
+const themes = [
+  { id: '', label: 'Sage' },
+  { id: 'dark', label: 'Dark' },
+  { id: 'lavender', label: 'Lavender' },
+  { id: 'lavender-dark', label: 'Lavender Dark' },
+  { id: 'cyberpunk', label: 'Cyberpunk' },
+  { id: 'high-contrast', label: 'High Contrast' },
+  { id: 'cloud', label: 'Cloud' },
+  { id: 'ocean', label: 'Ocean' },
+  { id: 'eco', label: 'Eco' },
+  { id: 'silent', label: 'Silent' },
+  { id: 'amber', label: 'Amber' },
+  { id: 'amoled', label: 'AMOLED' },
+]
+
+const activeTheme = ref('')
 
 const surfaces = [
   { name: '--cream', cssVar: '--cream' },
@@ -104,13 +122,21 @@ const typeClasses = [
 </script>
 
 <template>
-  <div class="page surface-app">
+  <div class="page surface-app" :data-theme="activeTheme || undefined">
     <header class="page-header surface-card">
       <h1 class="ad-h2">Design Tokens</h1>
-      <p class="ad-sm">
-        Switch theme:
-        <code>document.documentElement.dataset.theme = 'dark'</code>
-      </p>
+      <div class="theme-switcher">
+        <button
+          v-for="t in themes"
+          :key="t.id"
+          class="theme-btn"
+          :class="{ active: activeTheme === t.id }"
+          :data-theme="t.id || undefined"
+          @click="activeTheme = t.id"
+        >
+          {{ t.label }}
+        </button>
+      </div>
     </header>
 
     <main class="page-content">
@@ -306,9 +332,42 @@ const typeClasses = [
   border-bottom: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--s-6);
   flex-wrap: wrap;
+}
+
+.theme-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.theme-btn {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: var(--w-med);
+  color: var(--ink-soft);
+  background: var(--cream-deep);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 4px var(--s-3);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.theme-btn:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.theme-btn.active {
+  color: var(--sage-deep);
+  background: var(--sage-tint);
+  border-color: var(--sage-tint-2);
 }
 
 .page-content {
