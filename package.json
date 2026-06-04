@@ -18,7 +18,9 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "verify": "pnpm contract:build && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged",
