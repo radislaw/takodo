@@ -14,6 +14,7 @@ export default tseslint.config(
       '**/node_modules',
       'apps/web/src/assets',
       '.remember',
+      'apps/api/prisma/migrations',
     ],
   },
   {
