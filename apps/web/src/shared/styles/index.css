@@ -1,16 +1,16 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Self-hosted fonts — families match the token vars */
-@import "@fontsource/nunito/400.css";
-@import "@fontsource/nunito/500.css";
-@import "@fontsource/nunito/600.css";
-@import "@fontsource/nunito/700.css";
-@import "@fontsource/nunito/800.css";
-@import "@fontsource/nunito-sans/400.css";
-@import "@fontsource/nunito-sans/600.css";
-@import "@fontsource/nunito-sans/700.css";
+@import '@fontsource/nunito/400.css';
+@import '@fontsource/nunito/500.css';
+@import '@fontsource/nunito/600.css';
+@import '@fontsource/nunito/700.css';
+@import '@fontsource/nunito/800.css';
+@import '@fontsource/nunito-sans/400.css';
+@import '@fontsource/nunito-sans/600.css';
+@import '@fontsource/nunito-sans/700.css';
 
-@import "./tokens.css";
+@import './tokens.css';
 
 /*
   Tailwind v4 bridge: emit var(--token) so utilities reflect active [data-theme].
@@ -18,36 +18,36 @@
   below because cyberpunk sets them to gradients, and background-color rejects gradients.
 */
 @theme inline {
-  --color-ink:          var(--ink);
-  --color-ink-soft:     var(--ink-soft);
-  --color-ink-faint:    var(--ink-faint);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
 
-  --color-sage:         var(--sage);
-  --color-sage-deep:    var(--sage-deep);
-  --color-sage-tint:    var(--sage-tint);
-  --color-sage-tint-2:  var(--sage-tint-2);
+  --color-sage: var(--sage);
+  --color-sage-deep: var(--sage-deep);
+  --color-sage-tint: var(--sage-tint);
+  --color-sage-tint-2: var(--sage-tint-2);
 
-  --color-apricot:      var(--apricot);
+  --color-apricot: var(--apricot);
   --color-apricot-deep: var(--apricot-deep);
   --color-apricot-tint: var(--apricot-tint);
 
-  --color-done:         var(--done);
-  --color-done-tint:    var(--done-tint);
-  --color-gentle:       var(--gentle);
-  --color-gentle-tint:  var(--gentle-tint);
-  --color-softrose:     var(--softrose);
-  --color-softrose-tint:var(--softrose-tint);
+  --color-done: var(--done);
+  --color-done-tint: var(--done-tint);
+  --color-gentle: var(--gentle);
+  --color-gentle-tint: var(--gentle-tint);
+  --color-softrose: var(--softrose);
+  --color-softrose-tint: var(--softrose-tint);
 
-  --color-line:         var(--line);
-  --color-line-card:    var(--line-card);
-  --color-line-strong:  var(--line-strong);
+  --color-line: var(--line);
+  --color-line-card: var(--line-card);
+  --color-line-strong: var(--line-strong);
 
-  --color-cat-sage:     var(--cat-sage);
-  --color-cat-apricot:  var(--cat-apricot);
-  --color-cat-blue:     var(--cat-blue);
-  --color-cat-clay:     var(--cat-clay);
-  --color-cat-gold:     var(--cat-gold);
-  --color-cat-mauve:    var(--cat-mauve);
+  --color-cat-sage: var(--cat-sage);
+  --color-cat-apricot: var(--cat-apricot);
+  --color-cat-blue: var(--cat-blue);
+  --color-cat-clay: var(--cat-clay);
+  --color-cat-gold: var(--cat-gold);
+  --color-cat-mauve: var(--cat-mauve);
 }
 
 /*
@@ -55,8 +55,18 @@
   This handles cyberpunk where --cream, --card, --accent-fill, --reward-fill
   are gradients (radial-gradient / linear-gradient).
 */
-@utility surface-app  { background: var(--cream); }
-@utility surface-deep { background: var(--cream-deep); }
-@utility surface-card { background: var(--card); }
-@utility fill-accent  { background: var(--accent-fill); }
-@utility fill-reward  { background: var(--reward-fill); }
+@utility surface-app {
+  background: var(--cream);
+}
+@utility surface-deep {
+  background: var(--cream-deep);
+}
+@utility surface-card {
+  background: var(--card);
+}
+@utility fill-accent {
+  background: var(--accent-fill);
+}
+@utility fill-reward {
+  background: var(--reward-fill);
+}

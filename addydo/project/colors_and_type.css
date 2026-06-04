@@ -11,27 +11,27 @@
 :root {
   /* ---------- BASE PALETTE ---------------------------------- */
   /* Surfaces */
-  --cream:        #F5F3F0;   /* app background — warm off-white */
-  --cream-deep:   #EDEAE5;   /* recessed wells, pressed bg      */
-  --card:         #FFFFFF;   /* cards & sheets                  */
+  --cream: #f5f3f0; /* app background — warm off-white */
+  --cream-deep: #edeae5; /* recessed wells, pressed bg      */
+  --card: #ffffff; /* cards & sheets                  */
 
   /* Ink (text) */
-  --ink:          #2C3A33;   /* primary text — deep pine        */
-  --ink-soft:     #8A9A8F;   /* secondary / muted sage-grey     */
-  --ink-faint:    #B4BEB8;   /* placeholders, disabled          */
+  --ink: #2c3a33; /* primary text — deep pine        */
+  --ink-soft: #8a9a8f; /* secondary / muted sage-grey     */
+  --ink-faint: #b4beb8; /* placeholders, disabled          */
 
   /* Accent — sage (primary brand) */
-  --sage:         #7C9A92;   /* primary accent                  */
-  --sage-press:   #6A8780;   /* hover/pressed accent            */
-  --sage-deep:    #5A746D;   /* accent text on light            */
-  --sage-tint:    #E8EFEC;   /* selected bg, sage wash          */
-  --sage-tint-2:  #D6E3DE;   /* stronger wash, progress track   */
+  --sage: #7c9a92; /* primary accent                  */
+  --sage-press: #6a8780; /* hover/pressed accent            */
+  --sage-deep: #5a746d; /* accent text on light            */
+  --sage-tint: #e8efec; /* selected bg, sage wash          */
+  --sage-tint-2: #d6e3de; /* stronger wash, progress track   */
 
   /* Reward — apricot (celebration / streaks / done) */
-  --apricot:      #E0A87E;   /* reward accent                   */
-  --apricot-press:#D2956A;   /* pressed reward                  */
-  --apricot-deep: #B97C53;   /* reward text on light            */
-  --apricot-tint: #F7E9DC;   /* reward wash, badge bg           */
+  --apricot: #e0a87e; /* reward accent                   */
+  --apricot-press: #d2956a; /* pressed reward                  */
+  --apricot-deep: #b97c53; /* reward text on light            */
+  --apricot-tint: #f7e9dc; /* reward wash, badge bg           */
 
   /* Solid/gradient FILL tokens — used for filled buttons, FAB,
      checkbox, etc. Default to the flat accent/reward; a theme may
@@ -40,69 +40,91 @@
   --reward-fill: var(--apricot);
 
   /* Soft semantic — kept low-saturation to stay calm */
-  --done:         #84A98C;   /* completed / positive            */
-  --done-tint:    #E6EFE7;
-  --gentle:       #D9B36A;   /* soft "heads up" (never alarming)*/
-  --gentle-tint:  #F4EBD6;
-  --softrose:     #C99A9A;   /* overdue, handled tenderly       */
-  --softrose-tint:#F2E4E2;
+  --done: #84a98c; /* completed / positive            */
+  --done-tint: #e6efe7;
+  --gentle: #d9b36a; /* soft "heads up" (never alarming)*/
+  --gentle-tint: #f4ebd6;
+  --softrose: #c99a9a; /* overdue, handled tenderly       */
+  --softrose-tint: #f2e4e2;
 
   /* Category dots — muted, harmonious, never loud */
-  --cat-sage:     #7C9A92;
-  --cat-apricot:  #E0A87E;
-  --cat-blue:     #93A8B5;
-  --cat-clay:     #C49A8A;
-  --cat-gold:     #D4B483;
-  --cat-mauve:    #B59CB0;
+  --cat-sage: #7c9a92;
+  --cat-apricot: #e0a87e;
+  --cat-blue: #93a8b5;
+  --cat-clay: #c49a8a;
+  --cat-gold: #d4b483;
+  --cat-mauve: #b59cb0;
 
   /* Lines & edges */
-  --line:         #E7E3DE;   /* hairline borders on cream       */
-  --line-card:    #EFECE7;   /* divider inside cards            */
-  --line-strong:  #D8D2CA;
+  --line: #e7e3de; /* hairline borders on cream       */
+  --line-card: #efece7; /* divider inside cards            */
+  --line-strong: #d8d2ca;
 
   /* ---------- ELEVATION (soft, warm-tinted, barely there) --- */
-  --shadow-sm:  0 1px 2px rgba(44,58,51,.05), 0 1px 1px rgba(44,58,51,.03);
-  --shadow-md:  0 2px 6px rgba(44,58,51,.05), 0 4px 12px rgba(44,58,51,.04);
-  --shadow-lg:  0 6px 16px rgba(44,58,51,.06), 0 12px 32px rgba(44,58,51,.06);
-  --shadow-pop: 0 12px 40px rgba(44,58,51,.12);
+  --shadow-sm: 0 1px 2px rgba(44, 58, 51, 0.05), 0 1px 1px rgba(44, 58, 51, 0.03);
+  --shadow-md: 0 2px 6px rgba(44, 58, 51, 0.05), 0 4px 12px rgba(44, 58, 51, 0.04);
+  --shadow-lg: 0 6px 16px rgba(44, 58, 51, 0.06), 0 12px 32px rgba(44, 58, 51, 0.06);
+  --shadow-pop: 0 12px 40px rgba(44, 58, 51, 0.12);
   /* focus ring — sage, generous, calm */
-  --ring:       0 0 0 3px rgba(124,154,146,.30);
-  --ring-apr:   0 0 0 3px rgba(224,168,126,.32);
+  --ring: 0 0 0 3px rgba(124, 154, 146, 0.3);
+  --ring-apr: 0 0 0 3px rgba(224, 168, 126, 0.32);
 
   /* ---------- RADII (generous, rounded, friendly) ----------- */
   --r-xs: 8px;
   --r-sm: 12px;
   --r-md: 16px;
-  --r-lg: 20px;     /* default card radius */
-  --r-xl: 28px;     /* sheets, large cards */
+  --r-lg: 20px; /* default card radius */
+  --r-xl: 28px; /* sheets, large cards */
   --r-pill: 999px;
 
   /* ---------- SPACING (4px base) ---------------------------- */
-  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;  --s-4: 16px;
-  --s-5: 20px;  --s-6: 24px;  --s-7: 32px;  --s-8: 40px;
-  --s-9: 48px;  --s-10: 64px; --s-12: 80px;
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 40px;
+  --s-9: 48px;
+  --s-10: 64px;
+  --s-12: 80px;
 
   /* ---------- TYPE FAMILIES --------------------------------- */
-  --font-display: 'Nunito', ui-rounded, 'Segoe UI', sans-serif;       /* warm, rounded headings */
-  --font-body:    'Nunito Sans', ui-sans-serif, 'Segoe UI', sans-serif;/* clean, calm body/UI    */
-  --font-num:     'Nunito Sans', ui-sans-serif, sans-serif;           /* tabular numerals       */
+  --font-display: 'Nunito', ui-rounded, 'Segoe UI', sans-serif; /* warm, rounded headings */
+  --font-body: 'Nunito Sans', ui-sans-serif, 'Segoe UI', sans-serif; /* clean, calm body/UI    */
+  --font-num: 'Nunito Sans', ui-sans-serif, sans-serif; /* tabular numerals       */
 
   /* ---------- TYPE SCALE (px / line-height / weight) -------- */
   /* Display & headings use Nunito (display); set in semantic block */
-  --fs-display: 40px;   --lh-display: 1.12;
-  --fs-h1:      32px;   --lh-h1:      1.18;
-  --fs-h2:      26px;   --lh-h2:      1.22;
-  --fs-h3:      21px;   --lh-h3:      1.3;
-  --fs-h4:      18px;   --lh-h4:      1.35;
-  --fs-body-lg: 18px;   --lh-body-lg: 1.55;
-  --fs-body:    16px;   --lh-body:    1.55;
-  --fs-sm:      14px;   --lh-sm:      1.5;
-  --fs-cap:     13px;   --lh-cap:     1.4;
-  --fs-micro:   11px;   --lh-micro:   1.3;
+  --fs-display: 40px;
+  --lh-display: 1.12;
+  --fs-h1: 32px;
+  --lh-h1: 1.18;
+  --fs-h2: 26px;
+  --lh-h2: 1.22;
+  --fs-h3: 21px;
+  --lh-h3: 1.3;
+  --fs-h4: 18px;
+  --lh-h4: 1.35;
+  --fs-body-lg: 18px;
+  --lh-body-lg: 1.55;
+  --fs-body: 16px;
+  --lh-body: 1.55;
+  --fs-sm: 14px;
+  --lh-sm: 1.5;
+  --fs-cap: 13px;
+  --lh-cap: 1.4;
+  --fs-micro: 11px;
+  --lh-micro: 1.3;
 
-  --w-reg: 400; --w-med: 500; --w-semi: 600; --w-bold: 700; --w-x: 800;
+  --w-reg: 400;
+  --w-med: 500;
+  --w-semi: 600;
+  --w-bold: 700;
+  --w-x: 800;
   --tracking-tight: -0.01em;
-  --tracking-caps:  0.06em;
+  --tracking-caps: 0.06em;
 }
 
 /* ============================================================
@@ -110,55 +132,55 @@
    Warm dark pine, never pure black. Opt in with
    <element data-theme="dark"> (cascades to all descendants).
    ============================================================ */
-[data-theme="dark"] {
+[data-theme='dark'] {
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
   /* Surfaces — warm dark green-charcoal */
-  --cream:        #1A211D;   /* app background */
-  --cream-deep:   #131915;   /* recessed wells, pressed bg */
-  --card:         #242E29;   /* cards & sheets */
+  --cream: #1a211d; /* app background */
+  --cream-deep: #131915; /* recessed wells, pressed bg */
+  --card: #242e29; /* cards & sheets */
 
   /* Ink — warm off-white, calm greys */
-  --ink:          #ECEEE9;
-  --ink-soft:     #9CAAA0;
-  --ink-faint:    #66726B;
+  --ink: #eceee9;
+  --ink-soft: #9caaa0;
+  --ink-faint: #66726b;
 
   /* Accent — sage, lifted for contrast on dark */
-  --sage:         #8FAEA5;
-  --sage-press:   #7E9C93;
-  --sage-deep:    #AAC4BB;   /* links / accent text on dark */
-  --sage-tint:    #283430;   /* selected bg, sage wash */
-  --sage-tint-2:  #33433C;   /* stronger wash, progress track */
+  --sage: #8faea5;
+  --sage-press: #7e9c93;
+  --sage-deep: #aac4bb; /* links / accent text on dark */
+  --sage-tint: #283430; /* selected bg, sage wash */
+  --sage-tint-2: #33433c; /* stronger wash, progress track */
 
   /* Reward — apricot, lifted */
-  --apricot:      #E6B088;
-  --apricot-press:#D89E72;
-  --apricot-deep: #ECBE9A;   /* reward text on dark */
-  --apricot-tint: #3A2F25;   /* reward wash, badge bg */
+  --apricot: #e6b088;
+  --apricot-press: #d89e72;
+  --apricot-deep: #ecbe9a; /* reward text on dark */
+  --apricot-tint: #3a2f25; /* reward wash, badge bg */
 
   /* Soft semantic — dark washes */
-  --done:         #8FB596;
-  --done-tint:    #243029;
-  --gentle:       #DBB872;
-  --gentle-tint:  #342D1E;
-  --softrose:     #CFA1A1;
-  --softrose-tint:#352727;
+  --done: #8fb596;
+  --done-tint: #243029;
+  --gentle: #dbb872;
+  --gentle-tint: #342d1e;
+  --softrose: #cfa1a1;
+  --softrose-tint: #352727;
 
   /* Category dots — unchanged (read well on dark) */
 
   /* Lines & edges */
-  --line:         #313B35;
-  --line-card:    #2D3832;
-  --line-strong:  #415048;
+  --line: #313b35;
+  --line-card: #2d3832;
+  --line-strong: #415048;
 
   /* Elevation — deeper, since warm-tint shadows vanish on dark */
-  --shadow-sm:  0 1px 2px rgba(0,0,0,.30);
-  --shadow-md:  0 2px 8px rgba(0,0,0,.32), 0 1px 2px rgba(0,0,0,.24);
-  --shadow-lg:  0 8px 22px rgba(0,0,0,.40);
-  --shadow-pop: 0 16px 44px rgba(0,0,0,.50);
-  --ring:       0 0 0 3px rgba(143,174,165,.40);
-  --ring-apr:   0 0 0 3px rgba(230,176,136,.40);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.32), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-lg: 0 8px 22px rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 16px 44px rgba(0, 0, 0, 0.5);
+  --ring: 0 0 0 3px rgba(143, 174, 165, 0.4);
+  --ring-apr: 0 0 0 3px rgba(230, 176, 136, 0.4);
 }
 
 /* ============================================================
@@ -169,55 +191,55 @@
    <element data-theme="lavender"> (cascades to descendants).
    Stays true to the low-stimulation ethos — nothing vibrates.
    ============================================================ */
-[data-theme="lavender"] {
+[data-theme='lavender'] {
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
   /* Surfaces — soft lavender-tinted off-white */
-  --cream:        #F4F1F8;   /* app background */
-  --cream-deep:   #ECE7F2;   /* recessed wells, pressed bg */
-  --card:         #FFFFFF;   /* cards & sheets */
+  --cream: #f4f1f8; /* app background */
+  --cream-deep: #ece7f2; /* recessed wells, pressed bg */
+  --card: #ffffff; /* cards & sheets */
 
   /* Ink — deep muted plum, calm lavender-greys */
-  --ink:          #353048;
-  --ink-soft:     #8C86A2;
-  --ink-faint:    #BBB6CB;
+  --ink: #353048;
+  --ink-soft: #8c86a2;
+  --ink-faint: #bbb6cb;
 
   /* Accent — lavender (everyday primary) */
-  --sage:         #8E84B8;
-  --sage-press:   #7C71A7;
-  --sage-deep:    #685D92;   /* accent text on light */
-  --sage-tint:    #ECE8F5;   /* selected bg, lavender wash */
-  --sage-tint-2:  #DBD4EC;   /* stronger wash, progress track */
+  --sage: #8e84b8;
+  --sage-press: #7c71a7;
+  --sage-deep: #685d92; /* accent text on light */
+  --sage-tint: #ece8f5; /* selected bg, lavender wash */
+  --sage-tint-2: #dbd4ec; /* stronger wash, progress track */
 
   /* Reward — apricot, warm complement to lavender (unchanged warmth) */
-  --apricot:      #E0A87E;
-  --apricot-press:#D2956A;
-  --apricot-deep: #B97C53;
-  --apricot-tint: #F7E7DA;
+  --apricot: #e0a87e;
+  --apricot-press: #d2956a;
+  --apricot-deep: #b97c53;
+  --apricot-tint: #f7e7da;
 
   /* Soft semantic — kept low-saturation, harmonised to lavender */
-  --done:         #84A98C;
-  --done-tint:    #E6EFE7;
-  --gentle:       #D4B07A;
-  --gentle-tint:  #F3ECD9;
-  --softrose:     #C99AB4;   /* overdue — tender mauve-rose */
-  --softrose-tint:#F1E4EE;
+  --done: #84a98c;
+  --done-tint: #e6efe7;
+  --gentle: #d4b07a;
+  --gentle-tint: #f3ecd9;
+  --softrose: #c99ab4; /* overdue — tender mauve-rose */
+  --softrose-tint: #f1e4ee;
 
   /* Category dots — unchanged (read well on lavender) */
 
   /* Lines & edges */
-  --line:         #E5E0EE;
-  --line-card:    #EDE9F3;
-  --line-strong:  #D5CEE3;
+  --line: #e5e0ee;
+  --line-card: #ede9f3;
+  --line-strong: #d5cee3;
 
   /* Elevation — tinted with the plum ink so shadows read soft & cool */
-  --shadow-sm:  0 1px 2px rgba(53,48,72,.05), 0 1px 1px rgba(53,48,72,.03);
-  --shadow-md:  0 2px 6px rgba(53,48,72,.05), 0 4px 12px rgba(53,48,72,.04);
-  --shadow-lg:  0 6px 16px rgba(53,48,72,.06), 0 12px 32px rgba(53,48,72,.06);
-  --shadow-pop: 0 12px 40px rgba(53,48,72,.12);
-  --ring:       0 0 0 3px rgba(142,132,184,.32);
-  --ring-apr:   0 0 0 3px rgba(224,168,126,.32);
+  --shadow-sm: 0 1px 2px rgba(53, 48, 72, 0.05), 0 1px 1px rgba(53, 48, 72, 0.03);
+  --shadow-md: 0 2px 6px rgba(53, 48, 72, 0.05), 0 4px 12px rgba(53, 48, 72, 0.04);
+  --shadow-lg: 0 6px 16px rgba(53, 48, 72, 0.06), 0 12px 32px rgba(53, 48, 72, 0.06);
+  --shadow-pop: 0 12px 40px rgba(53, 48, 72, 0.12);
+  --ring: 0 0 0 3px rgba(142, 132, 184, 0.32);
+  --ring-apr: 0 0 0 3px rgba(224, 168, 126, 0.32);
 }
 
 /* ============================================================
@@ -227,55 +249,55 @@
    the warm reward complement — untouched.
    Opt in with <element data-theme="lavender-dark">.
    ============================================================ */
-[data-theme="lavender-dark"] {
+[data-theme='lavender-dark'] {
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
   /* Surfaces — deep warm purple-plum, never pure black */
-  --cream:        #1D1A28;   /* app background */
-  --cream-deep:   #161320;   /* recessed wells, pressed bg */
-  --card:         #27233A;   /* cards & sheets */
+  --cream: #1d1a28; /* app background */
+  --cream-deep: #161320; /* recessed wells, pressed bg */
+  --card: #27233a; /* cards & sheets */
 
   /* Ink — lavender-tinted off-white, calm purple-greys */
-  --ink:          #EDE9F8;
-  --ink-soft:     #9E98B8;
-  --ink-faint:    #635D7A;
+  --ink: #ede9f8;
+  --ink-soft: #9e98b8;
+  --ink-faint: #635d7a;
 
   /* Accent — lavender, lifted for contrast on dark */
-  --sage:         #A49AD4;
-  --sage-press:   #9088C4;
-  --sage-deep:    #BEB4E8;   /* accent text on dark */
-  --sage-tint:    #2C2844;   /* selected bg, lavender wash */
-  --sage-tint-2:  #373255;   /* stronger wash, progress track */
+  --sage: #a49ad4;
+  --sage-press: #9088c4;
+  --sage-deep: #beb4e8; /* accent text on dark */
+  --sage-tint: #2c2844; /* selected bg, lavender wash */
+  --sage-tint-2: #373255; /* stronger wash, progress track */
 
   /* Reward — apricot, lifted (same warmth as dark sage theme) */
-  --apricot:      #E6B088;
-  --apricot-press:#D89E72;
-  --apricot-deep: #ECBE9A;   /* reward text on dark */
-  --apricot-tint: #3A2F25;   /* reward wash, badge bg */
+  --apricot: #e6b088;
+  --apricot-press: #d89e72;
+  --apricot-deep: #ecbe9a; /* reward text on dark */
+  --apricot-tint: #3a2f25; /* reward wash, badge bg */
 
   /* Soft semantic — purple-tinted dark washes */
-  --done:         #8FB596;
-  --done-tint:    #1F2D24;
-  --gentle:       #DBB872;
-  --gentle-tint:  #2E2616;
-  --softrose:     #CFA8C0;   /* overdue — mauve-rose on dark */
-  --softrose-tint:#332231;
+  --done: #8fb596;
+  --done-tint: #1f2d24;
+  --gentle: #dbb872;
+  --gentle-tint: #2e2616;
+  --softrose: #cfa8c0; /* overdue — mauve-rose on dark */
+  --softrose-tint: #332231;
 
   /* Category dots — unchanged (read well on dark purple) */
 
   /* Lines & edges */
-  --line:         #2E2943;
-  --line-card:    #2A2540;
-  --line-strong:  #3D3660;
+  --line: #2e2943;
+  --line-card: #2a2540;
+  --line-strong: #3d3660;
 
   /* Elevation — deep plum-tinted shadows */
-  --shadow-sm:  0 1px 2px rgba(0,0,0,.36);
-  --shadow-md:  0 2px 8px rgba(0,0,0,.38), 0 1px 2px rgba(0,0,0,.28);
-  --shadow-lg:  0 8px 22px rgba(0,0,0,.46);
-  --shadow-pop: 0 16px 44px rgba(0,0,0,.56);
-  --ring:       0 0 0 3px rgba(164,154,212,.40);
-  --ring-apr:   0 0 0 3px rgba(230,176,136,.40);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.36);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.38), 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 8px 22px rgba(0, 0, 0, 0.46);
+  --shadow-pop: 0 16px 44px rgba(0, 0, 0, 0.56);
+  --ring: 0 0 0 3px rgba(164, 154, 212, 0.4);
+  --ring-apr: 0 0 0 3px rgba(230, 176, 136, 0.4);
 }
 
 /* ============================================================
@@ -286,62 +308,62 @@
    solid --sage / --apricot back text, dots & borders.
    Opt in with <element data-theme="cyberpunk">.
    ============================================================ */
-[data-theme="cyberpunk"] {
+[data-theme='cyberpunk'] {
   /* Surfaces — deep blue-violet void with a vertical gradient */
-  --cream:        radial-gradient(120% 90% at 15% -5%, #14082A 0%, #0A0820 45%, #06050F 100%);
-  --cream-deep:   #050410;   /* recessed wells, pressed bg */
-  --card:         linear-gradient(160deg, #161334 0%, #120E29 100%);
+  --cream: radial-gradient(120% 90% at 15% -5%, #14082a 0%, #0a0820 45%, #06050f 100%);
+  --cream-deep: #050410; /* recessed wells, pressed bg */
+  --card: linear-gradient(160deg, #161334 0%, #120e29 100%);
 
   /* Ink — cool blue-white */
-  --ink:          #E4E6FF;
-  --ink-soft:     #7E7FC8;
-  --ink-faint:    #3B3A78;
+  --ink: #e4e6ff;
+  --ink-soft: #7e7fc8;
+  --ink-faint: #3b3a78;
 
   /* Accent solids — electric blue (text, dots, borders) */
-  --sage:         #4D7CFF;
-  --sage-press:   #3D66E6;
-  --sage-deep:    #8AA6FF;   /* accent text / links on dark */
-  --sage-tint:    #14163C;   /* selected bg wash */
-  --sage-tint-2:  #20214F;   /* stronger wash, progress track */
+  --sage: #4d7cff;
+  --sage-press: #3d66e6;
+  --sage-deep: #8aa6ff; /* accent text / links on dark */
+  --sage-tint: #14163c; /* selected bg wash */
+  --sage-tint-2: #20214f; /* stronger wash, progress track */
 
   /* Reward solids — hot magenta-red */
-  --apricot:      #FF2D6E;
-  --apricot-press:#E61F5C;
-  --apricot-deep: #FF6C9C;   /* reward text */
-  --apricot-tint: #2A0A1E;   /* reward wash */
+  --apricot: #ff2d6e;
+  --apricot-press: #e61f5c;
+  --apricot-deep: #ff6c9c; /* reward text */
+  --apricot-tint: #2a0a1e; /* reward wash */
 
   /* GRADIENT FILLS — the signature of this theme */
-  --accent-fill:  linear-gradient(135deg, #2F6BFF 0%, #8A3DFF 100%);   /* blue → violet */
-  --reward-fill:  linear-gradient(135deg, #9D3DFF 0%, #FF2D5E 100%);   /* violet → red  */
+  --accent-fill: linear-gradient(135deg, #2f6bff 0%, #8a3dff 100%); /* blue → violet */
+  --reward-fill: linear-gradient(135deg, #9d3dff 0%, #ff2d5e 100%); /* violet → red  */
 
   /* Soft semantic */
-  --done:         #00E0B8;
-  --done-tint:    #04261F;
-  --gentle:       #FFC23D;   /* electric amber heads-up */
-  --gentle-tint:  #2A2008;
-  --softrose:     #FF4D86;   /* overdue — neon red-pink */
-  --softrose-tint:#2D0A18;
+  --done: #00e0b8;
+  --done-tint: #04261f;
+  --gentle: #ffc23d; /* electric amber heads-up */
+  --gentle-tint: #2a2008;
+  --softrose: #ff4d86; /* overdue — neon red-pink */
+  --softrose-tint: #2d0a18;
 
   /* Category dots — neon spectrum */
-  --cat-sage:     #4D7CFF;
-  --cat-apricot:  #FF2D6E;
-  --cat-blue:     #2FB8FF;
-  --cat-clay:     #FF6A3D;
-  --cat-gold:     #FFC23D;
-  --cat-mauve:    #B14DFF;
+  --cat-sage: #4d7cff;
+  --cat-apricot: #ff2d6e;
+  --cat-blue: #2fb8ff;
+  --cat-clay: #ff6a3d;
+  --cat-gold: #ffc23d;
+  --cat-mauve: #b14dff;
 
   /* Lines & edges */
-  --line:         #1E1C46;
-  --line-card:    #181638;
-  --line-strong:  #2E2B63;
+  --line: #1e1c46;
+  --line-card: #181638;
+  --line-strong: #2e2b63;
 
   /* Neon glow shadows — blue + violet bloom */
-  --shadow-sm:  0 0 7px  rgba(77,124,255,.16), 0 2px 4px  rgba(0,0,0,.6);
-  --shadow-md:  0 0 20px rgba(98,77,255,.24),  0 4px 14px rgba(0,0,0,.7);
-  --shadow-lg:  0 0 40px rgba(138,61,255,.28), 0 8px 28px rgba(0,0,0,.8);
-  --shadow-pop: 0 0 64px rgba(157,61,255,.34), 0 16px 48px rgba(0,0,0,.88);
-  --ring:       0 0 0 2px #4D7CFF, 0 0 16px rgba(77,124,255,.6);
-  --ring-apr:   0 0 0 2px #FF2D6E, 0 0 16px rgba(255,45,110,.6);
+  --shadow-sm: 0 0 7px rgba(77, 124, 255, 0.16), 0 2px 4px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 0 20px rgba(98, 77, 255, 0.24), 0 4px 14px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 0 40px rgba(138, 61, 255, 0.28), 0 8px 28px rgba(0, 0, 0, 0.8);
+  --shadow-pop: 0 0 64px rgba(157, 61, 255, 0.34), 0 16px 48px rgba(0, 0, 0, 0.88);
+  --ring: 0 0 0 2px #4d7cff, 0 0 16px rgba(77, 124, 255, 0.6);
+  --ring-apr: 0 0 0 2px #ff2d6e, 0 0 16px rgba(255, 45, 110, 0.6);
 }
 
 /* ============================================================
@@ -351,62 +373,62 @@
    (via shadow outlines) and a thick double focus ring.
    Opt in with <element data-theme="high-contrast">.
    ============================================================ */
-[data-theme="high-contrast"] {
+[data-theme='high-contrast'] {
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
   /* Surfaces — pure white, light recess */
-  --cream:        #FFFFFF;
-  --cream-deep:   #EDEDED;
-  --card:         #FFFFFF;
+  --cream: #ffffff;
+  --cream-deep: #ededed;
+  --card: #ffffff;
 
   /* Ink — pure black, dark greys that still pass AA */
-  --ink:          #000000;
-  --ink-soft:     #2B2B2B;
-  --ink-faint:    #545454;
+  --ink: #000000;
+  --ink-soft: #2b2b2b;
+  --ink-faint: #545454;
 
   /* Accent — strong blue (AAA on white) */
-  --sage:         #0B5FD4;
-  --sage-press:   #084BAA;
-  --sage-deep:    #073E8C;
-  --sage-tint:    #D6E6FB;
-  --sage-tint-2:  #B4D2F7;
+  --sage: #0b5fd4;
+  --sage-press: #084baa;
+  --sage-deep: #073e8c;
+  --sage-tint: #d6e6fb;
+  --sage-tint-2: #b4d2f7;
 
   /* Reward — strong dark orange (AA on white) */
-  --apricot:      #B85000;
-  --apricot-press:#9A4300;
-  --apricot-deep: #7E3800;
-  --apricot-tint: #FBE3D0;
+  --apricot: #b85000;
+  --apricot-press: #9a4300;
+  --apricot-deep: #7e3800;
+  --apricot-tint: #fbe3d0;
 
   /* Semantic — fully saturated, high contrast */
-  --done:         #0A7D2C;
-  --done-tint:    #D4F0DC;
-  --gentle:       #8A6A00;
-  --gentle-tint:  #F5EBC2;
-  --softrose:     #C20A2E;
-  --softrose-tint:#FBD8DE;
+  --done: #0a7d2c;
+  --done-tint: #d4f0dc;
+  --gentle: #8a6a00;
+  --gentle-tint: #f5ebc2;
+  --softrose: #c20a2e;
+  --softrose-tint: #fbd8de;
 
   /* Category dots — saturated, distinguishable */
-  --cat-sage:     #0B5FD4;
-  --cat-apricot:  #B85000;
-  --cat-blue:     #0A6CC2;
-  --cat-clay:     #A8431E;
-  --cat-gold:     #8A6A00;
-  --cat-mauve:    #7B2FA0;
+  --cat-sage: #0b5fd4;
+  --cat-apricot: #b85000;
+  --cat-blue: #0a6cc2;
+  --cat-clay: #a8431e;
+  --cat-gold: #8a6a00;
+  --cat-mauve: #7b2fa0;
 
   /* Lines & edges — visible, never faint */
-  --line:         #6B6B6B;
-  --line-card:    #8F8F8F;
-  --line-strong:  #000000;
+  --line: #6b6b6b;
+  --line-card: #8f8f8f;
+  --line-strong: #000000;
 
   /* Elevation — solid black outlines so cards are clearly bounded */
-  --shadow-sm:  0 0 0 1.5px #000000;
-  --shadow-md:  0 0 0 2px   #000000;
-  --shadow-lg:  0 0 0 2.5px #000000, 0 8px 22px rgba(0,0,0,.25);
-  --shadow-pop: 0 0 0 3px   #000000, 0 16px 44px rgba(0,0,0,.4);
+  --shadow-sm: 0 0 0 1.5px #000000;
+  --shadow-md: 0 0 0 2px #000000;
+  --shadow-lg: 0 0 0 2.5px #000000, 0 8px 22px rgba(0, 0, 0, 0.25);
+  --shadow-pop: 0 0 0 3px #000000, 0 16px 44px rgba(0, 0, 0, 0.4);
   /* Focus — thick double ring (white halo + amber), unmissable */
-  --ring:       0 0 0 3px #FFFFFF, 0 0 0 6px #0B5FD4;
-  --ring-apr:   0 0 0 3px #FFFFFF, 0 0 0 6px #B85000;
+  --ring: 0 0 0 3px #ffffff, 0 0 0 6px #0b5fd4;
+  --ring-apr: 0 0 0 3px #ffffff, 0 0 0 6px #b85000;
 }
 
 /* ============================================================
@@ -416,61 +438,61 @@
    Calm, papery, low-contrast-but-readable.
    Opt in with <element data-theme="cloud">.
    ============================================================ */
-[data-theme="cloud"] {
+[data-theme='cloud'] {
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
   /* Surfaces — matte cream, sandstone recess */
-  --cream:        #F0EEE9;   /* Cloud Dancer */
-  --cream-deep:   #E5E1D8;   /* warm beige well */
-  --card:         #FAF8F3;   /* lifted matte cream */
+  --cream: #f0eee9; /* Cloud Dancer */
+  --cream-deep: #e5e1d8; /* warm beige well */
+  --card: #faf8f3; /* lifted matte cream */
 
   /* Ink — warm taupe-brown, soft greys (never black) */
-  --ink:          #4A453D;
-  --ink-soft:     #948C7E;
-  --ink-faint:    #BEB7A9;
+  --ink: #4a453d;
+  --ink-soft: #948c7e;
+  --ink-faint: #beb7a9;
 
   /* Accent — warm clay */
-  --sage:         #B08968;
-  --sage-press:   #9C785A;
-  --sage-deep:    #7C5E45;   /* accent text on cream */
-  --sage-tint:    #EAE2D7;
-  --sage-tint-2:  #DCD1C1;
+  --sage: #b08968;
+  --sage-press: #9c785a;
+  --sage-deep: #7c5e45; /* accent text on cream */
+  --sage-tint: #eae2d7;
+  --sage-tint-2: #dcd1c1;
 
   /* Reward — soft sandstone-apricot */
-  --apricot:      #C8A07E;
-  --apricot-press:#B88E6B;
-  --apricot-deep: #8C6648;
-  --apricot-tint: #EFE5D8;
+  --apricot: #c8a07e;
+  --apricot-press: #b88e6b;
+  --apricot-deep: #8c6648;
+  --apricot-tint: #efe5d8;
 
   /* Soft semantic — muted earth */
-  --done:         #9CA88E;
-  --done-tint:    #E5E8DC;
-  --gentle:       #C9A86E;
-  --gentle-tint:  #EFE6D1;
-  --softrose:     #C49B95;
-  --softrose-tint:#EEE2DF;
+  --done: #9ca88e;
+  --done-tint: #e5e8dc;
+  --gentle: #c9a86e;
+  --gentle-tint: #efe6d1;
+  --softrose: #c49b95;
+  --softrose-tint: #eee2df;
 
   /* Category dots — quiet earth tones */
-  --cat-sage:     #9CA88E;
-  --cat-apricot:  #C8A07E;
-  --cat-blue:     #93A0A5;
-  --cat-clay:     #B08968;
-  --cat-gold:     #C9A86E;
-  --cat-mauve:    #AE9BA4;
+  --cat-sage: #9ca88e;
+  --cat-apricot: #c8a07e;
+  --cat-blue: #93a0a5;
+  --cat-clay: #b08968;
+  --cat-gold: #c9a86e;
+  --cat-mauve: #ae9ba4;
 
   /* Lines & edges */
-  --line:         #E0DACE;
-  --line-card:    #E8E2D7;
-  --line-strong:  #CEC6B7;
+  --line: #e0dace;
+  --line-card: #e8e2d7;
+  --line-strong: #cec6b7;
 
   /* Elevation — warm, papery, barely there */
-  --shadow-sm:  0 1px 2px rgba(74,69,61,.04), 0 1px 1px rgba(74,69,61,.03);
-  --shadow-md:  0 2px 6px rgba(74,69,61,.05), 0 4px 12px rgba(74,69,61,.04);
-  --shadow-lg:  0 6px 16px rgba(74,69,61,.06), 0 12px 32px rgba(74,69,61,.05);
-  --shadow-pop: 0 12px 40px rgba(74,69,61,.12);
-  --ring:       0 0 0 3px rgba(176,137,104,.32);
-  --ring-apr:   0 0 0 3px rgba(200,160,126,.34);
+  --shadow-sm: 0 1px 2px rgba(74, 69, 61, 0.04), 0 1px 1px rgba(74, 69, 61, 0.03);
+  --shadow-md: 0 2px 6px rgba(74, 69, 61, 0.05), 0 4px 12px rgba(74, 69, 61, 0.04);
+  --shadow-lg: 0 6px 16px rgba(74, 69, 61, 0.06), 0 12px 32px rgba(74, 69, 61, 0.05);
+  --shadow-pop: 0 12px 40px rgba(74, 69, 61, 0.12);
+  --ring: 0 0 0 3px rgba(176, 137, 104, 0.32);
+  --ring-apr: 0 0 0 3px rgba(200, 160, 126, 0.34);
 }
 
 /* ============================================================
@@ -479,61 +501,61 @@
    copper over a soft botanical paper. Grounded and organic.
    Opt in with <element data-theme="eco">.
    ============================================================ */
-[data-theme="eco"] {
+[data-theme='eco'] {
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
   /* Surfaces — soft botanical paper */
-  --cream:        #F0F1E9;
-  --cream-deep:   #E3E6DA;
-  --card:         #FAFBF5;
+  --cream: #f0f1e9;
+  --cream-deep: #e3e6da;
+  --card: #fafbf5;
 
   /* Ink — deep forest moss */
-  --ink:          #2E3A2B;
-  --ink-soft:     #74806B;
-  --ink-faint:    #A6AE9A;
+  --ink: #2e3a2b;
+  --ink-soft: #74806b;
+  --ink-faint: #a6ae9a;
 
   /* Accent — living moss green */
-  --sage:         #6B8A56;
-  --sage-press:   #5B7848;
-  --sage-deep:    #455E38;
-  --sage-tint:    #E2EAD7;
-  --sage-tint-2:  #CFDABF;
+  --sage: #6b8a56;
+  --sage-press: #5b7848;
+  --sage-deep: #455e38;
+  --sage-tint: #e2ead7;
+  --sage-tint-2: #cfdabf;
 
   /* Reward — warm terracotta */
-  --apricot:      #C57043;
-  --apricot-press:#B05E33;
-  --apricot-deep: #8C4A28;
-  --apricot-tint: #F2E0D4;
+  --apricot: #c57043;
+  --apricot-press: #b05e33;
+  --apricot-deep: #8c4a28;
+  --apricot-tint: #f2e0d4;
 
   /* Soft semantic — ocean, ochre, copper */
-  --done:         #4F8A6B;
-  --done-tint:    #DBEDE3;
-  --gentle:       #C99A3E;
-  --gentle-tint:  #F2E8CD;
-  --softrose:     #BC6A4A;
-  --softrose-tint:#F0DCD2;
+  --done: #4f8a6b;
+  --done-tint: #dbede3;
+  --gentle: #c99a3e;
+  --gentle-tint: #f2e8cd;
+  --softrose: #bc6a4a;
+  --softrose-tint: #f0dcd2;
 
   /* Category dots — full nature spectrum */
-  --cat-sage:     #6B8A56;
-  --cat-apricot:  #C57043;
-  --cat-blue:     #3E7C8C;   /* ocean */
-  --cat-clay:     #B5703F;   /* copper */
-  --cat-gold:     #C99A3E;   /* ochre */
-  --cat-mauve:    #88A06E;   /* sage-leaf */
+  --cat-sage: #6b8a56;
+  --cat-apricot: #c57043;
+  --cat-blue: #3e7c8c; /* ocean */
+  --cat-clay: #b5703f; /* copper */
+  --cat-gold: #c99a3e; /* ochre */
+  --cat-mauve: #88a06e; /* sage-leaf */
 
   /* Lines & edges */
-  --line:         #DEE2D4;
-  --line-card:    #E6E9DD;
-  --line-strong:  #C7CDBA;
+  --line: #dee2d4;
+  --line-card: #e6e9dd;
+  --line-strong: #c7cdba;
 
   /* Elevation — soft green-tinted */
-  --shadow-sm:  0 1px 2px rgba(46,58,43,.05), 0 1px 1px rgba(46,58,43,.03);
-  --shadow-md:  0 2px 6px rgba(46,58,43,.06), 0 4px 12px rgba(46,58,43,.04);
-  --shadow-lg:  0 6px 16px rgba(46,58,43,.07), 0 12px 32px rgba(46,58,43,.06);
-  --shadow-pop: 0 12px 40px rgba(46,58,43,.14);
-  --ring:       0 0 0 3px rgba(107,138,86,.34);
-  --ring-apr:   0 0 0 3px rgba(197,112,67,.34);
+  --shadow-sm: 0 1px 2px rgba(46, 58, 43, 0.05), 0 1px 1px rgba(46, 58, 43, 0.03);
+  --shadow-md: 0 2px 6px rgba(46, 58, 43, 0.06), 0 4px 12px rgba(46, 58, 43, 0.04);
+  --shadow-lg: 0 6px 16px rgba(46, 58, 43, 0.07), 0 12px 32px rgba(46, 58, 43, 0.06);
+  --shadow-pop: 0 12px 40px rgba(46, 58, 43, 0.14);
+  --ring: 0 0 0 3px rgba(107, 138, 86, 0.34);
+  --ring-apr: 0 0 0 3px rgba(197, 112, 67, 0.34);
 }
 
 /* ============================================================
@@ -544,61 +566,61 @@
    there dusty tan. On-brand with AddyDo's anti-stimulation ethos.
    Opt in with <element data-theme="silent">.
    ============================================================ */
-[data-theme="silent"] {
+[data-theme='silent'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
   /* Surfaces — warm off-white, barely perceptible warmth */
-  --cream:        #F2F1EF;
-  --cream-deep:   #E8E7E3;
-  --card:         #F9F8F6;
+  --cream: #f2f1ef;
+  --cream-deep: #e8e7e3;
+  --card: #f9f8f6;
 
   /* Ink — warm soft graphite, never black */
-  --ink:          #3D3C3A;
-  --ink-soft:     #888480;
-  --ink-faint:    #BAB7B3;
+  --ink: #3d3c3a;
+  --ink-soft: #888480;
+  --ink-faint: #bab7b3;
 
   /* Accent — quiet blue-grey, almost colourless */
-  --sage:         #8E9090;
-  --sage-press:   #7C7E7E;
-  --sage-deep:    #626464;
-  --sage-tint:    #EDECEB;
-  --sage-tint-2:  #E0DEDC;
+  --sage: #8e9090;
+  --sage-press: #7c7e7e;
+  --sage-deep: #626464;
+  --sage-tint: #edeceb;
+  --sage-tint-2: #e0dedc;
 
   /* Reward — dusty tan, barely warm */
-  --apricot:      #C4A78A;
-  --apricot-press:#B09476;
-  --apricot-deep: #8B7058;
-  --apricot-tint: #F0E9E1;
+  --apricot: #c4a78a;
+  --apricot-press: #b09476;
+  --apricot-deep: #8b7058;
+  --apricot-tint: #f0e9e1;
 
   /* Soft semantic — all desaturated */
-  --done:         #8FA494;
-  --done-tint:    #E8EDE9;
-  --gentle:       #BBA880;
-  --gentle-tint:  #EDE6D5;
-  --softrose:     #C0A5A5;
-  --softrose-tint:#EDE5E5;
+  --done: #8fa494;
+  --done-tint: #e8ede9;
+  --gentle: #bba880;
+  --gentle-tint: #ede6d5;
+  --softrose: #c0a5a5;
+  --softrose-tint: #ede5e5;
 
   /* Category dots — muted grey tones, nothing vibrates */
-  --cat-sage:     #8A9090;
-  --cat-apricot:  #B8A28A;
-  --cat-blue:     #8A9AA5;
-  --cat-clay:     #A89A8A;
-  --cat-gold:     #B8B090;
-  --cat-mauve:    #A89AAA;
+  --cat-sage: #8a9090;
+  --cat-apricot: #b8a28a;
+  --cat-blue: #8a9aa5;
+  --cat-clay: #a89a8a;
+  --cat-gold: #b8b090;
+  --cat-mauve: #a89aaa;
 
   /* Lines & edges */
-  --line:         #E5E3DF;
-  --line-card:    #ECEAE7;
-  --line-strong:  #CCCAC5;
+  --line: #e5e3df;
+  --line-card: #eceae7;
+  --line-strong: #cccac5;
 
   /* Elevation — barely there */
-  --shadow-sm:  0 1px 2px rgba(50,49,46,.04), 0 1px 1px rgba(50,49,46,.03);
-  --shadow-md:  0 2px 6px rgba(50,49,46,.05), 0 4px 12px rgba(50,49,46,.04);
-  --shadow-lg:  0 6px 16px rgba(50,49,46,.05), 0 12px 32px rgba(50,49,46,.04);
-  --shadow-pop: 0 12px 40px rgba(50,49,46,.10);
-  --ring:       0 0 0 3px rgba(142,144,144,.22);
-  --ring-apr:   0 0 0 3px rgba(196,167,138,.26);
+  --shadow-sm: 0 1px 2px rgba(50, 49, 46, 0.04), 0 1px 1px rgba(50, 49, 46, 0.03);
+  --shadow-md: 0 2px 6px rgba(50, 49, 46, 0.05), 0 4px 12px rgba(50, 49, 46, 0.04);
+  --shadow-lg: 0 6px 16px rgba(50, 49, 46, 0.05), 0 12px 32px rgba(50, 49, 46, 0.04);
+  --shadow-pop: 0 12px 40px rgba(50, 49, 46, 0.1);
+  --ring: 0 0 0 3px rgba(142, 144, 144, 0.22);
+  --ring-apr: 0 0 0 3px rgba(196, 167, 138, 0.26);
 }
 
 /* ============================================================
@@ -608,61 +630,61 @@
    so the app can be used right before sleep without disruption.
    Opt in with <element data-theme="amber">.
    ============================================================ */
-[data-theme="amber"] {
+[data-theme='amber'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
   /* Surfaces — very dark warm brown-black */
-  --cream:        #1C1610;
-  --cream-deep:   #140F0A;
-  --card:         #241C14;
+  --cream: #1c1610;
+  --cream-deep: #140f0a;
+  --card: #241c14;
 
   /* Ink — warm cream-amber */
-  --ink:          #F0DEB8;
-  --ink-soft:     #9C8C6C;
-  --ink-faint:    #5C5040;
+  --ink: #f0deb8;
+  --ink-soft: #9c8c6c;
+  --ink-faint: #5c5040;
 
   /* Accent — warm amber (no blue at all) */
-  --sage:         #C89018;
-  --sage-press:   #B07A10;
-  --sage-deep:    #E0A828;
-  --sage-tint:    #2A1E06;
-  --sage-tint-2:  #362808;
+  --sage: #c89018;
+  --sage-press: #b07a10;
+  --sage-deep: #e0a828;
+  --sage-tint: #2a1e06;
+  --sage-tint-2: #362808;
 
   /* Reward — warm rust-copper */
-  --apricot:      #C85A28;
-  --apricot-press:#AA4A1E;
-  --apricot-deep: #E07A46;
-  --apricot-tint: #2A1408;
+  --apricot: #c85a28;
+  --apricot-press: #aa4a1e;
+  --apricot-deep: #e07a46;
+  --apricot-tint: #2a1408;
 
   /* Soft semantic — warm, no cool tones */
-  --done:         #7A9A60;
-  --done-tint:    #1C2A12;
-  --gentle:       #C89018;
-  --gentle-tint:  #2A1E06;
-  --softrose:     #B84A40;
-  --softrose-tint:#2A1212;
+  --done: #7a9a60;
+  --done-tint: #1c2a12;
+  --gentle: #c89018;
+  --gentle-tint: #2a1e06;
+  --softrose: #b84a40;
+  --softrose-tint: #2a1212;
 
   /* Category dots — warm amber spectrum */
-  --cat-sage:     #C89018;
-  --cat-apricot:  #C85A28;
-  --cat-blue:     #7A9A60;   /* no blue — use warm green instead */
-  --cat-clay:     #A07848;
-  --cat-gold:     #D0B040;
-  --cat-mauve:    #A07870;
+  --cat-sage: #c89018;
+  --cat-apricot: #c85a28;
+  --cat-blue: #7a9a60; /* no blue — use warm green instead */
+  --cat-clay: #a07848;
+  --cat-gold: #d0b040;
+  --cat-mauve: #a07870;
 
   /* Lines & edges */
-  --line:         #2A2018;
-  --line-card:    #241C10;
-  --line-strong:  #3A2E1C;
+  --line: #2a2018;
+  --line-card: #241c10;
+  --line-strong: #3a2e1c;
 
   /* Elevation — deep warm shadows */
-  --shadow-sm:  0 1px 2px rgba(0,0,0,.40);
-  --shadow-md:  0 2px 8px rgba(0,0,0,.44), 0 1px 2px rgba(0,0,0,.36);
-  --shadow-lg:  0 8px 22px rgba(0,0,0,.50);
-  --shadow-pop: 0 16px 44px rgba(0,0,0,.60);
-  --ring:       0 0 0 3px rgba(200,144,24,.38);
-  --ring-apr:   0 0 0 3px rgba(200,90,40,.38);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.44), 0 1px 2px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 8px 22px rgba(0, 0, 0, 0.5);
+  --shadow-pop: 0 16px 44px rgba(0, 0, 0, 0.6);
+  --ring: 0 0 0 3px rgba(200, 144, 24, 0.38);
+  --ring-apr: 0 0 0 3px rgba(200, 90, 40, 0.38);
 }
 
 /* ============================================================
@@ -673,61 +695,61 @@
    sage-teal accent, nothing extra.
    Opt in with <element data-theme="amoled">.
    ============================================================ */
-[data-theme="amoled"] {
+[data-theme='amoled'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
   /* Surfaces — true black + near-black cards */
-  --cream:        #000000;
-  --cream-deep:   #000000;
-  --card:         #0C0C0C;
+  --cream: #000000;
+  --cream-deep: #000000;
+  --card: #0c0c0c;
 
   /* Ink — pure white, clean greys */
-  --ink:          #FFFFFF;
-  --ink-soft:     #999999;
-  --ink-faint:    #444444;
+  --ink: #ffffff;
+  --ink-soft: #999999;
+  --ink-faint: #444444;
 
   /* Accent — crisp bright sage-teal (pops on black) */
-  --sage:         #5AB4A0;
-  --sage-press:   #48A08C;
-  --sage-deep:    #7CC4B4;
-  --sage-tint:    #0A1E1A;
-  --sage-tint-2:  #0E2A24;
+  --sage: #5ab4a0;
+  --sage-press: #48a08c;
+  --sage-deep: #7cc4b4;
+  --sage-tint: #0a1e1a;
+  --sage-tint-2: #0e2a24;
 
   /* Reward — warm peach-orange */
-  --apricot:      #E09A64;
-  --apricot-press:#C88450;
-  --apricot-deep: #F0B07A;
-  --apricot-tint: #1E1008;
+  --apricot: #e09a64;
+  --apricot-press: #c88450;
+  --apricot-deep: #f0b07a;
+  --apricot-tint: #1e1008;
 
   /* Soft semantic */
-  --done:         #5AB4A0;
-  --done-tint:    #0A1E1A;
-  --gentle:       #E0C050;
-  --gentle-tint:  #1E1A00;
-  --softrose:     #E07878;
-  --softrose-tint:#1E0808;
+  --done: #5ab4a0;
+  --done-tint: #0a1e1a;
+  --gentle: #e0c050;
+  --gentle-tint: #1e1a00;
+  --softrose: #e07878;
+  --softrose-tint: #1e0808;
 
   /* Category dots — clean, vivid on black */
-  --cat-sage:     #5AB4A0;
-  --cat-apricot:  #E09A64;
-  --cat-blue:     #60A0E0;
-  --cat-clay:     #C08060;
-  --cat-gold:     #E0C050;
-  --cat-mauve:    #A080D0;
+  --cat-sage: #5ab4a0;
+  --cat-apricot: #e09a64;
+  --cat-blue: #60a0e0;
+  --cat-clay: #c08060;
+  --cat-gold: #e0c050;
+  --cat-mauve: #a080d0;
 
   /* Lines — ultra-subtle on true black */
-  --line:         #1A1A1A;
-  --line-card:    #141414;
-  --line-strong:  #2A2A2A;
+  --line: #1a1a1a;
+  --line-card: #141414;
+  --line-strong: #2a2a2a;
 
   /* Elevation — card borders (shadow on black = invisible) */
-  --shadow-sm:  0 0 0 1px #1A1A1A;
-  --shadow-md:  0 0 0 1px #222222, 0 2px 10px rgba(0,0,0,.95);
-  --shadow-lg:  0 0 0 1px #2A2A2A, 0 8px 24px rgba(0,0,0,1);
-  --shadow-pop: 0 0 0 1px #333333, 0 16px 48px rgba(0,0,0,1);
-  --ring:       0 0 0 3px rgba(90,180,160,.45);
-  --ring-apr:   0 0 0 3px rgba(224,154,100,.45);
+  --shadow-sm: 0 0 0 1px #1a1a1a;
+  --shadow-md: 0 0 0 1px #222222, 0 2px 10px rgba(0, 0, 0, 0.95);
+  --shadow-lg: 0 0 0 1px #2a2a2a, 0 8px 24px rgba(0, 0, 0, 1);
+  --shadow-pop: 0 0 0 1px #333333, 0 16px 48px rgba(0, 0, 0, 1);
+  --ring: 0 0 0 3px rgba(90, 180, 160, 0.45);
+  --ring-apr: 0 0 0 3px rgba(224, 154, 100, 0.45);
 }
 
 /* ============================================================
@@ -735,60 +757,94 @@
    ============================================================ */
 .ad-display {
   font-family: var(--font-display);
-  font-size: var(--fs-display); line-height: var(--lh-display);
-  font-weight: var(--w-x); letter-spacing: var(--tracking-tight);
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  font-weight: var(--w-x);
+  letter-spacing: var(--tracking-tight);
   color: var(--ink);
 }
 .ad-h1 {
   font-family: var(--font-display);
-  font-size: var(--fs-h1); line-height: var(--lh-h1);
-  font-weight: var(--w-x); letter-spacing: var(--tracking-tight); color: var(--ink);
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
+  font-weight: var(--w-x);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
 }
 .ad-h2 {
   font-family: var(--font-display);
-  font-size: var(--fs-h2); line-height: var(--lh-h2);
-  font-weight: var(--w-bold); letter-spacing: var(--tracking-tight); color: var(--ink);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  font-weight: var(--w-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
 }
 .ad-h3 {
   font-family: var(--font-display);
-  font-size: var(--fs-h3); line-height: var(--lh-h3);
-  font-weight: var(--w-bold); color: var(--ink);
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+  font-weight: var(--w-bold);
+  color: var(--ink);
 }
 .ad-h4 {
   font-family: var(--font-display);
-  font-size: var(--fs-h4); line-height: var(--lh-h4);
-  font-weight: var(--w-bold); color: var(--ink);
+  font-size: var(--fs-h4);
+  line-height: var(--lh-h4);
+  font-weight: var(--w-bold);
+  color: var(--ink);
 }
 .ad-body-lg {
   font-family: var(--font-body);
-  font-size: var(--fs-body-lg); line-height: var(--lh-body-lg);
-  font-weight: var(--w-reg); color: var(--ink);
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body-lg);
+  font-weight: var(--w-reg);
+  color: var(--ink);
 }
 .ad-body {
   font-family: var(--font-body);
-  font-size: var(--fs-body); line-height: var(--lh-body);
-  font-weight: var(--w-reg); color: var(--ink);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--w-reg);
+  color: var(--ink);
 }
 .ad-sm {
   font-family: var(--font-body);
-  font-size: var(--fs-sm); line-height: var(--lh-sm);
-  font-weight: var(--w-reg); color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  font-weight: var(--w-reg);
+  color: var(--ink-soft);
 }
 .ad-cap {
   font-family: var(--font-body);
-  font-size: var(--fs-cap); line-height: var(--lh-cap);
-  font-weight: var(--w-semi); color: var(--ink-soft);
+  font-size: var(--fs-cap);
+  line-height: var(--lh-cap);
+  font-weight: var(--w-semi);
+  color: var(--ink-soft);
 }
 .ad-overline {
   font-family: var(--font-body);
-  font-size: var(--fs-micro); line-height: var(--lh-micro);
-  font-weight: var(--w-bold); letter-spacing: var(--tracking-caps);
-  text-transform: uppercase; color: var(--ink-soft);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-micro);
+  font-weight: var(--w-bold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
-.ad-num { font-variant-numeric: tabular-nums; font-family: var(--font-num); }
+.ad-num {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-num);
+}
 
 /* Helpers */
-.ad-ink   { color: var(--ink); }
-.ad-soft  { color: var(--ink-soft); }
-.ad-sage  { color: var(--sage-deep); }
-.ad-apr   { color: var(--apricot-deep); }
+.ad-ink {
+  color: var(--ink);
+}
+.ad-soft {
+  color: var(--ink-soft);
+}
+.ad-sage {
+  color: var(--sage-deep);
+}
+.ad-apr {
+  color: var(--apricot-deep);
+}

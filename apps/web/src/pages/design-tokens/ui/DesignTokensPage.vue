@@ -108,23 +108,30 @@ const typeClasses = [
     <header class="page-header surface-card">
       <h1 class="ad-h2">Design Tokens</h1>
       <p class="ad-sm">
-        Switch theme: <code>document.documentElement.dataset.theme = 'dark'</code>
+        Switch theme:
+        <code>document.documentElement.dataset.theme = 'dark'</code>
       </p>
     </header>
 
     <main class="page-content">
-
       <!-- Surfaces -->
       <section class="token-section">
         <h2 class="ad-h4 section-title">Surfaces</h2>
         <p class="ad-sm section-note">
-          Use <code>surface-app</code> / <code>surface-deep</code> / <code>surface-card</code> utilities
-          (gradient-safe; cyberpunk uses radial/linear gradients here).
+          Use <code>surface-app</code> / <code>surface-deep</code> /
+          <code>surface-card</code> utilities (gradient-safe; cyberpunk uses radial/linear gradients
+          here).
         </p>
         <div class="swatch-grid">
           <div v-for="t in surfaces" :key="t.name" class="token-swatch">
-            <div class="swatch-box surface-preview" :class="`surface-${t.name.replace('--cream', 'deep').replace('--card', 'card')}`"
-              :style="{ background: `var(${t.cssVar})`, border: '1px solid var(--line)' }" />
+            <div
+              class="swatch-box surface-preview"
+              :class="`surface-${t.name.replace('--cream', 'deep').replace('--card', 'card')}`"
+              :style="{
+                background: `var(${t.cssVar})`,
+                border: '1px solid var(--line)',
+              }"
+            />
             <code class="swatch-label">{{ t.name }}</code>
           </div>
         </div>
@@ -134,11 +141,15 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Fills (accent &amp; reward)</h2>
         <p class="ad-sm section-note">
-          Use <code>fill-accent</code> / <code>fill-reward</code> utilities. May be gradients in some themes.
+          Use <code>fill-accent</code> / <code>fill-reward</code> utilities. May be gradients in
+          some themes.
         </p>
         <div class="swatch-grid">
           <div v-for="t in fills" :key="t.name" class="token-swatch">
-            <div class="swatch-box" :class="t.cssVar === '--accent-fill' ? 'fill-accent' : 'fill-reward'" />
+            <div
+              class="swatch-box"
+              :class="t.cssVar === '--accent-fill' ? 'fill-accent' : 'fill-reward'"
+            />
             <code class="swatch-label">{{ t.name }}</code>
           </div>
         </div>
@@ -148,7 +159,13 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Ink (text)</h2>
         <div class="swatch-grid">
-          <TokenSwatch v-for="t in ink" :key="t.name" :name="t.name" :css-var="t.cssVar" kind="color" />
+          <TokenSwatch
+            v-for="t in ink"
+            :key="t.name"
+            :name="t.name"
+            :css-var="t.cssVar"
+            kind="color"
+          />
         </div>
       </section>
 
@@ -156,7 +173,13 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Sage (primary accent)</h2>
         <div class="swatch-grid">
-          <TokenSwatch v-for="t in sage" :key="t.name" :name="t.name" :css-var="t.cssVar" kind="color" />
+          <TokenSwatch
+            v-for="t in sage"
+            :key="t.name"
+            :name="t.name"
+            :css-var="t.cssVar"
+            kind="color"
+          />
         </div>
       </section>
 
@@ -164,7 +187,13 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Apricot (reward)</h2>
         <div class="swatch-grid">
-          <TokenSwatch v-for="t in apricot" :key="t.name" :name="t.name" :css-var="t.cssVar" kind="color" />
+          <TokenSwatch
+            v-for="t in apricot"
+            :key="t.name"
+            :name="t.name"
+            :css-var="t.cssVar"
+            kind="color"
+          />
         </div>
       </section>
 
@@ -172,7 +201,13 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Semantic</h2>
         <div class="swatch-grid">
-          <TokenSwatch v-for="t in semantic" :key="t.name" :name="t.name" :css-var="t.cssVar" kind="color" />
+          <TokenSwatch
+            v-for="t in semantic"
+            :key="t.name"
+            :name="t.name"
+            :css-var="t.cssVar"
+            kind="color"
+          />
         </div>
       </section>
 
@@ -180,7 +215,13 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Category dots</h2>
         <div class="swatch-grid">
-          <TokenSwatch v-for="t in categories" :key="t.name" :name="t.name" :css-var="t.cssVar" kind="color" />
+          <TokenSwatch
+            v-for="t in categories"
+            :key="t.name"
+            :name="t.name"
+            :css-var="t.cssVar"
+            kind="color"
+          />
         </div>
       </section>
 
@@ -188,7 +229,13 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Lines &amp; edges</h2>
         <div class="swatch-grid">
-          <TokenSwatch v-for="t in lines" :key="t.name" :name="t.name" :css-var="t.cssVar" kind="color" />
+          <TokenSwatch
+            v-for="t in lines"
+            :key="t.name"
+            :name="t.name"
+            :css-var="t.cssVar"
+            kind="color"
+          />
         </div>
       </section>
 
@@ -196,7 +243,13 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Shadows &amp; rings</h2>
         <div class="swatch-grid">
-          <TokenSwatch v-for="t in shadows" :key="t.name" :name="t.name" :css-var="t.cssVar" kind="shadow" />
+          <TokenSwatch
+            v-for="t in shadows"
+            :key="t.name"
+            :name="t.name"
+            :css-var="t.cssVar"
+            kind="shadow"
+          />
         </div>
       </section>
 
@@ -204,7 +257,13 @@ const typeClasses = [
       <section class="token-section">
         <h2 class="ad-h4 section-title">Radii</h2>
         <div class="swatch-grid">
-          <TokenSwatch v-for="t in radii" :key="t.name" :name="t.name" :css-var="t.cssVar" kind="radius" />
+          <TokenSwatch
+            v-for="t in radii"
+            :key="t.name"
+            :name="t.name"
+            :css-var="t.cssVar"
+            kind="radius"
+          />
         </div>
       </section>
 
@@ -229,7 +288,6 @@ const typeClasses = [
           </div>
         </div>
       </section>
-
     </main>
   </div>
 </template>

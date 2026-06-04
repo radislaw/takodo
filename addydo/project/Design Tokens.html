@@ -1,1116 +1,1647 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AddyDo — Дизайн-токены</title>
-  <link rel="stylesheet" href="colors_and_type.css">
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--cream);
-      color: var(--ink);
-      font-family: var(--font-body);
-      font-size: var(--fs-body);
-      line-height: var(--lh-body);
-      min-height: 100vh;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 224px 1fr;
-      min-height: 100vh;
-    }
-
-    /* ── Sidebar ─────────────────────────────────────────── */
-    .sidebar {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-      background: var(--card);
-      border-right: 1px solid var(--line);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar-logo {
-      padding: var(--s-5) var(--s-5) var(--s-5);
-      border-bottom: 1px solid var(--line);
-      flex-shrink: 0;
-    }
-
-    .wordmark {
-      font-family: var(--font-display);
-      font-size: 20px;
-      font-weight: var(--w-x);
-      color: var(--ink);
-      letter-spacing: var(--tracking-tight);
-      line-height: 1;
-    }
-
-    .wordmark span { color: var(--sage-deep); }
-
-    .sidebar-sub {
-      font-size: var(--fs-cap);
-      color: var(--ink-soft);
-      margin-top: var(--s-1);
-    }
-
-    .nav-scroll { flex: 1; overflow-y: auto; padding: var(--s-3) 0; }
-
-    .nav-label {
-      font-size: var(--fs-micro);
-      font-weight: var(--w-bold);
-      letter-spacing: var(--tracking-caps);
-      text-transform: uppercase;
-      color: var(--ink-faint);
-      padding: var(--s-3) var(--s-5) var(--s-2);
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: var(--s-2);
-      padding: 7px var(--s-5);
-      font-size: var(--fs-sm);
-      color: var(--ink-soft);
-      text-decoration: none;
-      transition: background 160ms, color 160ms;
-    }
-
-    .nav-item:hover { background: var(--sage-tint); color: var(--ink); }
-    .nav-item.active { background: var(--sage-tint); color: var(--sage-deep); font-weight: var(--w-semi); }
-
-    /* Theme switcher */
-    .theme-switcher {
-      padding: var(--s-4) var(--s-5);
-      border-top: 1px solid var(--line);
-      flex-shrink: 0;
-    }
-
-    .theme-switcher-label {
-      font-size: var(--fs-micro);
-      font-weight: var(--w-bold);
-      letter-spacing: var(--tracking-caps);
-      text-transform: uppercase;
-      color: var(--ink-faint);
-      margin-bottom: var(--s-2);
-    }
-
-    .theme-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-
-    .theme-pill {
-      font-size: 10px;
-      padding: 3px 7px;
-      border-radius: var(--r-pill);
-      border: 1px solid var(--line);
-      background: transparent;
-      color: var(--ink-soft);
-      cursor: pointer;
-      font-family: var(--font-body);
-      transition: all 140ms;
-    }
-
-    .theme-pill:hover { border-color: var(--sage); color: var(--sage-deep); }
-    .theme-pill.active { background: var(--accent-fill); color: #fff; border-color: transparent; }
-
-    /* ── Main ────────────────────────────────────────────── */
-    .main {
-      padding: var(--s-9) var(--s-8) var(--s-12);
-      max-width: 1000px;
-    }
-
-    .section {
-      margin-bottom: var(--s-12);
-      scroll-margin-top: var(--s-6);
-    }
-
-    .section-header {
-      margin-bottom: var(--s-7);
-      padding-bottom: var(--s-4);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .section-title {
-      font-family: var(--font-display);
-      font-size: var(--fs-h1);
-      font-weight: var(--w-x);
-      letter-spacing: var(--tracking-tight);
-      color: var(--ink);
-    }
-
-    .section-desc {
-      font-size: var(--fs-sm);
-      color: var(--ink-soft);
-      margin-top: var(--s-1);
-      line-height: 1.5;
-    }
-
-    .subsection { margin-bottom: var(--s-7); }
-
-    .sub-label {
-      font-size: var(--fs-micro);
-      font-weight: var(--w-bold);
-      letter-spacing: var(--tracking-caps);
-      text-transform: uppercase;
-      color: var(--ink-faint);
-      margin-bottom: var(--s-3);
-    }
-
-    /* ── Color swatches ──────────────────────────────────── */
-    .swatch-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
-      gap: var(--s-3);
-    }
-
-    .swatch-card {
-      border-radius: var(--r-md);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .swatch-color {
-      height: 68px;
-    }
-
-    .swatch-color.bordered {
-      border-bottom: 1px solid var(--line-card);
-      outline: 1px solid var(--line);
-      outline-offset: -1px;
-    }
-
-    .swatch-body {
-      background: var(--card);
-      padding: var(--s-2) var(--s-3) var(--s-3);
-    }
-
-    .swatch-name {
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-
-    .swatch-note {
-      font-size: var(--fs-micro);
-      color: var(--ink-soft);
-      margin-top: 1px;
-      line-height: 1.35;
-    }
-
-    .swatch-hex {
-      font-family: 'Courier New', monospace;
-      font-size: var(--fs-micro);
-      color: var(--ink-faint);
-      margin-top: 2px;
-    }
-
-    /* ── Fill tokens ─────────────────────────────────────── */
-    .fill-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--s-4);
-    }
-
-    .fill-card {
-      border-radius: var(--r-md);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .fill-swatch-accent {
-      height: 56px;
-      background: var(--accent-fill);
-    }
-
-    .fill-swatch-reward {
-      height: 56px;
-      background: var(--reward-fill);
-    }
-
-    .fill-body {
-      background: var(--card);
-      padding: var(--s-2) var(--s-3) var(--s-3);
-    }
-
-    .fill-name {
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-
-    .fill-note {
-      font-size: var(--fs-micro);
-      color: var(--ink-soft);
-      margin-top: 1px;
-    }
-
-    /* ── Shadows ─────────────────────────────────────────── */
-    .shadow-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: var(--s-5);
-    }
-
-    .shadow-card {
-      background: var(--card);
-      border-radius: var(--r-lg);
-      padding: var(--s-5) var(--s-5) var(--s-4);
-    }
-
-    .shadow-name {
-      font-family: 'Courier New', monospace;
-      font-size: var(--fs-cap);
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: var(--s-1);
-    }
-
-    .shadow-desc {
-      font-size: var(--fs-micro);
-      color: var(--ink-soft);
-      line-height: 1.4;
-    }
-
-    .ring-swatch {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--r-md);
-      margin-bottom: var(--s-3);
-    }
-
-    /* ── Radii ───────────────────────────────────────────── */
-    .radius-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s-7);
-      align-items: flex-end;
-    }
-
-    .radius-demo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--s-3);
-    }
-
-    .radius-shape {
-      background: var(--sage-tint);
-      border: 1.5px solid var(--sage);
-      width: 72px;
-      height: 72px;
-    }
-
-    .radius-pill-shape {
-      background: var(--sage-tint);
-      border: 1.5px solid var(--sage);
-      width: 120px;
-      height: 44px;
-    }
-
-    .radius-label {
-      text-align: center;
-    }
-
-    .radius-token {
-      display: block;
-      font-family: 'Courier New', monospace;
-      font-size: var(--fs-cap);
-      font-weight: 700;
-      color: var(--ink);
-    }
-
-    .radius-value {
-      display: block;
-      font-size: var(--fs-micro);
-      color: var(--ink-soft);
-      margin-top: 1px;
-    }
-
-    /* ── Spacing ─────────────────────────────────────────── */
-    .spacing-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--s-2);
-    }
-
-    .spacing-row {
-      display: flex;
-      align-items: center;
-      gap: var(--s-4);
-    }
-
-    .spacing-token {
-      font-family: 'Courier New', monospace;
-      font-size: var(--fs-cap);
-      font-weight: 700;
-      color: var(--ink);
-      width: 52px;
-      flex-shrink: 0;
-    }
-
-    .spacing-track {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: var(--s-3);
-    }
-
-    .spacing-bar {
-      background: var(--sage);
-      opacity: 0.6;
-      height: 18px;
-      border-radius: 4px;
-      flex-shrink: 0;
-    }
-
-    .spacing-val {
-      font-size: var(--fs-sm);
-      color: var(--ink-soft);
-      min-width: 32px;
-    }
-
-    /* ── Type ────────────────────────────────────────────── */
-    .font-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--s-4);
-      margin-bottom: var(--s-6);
-    }
-
-    .font-card {
-      background: var(--card);
-      border-radius: var(--r-lg);
-      padding: var(--s-6);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .font-sample {
-      font-size: 34px;
-      font-weight: 800;
-      color: var(--ink);
-      line-height: 1.1;
-      margin-bottom: var(--s-3);
-    }
-
-    .font-body-sample {
-      font-size: 17px;
-      font-weight: 400;
-      color: var(--ink-soft);
-      line-height: 1.55;
-      margin-bottom: var(--s-3);
-    }
-
-    .font-meta {
-      font-size: var(--fs-micro);
-      color: var(--ink-soft);
-    }
-
-    .font-token {
-      font-family: 'Courier New', monospace;
-      font-size: var(--fs-micro);
-      color: var(--ink-faint);
-      margin-top: 2px;
-    }
-
-    /* Type scale table */
-    .type-table {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .type-row {
-      display: grid;
-      grid-template-columns: 200px 1fr 100px;
-      align-items: center;
-      gap: var(--s-5);
-      padding: var(--s-4) 0;
-      border-bottom: 1px solid var(--line-card);
-    }
-
-    .type-meta { display: flex; flex-direction: column; gap: 2px; }
-
-    .type-token {
-      font-family: 'Courier New', monospace;
-      font-size: var(--fs-cap);
-      font-weight: 700;
-      color: var(--sage-deep);
-    }
-
-    .type-spec {
-      font-size: var(--fs-micro);
-      color: var(--ink-faint);
-    }
-
-    .type-class {
-      font-family: 'Courier New', monospace;
-      font-size: var(--fs-micro);
-      color: var(--ink-faint);
-      text-align: right;
-    }
-
-    /* Weights */
-    .weight-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s-4);
-    }
-
-    .weight-card {
-      background: var(--card);
-      border-radius: var(--r-md);
-      padding: var(--s-4) var(--s-5);
-      box-shadow: var(--shadow-sm);
-      min-width: 120px;
-    }
-
-    .weight-sample {
-      font-family: var(--font-display);
-      font-size: 26px;
-      color: var(--ink);
-      line-height: 1.1;
-      margin-bottom: 2px;
-    }
-
-    .weight-label {
-      font-size: var(--fs-micro);
-      color: var(--ink-soft);
-    }
-
-    .weight-token {
-      font-family: 'Courier New', monospace;
-      font-size: var(--fs-micro);
-      color: var(--ink-faint);
-      margin-top: 1px;
-    }
-
-    /* Tracking */
-    .tracking-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--s-3);
-    }
-
-    .tracking-row {
-      background: var(--card);
-      border-radius: var(--r-md);
-      padding: var(--s-3) var(--s-5);
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--s-4);
-    }
-
-    .tracking-sample {
-      font-family: var(--font-body);
-      font-size: 15px;
-      color: var(--ink);
-    }
-
-    .tracking-right { text-align: right; flex-shrink: 0; }
-
-    /* ── Themes grid ─────────────────────────────────────── */
-    .themes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-      gap: var(--s-4);
-    }
-
-    .theme-tile {
-      border-radius: var(--r-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-      transition: transform 200ms, box-shadow 200ms;
-      cursor: default;
-    }
-
-    .theme-tile:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .theme-preview {
-      height: 96px;
-      padding: var(--s-3) var(--s-4);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .theme-dots {
-      display: flex;
-      gap: 5px;
-    }
-
-    .theme-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-    }
-
-    .theme-mock {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .theme-mock-row {
-      height: 22px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      padding: 0 7px;
-      gap: 5px;
-    }
-
-    .theme-mock-check {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      border: 1.5px solid;
-      flex-shrink: 0;
-    }
-
-    .theme-mock-line {
-      height: 5px;
-      border-radius: 3px;
-      flex: 1;
-    }
-
-    .theme-info-bar {
-      padding: var(--s-2) var(--s-3) var(--s-3);
-    }
-
-    .theme-name {
-      font-size: var(--fs-sm);
-      font-weight: var(--w-semi);
-    }
-
-    .theme-attr {
-      font-family: 'Courier New', monospace;
-      font-size: 10px;
-      margin-top: 1px;
-      opacity: 0.55;
-    }
-  </style>
-</head>
-<body>
-<div class="layout" id="root">
-
-  <!-- ── Sidebar ─────────────────────────────────────── -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="wordmark">Addy<span>Do</span></div>
-      <div class="sidebar-sub">Дизайн-токены</div>
-    </div>
-
-    <nav class="nav-scroll">
-      <div class="nav-label">Токены</div>
-      <a class="nav-item" href="#colors"><i data-lucide="palette" style="width:13px;height:13px;flex-shrink:0"></i>Цвета</a>
-      <a class="nav-item" href="#shadows"><i data-lucide="layers" style="width:13px;height:13px;flex-shrink:0"></i>Тени</a>
-      <a class="nav-item" href="#radii"><i data-lucide="square-dashed" style="width:13px;height:13px;flex-shrink:0"></i>Скругления</a>
-      <a class="nav-item" href="#spacing"><i data-lucide="move-horizontal" style="width:13px;height:13px;flex-shrink:0"></i>Отступы</a>
-      <a class="nav-item" href="#type"><i data-lucide="type" style="width:13px;height:13px;flex-shrink:0"></i>Типографика</a>
-      <a class="nav-item" href="#themes"><i data-lucide="sun-moon" style="width:13px;height:13px;flex-shrink:0"></i>Темы</a>
-    </nav>
-
-    <div class="theme-switcher">
-      <div class="theme-switcher-label">Тема страницы</div>
-      <div class="theme-pills" id="themePills"></div>
-    </div>
-  </aside>
-
-  <!-- ── Main ────────────────────────────────────────── -->
-  <main class="main">
-
-    <!-- COLORS -->
-    <section class="section" id="colors">
-      <div class="section-header">
-        <h2 class="section-title">Цвета</h2>
-        <p class="section-desc">Базовая палитра «Спокойный шалфей и сливки» — поверхности, текст, акцент, награда, семантика, категории.</p>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Поверхности</div>
-        <div class="swatch-grid">
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#F5F3F0"></div>
-            <div class="swatch-body"><div class="swatch-name">--cream</div><div class="swatch-note">Фон приложения</div><div class="swatch-hex">#F5F3F0</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#EDEAE5"></div>
-            <div class="swatch-body"><div class="swatch-name">--cream-deep</div><div class="swatch-note">Вдавленные поля</div><div class="swatch-hex">#EDEAE5</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#FFFFFF"></div>
-            <div class="swatch-body"><div class="swatch-name">--card</div><div class="swatch-note">Карточки и шторки</div><div class="swatch-hex">#FFFFFF</div></div>
-          </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AddyDo — Дизайн-токены</title>
+    <link rel="stylesheet" href="colors_and_type.css" />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--cream);
+        color: var(--ink);
+        font-family: var(--font-body);
+        font-size: var(--fs-body);
+        line-height: var(--lh-body);
+        min-height: 100vh;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 224px 1fr;
+        min-height: 100vh;
+      }
+
+      /* ── Sidebar ─────────────────────────────────────────── */
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar-logo {
+        padding: var(--s-5) var(--s-5) var(--s-5);
+        border-bottom: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+
+      .wordmark {
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: var(--w-x);
+        color: var(--ink);
+        letter-spacing: var(--tracking-tight);
+        line-height: 1;
+      }
+
+      .wordmark span {
+        color: var(--sage-deep);
+      }
+
+      .sidebar-sub {
+        font-size: var(--fs-cap);
+        color: var(--ink-soft);
+        margin-top: var(--s-1);
+      }
+
+      .nav-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: var(--s-3) 0;
+      }
+
+      .nav-label {
+        font-size: var(--fs-micro);
+        font-weight: var(--w-bold);
+        letter-spacing: var(--tracking-caps);
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        padding: var(--s-3) var(--s-5) var(--s-2);
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: var(--s-2);
+        padding: 7px var(--s-5);
+        font-size: var(--fs-sm);
+        color: var(--ink-soft);
+        text-decoration: none;
+        transition:
+          background 160ms,
+          color 160ms;
+      }
+
+      .nav-item:hover {
+        background: var(--sage-tint);
+        color: var(--ink);
+      }
+      .nav-item.active {
+        background: var(--sage-tint);
+        color: var(--sage-deep);
+        font-weight: var(--w-semi);
+      }
+
+      /* Theme switcher */
+      .theme-switcher {
+        padding: var(--s-4) var(--s-5);
+        border-top: 1px solid var(--line);
+        flex-shrink: 0;
+      }
+
+      .theme-switcher-label {
+        font-size: var(--fs-micro);
+        font-weight: var(--w-bold);
+        letter-spacing: var(--tracking-caps);
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin-bottom: var(--s-2);
+      }
+
+      .theme-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .theme-pill {
+        font-size: 10px;
+        padding: 3px 7px;
+        border-radius: var(--r-pill);
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--ink-soft);
+        cursor: pointer;
+        font-family: var(--font-body);
+        transition: all 140ms;
+      }
+
+      .theme-pill:hover {
+        border-color: var(--sage);
+        color: var(--sage-deep);
+      }
+      .theme-pill.active {
+        background: var(--accent-fill);
+        color: #fff;
+        border-color: transparent;
+      }
+
+      /* ── Main ────────────────────────────────────────────── */
+      .main {
+        padding: var(--s-9) var(--s-8) var(--s-12);
+        max-width: 1000px;
+      }
+
+      .section {
+        margin-bottom: var(--s-12);
+        scroll-margin-top: var(--s-6);
+      }
+
+      .section-header {
+        margin-bottom: var(--s-7);
+        padding-bottom: var(--s-4);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-title {
+        font-family: var(--font-display);
+        font-size: var(--fs-h1);
+        font-weight: var(--w-x);
+        letter-spacing: var(--tracking-tight);
+        color: var(--ink);
+      }
+
+      .section-desc {
+        font-size: var(--fs-sm);
+        color: var(--ink-soft);
+        margin-top: var(--s-1);
+        line-height: 1.5;
+      }
+
+      .subsection {
+        margin-bottom: var(--s-7);
+      }
+
+      .sub-label {
+        font-size: var(--fs-micro);
+        font-weight: var(--w-bold);
+        letter-spacing: var(--tracking-caps);
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin-bottom: var(--s-3);
+      }
+
+      /* ── Color swatches ──────────────────────────────────── */
+      .swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+        gap: var(--s-3);
+      }
+
+      .swatch-card {
+        border-radius: var(--r-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .swatch-color {
+        height: 68px;
+      }
+
+      .swatch-color.bordered {
+        border-bottom: 1px solid var(--line-card);
+        outline: 1px solid var(--line);
+        outline-offset: -1px;
+      }
+
+      .swatch-body {
+        background: var(--card);
+        padding: var(--s-2) var(--s-3) var(--s-3);
+      }
+
+      .swatch-name {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .swatch-note {
+        font-size: var(--fs-micro);
+        color: var(--ink-soft);
+        margin-top: 1px;
+        line-height: 1.35;
+      }
+
+      .swatch-hex {
+        font-family: 'Courier New', monospace;
+        font-size: var(--fs-micro);
+        color: var(--ink-faint);
+        margin-top: 2px;
+      }
+
+      /* ── Fill tokens ─────────────────────────────────────── */
+      .fill-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--s-4);
+      }
+
+      .fill-card {
+        border-radius: var(--r-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .fill-swatch-accent {
+        height: 56px;
+        background: var(--accent-fill);
+      }
+
+      .fill-swatch-reward {
+        height: 56px;
+        background: var(--reward-fill);
+      }
+
+      .fill-body {
+        background: var(--card);
+        padding: var(--s-2) var(--s-3) var(--s-3);
+      }
+
+      .fill-name {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .fill-note {
+        font-size: var(--fs-micro);
+        color: var(--ink-soft);
+        margin-top: 1px;
+      }
+
+      /* ── Shadows ─────────────────────────────────────────── */
+      .shadow-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--s-5);
+      }
+
+      .shadow-card {
+        background: var(--card);
+        border-radius: var(--r-lg);
+        padding: var(--s-5) var(--s-5) var(--s-4);
+      }
+
+      .shadow-name {
+        font-family: 'Courier New', monospace;
+        font-size: var(--fs-cap);
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: var(--s-1);
+      }
+
+      .shadow-desc {
+        font-size: var(--fs-micro);
+        color: var(--ink-soft);
+        line-height: 1.4;
+      }
+
+      .ring-swatch {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--r-md);
+        margin-bottom: var(--s-3);
+      }
+
+      /* ── Radii ───────────────────────────────────────────── */
+      .radius-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s-7);
+        align-items: flex-end;
+      }
+
+      .radius-demo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--s-3);
+      }
+
+      .radius-shape {
+        background: var(--sage-tint);
+        border: 1.5px solid var(--sage);
+        width: 72px;
+        height: 72px;
+      }
+
+      .radius-pill-shape {
+        background: var(--sage-tint);
+        border: 1.5px solid var(--sage);
+        width: 120px;
+        height: 44px;
+      }
+
+      .radius-label {
+        text-align: center;
+      }
+
+      .radius-token {
+        display: block;
+        font-family: 'Courier New', monospace;
+        font-size: var(--fs-cap);
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .radius-value {
+        display: block;
+        font-size: var(--fs-micro);
+        color: var(--ink-soft);
+        margin-top: 1px;
+      }
+
+      /* ── Spacing ─────────────────────────────────────────── */
+      .spacing-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s-2);
+      }
+
+      .spacing-row {
+        display: flex;
+        align-items: center;
+        gap: var(--s-4);
+      }
+
+      .spacing-token {
+        font-family: 'Courier New', monospace;
+        font-size: var(--fs-cap);
+        font-weight: 700;
+        color: var(--ink);
+        width: 52px;
+        flex-shrink: 0;
+      }
+
+      .spacing-track {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: var(--s-3);
+      }
+
+      .spacing-bar {
+        background: var(--sage);
+        opacity: 0.6;
+        height: 18px;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+
+      .spacing-val {
+        font-size: var(--fs-sm);
+        color: var(--ink-soft);
+        min-width: 32px;
+      }
+
+      /* ── Type ────────────────────────────────────────────── */
+      .font-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--s-4);
+        margin-bottom: var(--s-6);
+      }
+
+      .font-card {
+        background: var(--card);
+        border-radius: var(--r-lg);
+        padding: var(--s-6);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .font-sample {
+        font-size: 34px;
+        font-weight: 800;
+        color: var(--ink);
+        line-height: 1.1;
+        margin-bottom: var(--s-3);
+      }
+
+      .font-body-sample {
+        font-size: 17px;
+        font-weight: 400;
+        color: var(--ink-soft);
+        line-height: 1.55;
+        margin-bottom: var(--s-3);
+      }
+
+      .font-meta {
+        font-size: var(--fs-micro);
+        color: var(--ink-soft);
+      }
+
+      .font-token {
+        font-family: 'Courier New', monospace;
+        font-size: var(--fs-micro);
+        color: var(--ink-faint);
+        margin-top: 2px;
+      }
+
+      /* Type scale table */
+      .type-table {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .type-row {
+        display: grid;
+        grid-template-columns: 200px 1fr 100px;
+        align-items: center;
+        gap: var(--s-5);
+        padding: var(--s-4) 0;
+        border-bottom: 1px solid var(--line-card);
+      }
+
+      .type-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .type-token {
+        font-family: 'Courier New', monospace;
+        font-size: var(--fs-cap);
+        font-weight: 700;
+        color: var(--sage-deep);
+      }
+
+      .type-spec {
+        font-size: var(--fs-micro);
+        color: var(--ink-faint);
+      }
+
+      .type-class {
+        font-family: 'Courier New', monospace;
+        font-size: var(--fs-micro);
+        color: var(--ink-faint);
+        text-align: right;
+      }
+
+      /* Weights */
+      .weight-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s-4);
+      }
+
+      .weight-card {
+        background: var(--card);
+        border-radius: var(--r-md);
+        padding: var(--s-4) var(--s-5);
+        box-shadow: var(--shadow-sm);
+        min-width: 120px;
+      }
+
+      .weight-sample {
+        font-family: var(--font-display);
+        font-size: 26px;
+        color: var(--ink);
+        line-height: 1.1;
+        margin-bottom: 2px;
+      }
+
+      .weight-label {
+        font-size: var(--fs-micro);
+        color: var(--ink-soft);
+      }
+
+      .weight-token {
+        font-family: 'Courier New', monospace;
+        font-size: var(--fs-micro);
+        color: var(--ink-faint);
+        margin-top: 1px;
+      }
+
+      /* Tracking */
+      .tracking-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s-3);
+      }
+
+      .tracking-row {
+        background: var(--card);
+        border-radius: var(--r-md);
+        padding: var(--s-3) var(--s-5);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--s-4);
+      }
+
+      .tracking-sample {
+        font-family: var(--font-body);
+        font-size: 15px;
+        color: var(--ink);
+      }
+
+      .tracking-right {
+        text-align: right;
+        flex-shrink: 0;
+      }
+
+      /* ── Themes grid ─────────────────────────────────────── */
+      .themes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+        gap: var(--s-4);
+      }
+
+      .theme-tile {
+        border-radius: var(--r-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        transition:
+          transform 200ms,
+          box-shadow 200ms;
+        cursor: default;
+      }
+
+      .theme-tile:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .theme-preview {
+        height: 96px;
+        padding: var(--s-3) var(--s-4);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .theme-dots {
+        display: flex;
+        gap: 5px;
+      }
+
+      .theme-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+
+      .theme-mock {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .theme-mock-row {
+        height: 22px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        padding: 0 7px;
+        gap: 5px;
+      }
+
+      .theme-mock-check {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 1.5px solid;
+        flex-shrink: 0;
+      }
+
+      .theme-mock-line {
+        height: 5px;
+        border-radius: 3px;
+        flex: 1;
+      }
+
+      .theme-info-bar {
+        padding: var(--s-2) var(--s-3) var(--s-3);
+      }
+
+      .theme-name {
+        font-size: var(--fs-sm);
+        font-weight: var(--w-semi);
+      }
+
+      .theme-attr {
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        margin-top: 1px;
+        opacity: 0.55;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout" id="root">
+      <!-- ── Sidebar ─────────────────────────────────────── -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">
+          <div class="wordmark">Addy<span>Do</span></div>
+          <div class="sidebar-sub">Дизайн-токены</div>
         </div>
-      </div>
 
-      <div class="subsection">
-        <div class="sub-label">Текст (Ink)</div>
-        <div class="swatch-grid">
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#2C3A33"></div>
-            <div class="swatch-body"><div class="swatch-name">--ink</div><div class="swatch-note">Основной текст</div><div class="swatch-hex">#2C3A33</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#8A9A8F"></div>
-            <div class="swatch-body"><div class="swatch-name">--ink-soft</div><div class="swatch-note">Вторичный</div><div class="swatch-hex">#8A9A8F</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#B4BEB8"></div>
-            <div class="swatch-body"><div class="swatch-name">--ink-faint</div><div class="swatch-note">Плейсхолдеры</div><div class="swatch-hex">#B4BEB8</div></div>
-          </div>
+        <nav class="nav-scroll">
+          <div class="nav-label">Токены</div>
+          <a class="nav-item" href="#colors"
+            ><i data-lucide="palette" style="width: 13px; height: 13px; flex-shrink: 0"></i>Цвета</a
+          >
+          <a class="nav-item" href="#shadows"
+            ><i data-lucide="layers" style="width: 13px; height: 13px; flex-shrink: 0"></i>Тени</a
+          >
+          <a class="nav-item" href="#radii"
+            ><i data-lucide="square-dashed" style="width: 13px; height: 13px; flex-shrink: 0"></i
+            >Скругления</a
+          >
+          <a class="nav-item" href="#spacing"
+            ><i data-lucide="move-horizontal" style="width: 13px; height: 13px; flex-shrink: 0"></i
+            >Отступы</a
+          >
+          <a class="nav-item" href="#type"
+            ><i data-lucide="type" style="width: 13px; height: 13px; flex-shrink: 0"></i
+            >Типографика</a
+          >
+          <a class="nav-item" href="#themes"
+            ><i data-lucide="sun-moon" style="width: 13px; height: 13px; flex-shrink: 0"></i>Темы</a
+          >
+        </nav>
+
+        <div class="theme-switcher">
+          <div class="theme-switcher-label">Тема страницы</div>
+          <div class="theme-pills" id="themePills"></div>
         </div>
-      </div>
+      </aside>
 
-      <div class="subsection">
-        <div class="sub-label">Акцент — шалфей (Sage)</div>
-        <div class="swatch-grid">
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#7C9A92"></div>
-            <div class="swatch-body"><div class="swatch-name">--sage</div><div class="swatch-note">Основной акцент</div><div class="swatch-hex">#7C9A92</div></div>
+      <!-- ── Main ────────────────────────────────────────── -->
+      <main class="main">
+        <!-- COLORS -->
+        <section class="section" id="colors">
+          <div class="section-header">
+            <h2 class="section-title">Цвета</h2>
+            <p class="section-desc">
+              Базовая палитра «Спокойный шалфей и сливки» — поверхности, текст, акцент, награда,
+              семантика, категории.
+            </p>
           </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#6A8780"></div>
-            <div class="swatch-body"><div class="swatch-name">--sage-press</div><div class="swatch-note">Hover / нажатие</div><div class="swatch-hex">#6A8780</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#5A746D"></div>
-            <div class="swatch-body"><div class="swatch-name">--sage-deep</div><div class="swatch-note">Акцентный текст</div><div class="swatch-hex">#5A746D</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#E8EFEC"></div>
-            <div class="swatch-body"><div class="swatch-name">--sage-tint</div><div class="swatch-note">Выделенный фон</div><div class="swatch-hex">#E8EFEC</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#D6E3DE"></div>
-            <div class="swatch-body"><div class="swatch-name">--sage-tint-2</div><div class="swatch-note">Прогресс-трек</div><div class="swatch-hex">#D6E3DE</div></div>
-          </div>
-        </div>
-      </div>
 
-      <div class="subsection">
-        <div class="sub-label">Награда — абрикос (Apricot)</div>
-        <div class="swatch-grid">
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#E0A87E"></div>
-            <div class="swatch-body"><div class="swatch-name">--apricot</div><div class="swatch-note">Награда / серия</div><div class="swatch-hex">#E0A87E</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#D2956A"></div>
-            <div class="swatch-body"><div class="swatch-name">--apricot-press</div><div class="swatch-note">Нажатие</div><div class="swatch-hex">#D2956A</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#B97C53"></div>
-            <div class="swatch-body"><div class="swatch-name">--apricot-deep</div><div class="swatch-note">Текст награды</div><div class="swatch-hex">#B97C53</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#F7E9DC"></div>
-            <div class="swatch-body"><div class="swatch-name">--apricot-tint</div><div class="swatch-note">Фон бейджа</div><div class="swatch-hex">#F7E9DC</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Заливки (Fill Tokens)</div>
-        <div class="fill-grid">
-          <div class="fill-card">
-            <div class="fill-swatch-accent"></div>
-            <div class="fill-body"><div class="fill-name">--accent-fill</div><div class="fill-note">Кнопки, FAB, чекбокс — градиент в теме Киберпанк</div></div>
-          </div>
-          <div class="fill-card">
-            <div class="fill-swatch-reward"></div>
-            <div class="fill-body"><div class="fill-name">--reward-fill</div><div class="fill-note">Награда — градиент в теме Киберпанк</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Семантика</div>
-        <div class="swatch-grid">
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#84A98C"></div>
-            <div class="swatch-body"><div class="swatch-name">--done</div><div class="swatch-note">Выполнено</div><div class="swatch-hex">#84A98C</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#E6EFE7"></div>
-            <div class="swatch-body"><div class="swatch-name">--done-tint</div><div class="swatch-hex">#E6EFE7</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#D9B36A"></div>
-            <div class="swatch-body"><div class="swatch-name">--gentle</div><div class="swatch-note">Мягкое предупреждение</div><div class="swatch-hex">#D9B36A</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#F4EBD6"></div>
-            <div class="swatch-body"><div class="swatch-name">--gentle-tint</div><div class="swatch-hex">#F4EBD6</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#C99A9A"></div>
-            <div class="swatch-body"><div class="swatch-name">--softrose</div><div class="swatch-note">Просрочено — мягко</div><div class="swatch-hex">#C99A9A</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#F2E4E2"></div>
-            <div class="swatch-body"><div class="swatch-name">--softrose-tint</div><div class="swatch-hex">#F2E4E2</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Категории (Category Dots)</div>
-        <div class="swatch-grid">
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#7C9A92"></div>
-            <div class="swatch-body"><div class="swatch-name">--cat-sage</div><div class="swatch-hex">#7C9A92</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#E0A87E"></div>
-            <div class="swatch-body"><div class="swatch-name">--cat-apricot</div><div class="swatch-hex">#E0A87E</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#93A8B5"></div>
-            <div class="swatch-body"><div class="swatch-name">--cat-blue</div><div class="swatch-hex">#93A8B5</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#C49A8A"></div>
-            <div class="swatch-body"><div class="swatch-name">--cat-clay</div><div class="swatch-hex">#C49A8A</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#D4B483"></div>
-            <div class="swatch-body"><div class="swatch-name">--cat-gold</div><div class="swatch-hex">#D4B483</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color" style="background:#B59CB0"></div>
-            <div class="swatch-body"><div class="swatch-name">--cat-mauve</div><div class="swatch-hex">#B59CB0</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Линии и границы</div>
-        <div class="swatch-grid">
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#E7E3DE"></div>
-            <div class="swatch-body"><div class="swatch-name">--line</div><div class="swatch-note">Граница на cream</div><div class="swatch-hex">#E7E3DE</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#EFECE7"></div>
-            <div class="swatch-body"><div class="swatch-name">--line-card</div><div class="swatch-note">Разделитель в карте</div><div class="swatch-hex">#EFECE7</div></div>
-          </div>
-          <div class="swatch-card">
-            <div class="swatch-color bordered" style="background:#D8D2CA"></div>
-            <div class="swatch-body"><div class="swatch-name">--line-strong</div><div class="swatch-note">Акцентный</div><div class="swatch-hex">#D8D2CA</div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SHADOWS -->
-    <section class="section" id="shadows">
-      <div class="section-header">
-        <h2 class="section-title">Тени</h2>
-        <p class="section-desc">Мягкие, тёплые, едва заметные. Четыре уровня высоты + кольца фокуса.</p>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Elevation</div>
-        <div class="shadow-grid">
-          <div class="shadow-card" style="box-shadow:var(--shadow-sm)">
-            <div class="shadow-name">--shadow-sm</div>
-            <div class="shadow-desc">Чипы, иконки — минимальная высота</div>
-          </div>
-          <div class="shadow-card" style="box-shadow:var(--shadow-md)">
-            <div class="shadow-name">--shadow-md</div>
-            <div class="shadow-desc">Карточки задач, листы</div>
-          </div>
-          <div class="shadow-card" style="box-shadow:var(--shadow-lg)">
-            <div class="shadow-name">--shadow-lg</div>
-            <div class="shadow-desc">Модальные окна, шторки</div>
-          </div>
-          <div class="shadow-card" style="box-shadow:var(--shadow-pop)">
-            <div class="shadow-name">--shadow-pop</div>
-            <div class="shadow-desc">Всплывающие элементы, FAB</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Кольца фокуса</div>
-        <div class="shadow-grid">
-          <div class="shadow-card" style="box-shadow:none">
-            <div class="ring-swatch" style="background:var(--sage-tint);box-shadow:var(--ring)"></div>
-            <div class="shadow-name">--ring</div>
-            <div class="shadow-desc">Sage-кольцо — спокойный фокус</div>
-          </div>
-          <div class="shadow-card" style="box-shadow:none">
-            <div class="ring-swatch" style="background:var(--apricot-tint);box-shadow:var(--ring-apr)"></div>
-            <div class="shadow-name">--ring-apr</div>
-            <div class="shadow-desc">Apricot-кольцо — для наград</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- RADII -->
-    <section class="section" id="radii">
-      <div class="section-header">
-        <h2 class="section-title">Скругления</h2>
-        <p class="section-desc">Щедрые, мягкие, дружелюбные. Ничего с острыми углами.</p>
-      </div>
-
-      <div class="radius-grid">
-        <div class="radius-demo">
-          <div class="radius-shape" style="border-radius:8px"></div>
-          <div class="radius-label">
-            <span class="radius-token">--r-xs</span>
-            <span class="radius-value">8px</span>
-          </div>
-        </div>
-        <div class="radius-demo">
-          <div class="radius-shape" style="border-radius:12px"></div>
-          <div class="radius-label">
-            <span class="radius-token">--r-sm</span>
-            <span class="radius-value">12px</span>
-          </div>
-        </div>
-        <div class="radius-demo">
-          <div class="radius-shape" style="border-radius:16px"></div>
-          <div class="radius-label">
-            <span class="radius-token">--r-md</span>
-            <span class="radius-value">16px</span>
-          </div>
-        </div>
-        <div class="radius-demo">
-          <div class="radius-shape" style="border-radius:20px"></div>
-          <div class="radius-label">
-            <span class="radius-token">--r-lg</span>
-            <span class="radius-value">20px · карточки</span>
-          </div>
-        </div>
-        <div class="radius-demo">
-          <div class="radius-shape" style="border-radius:28px"></div>
-          <div class="radius-label">
-            <span class="radius-token">--r-xl</span>
-            <span class="radius-value">28px · шторки</span>
-          </div>
-        </div>
-        <div class="radius-demo">
-          <div class="radius-pill-shape" style="border-radius:999px"></div>
-          <div class="radius-label">
-            <span class="radius-token">--r-pill</span>
-            <span class="radius-value">999px · пилюли</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SPACING -->
-    <section class="section" id="spacing">
-      <div class="section-header">
-        <h2 class="section-title">Отступы</h2>
-        <p class="section-desc">4px база, применяется щедро. Воздух — это часть дизайна.</p>
-      </div>
-
-      <div class="spacing-list">
-        <div class="spacing-row"><div class="spacing-token">--s-1</div><div class="spacing-track"><div class="spacing-bar" style="width:4px"></div><div class="spacing-val">4px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-2</div><div class="spacing-track"><div class="spacing-bar" style="width:8px"></div><div class="spacing-val">8px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-3</div><div class="spacing-track"><div class="spacing-bar" style="width:12px"></div><div class="spacing-val">12px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-4</div><div class="spacing-track"><div class="spacing-bar" style="width:16px"></div><div class="spacing-val">16px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-5</div><div class="spacing-track"><div class="spacing-bar" style="width:20px"></div><div class="spacing-val">20px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-6</div><div class="spacing-track"><div class="spacing-bar" style="width:24px"></div><div class="spacing-val">24px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-7</div><div class="spacing-track"><div class="spacing-bar" style="width:32px"></div><div class="spacing-val">32px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-8</div><div class="spacing-track"><div class="spacing-bar" style="width:40px"></div><div class="spacing-val">40px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-9</div><div class="spacing-track"><div class="spacing-bar" style="width:48px"></div><div class="spacing-val">48px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-10</div><div class="spacing-track"><div class="spacing-bar" style="width:64px"></div><div class="spacing-val">64px</div></div></div>
-        <div class="spacing-row"><div class="spacing-token">--s-12</div><div class="spacing-track"><div class="spacing-bar" style="width:80px"></div><div class="spacing-val">80px</div></div></div>
-      </div>
-    </section>
-
-    <!-- TYPOGRAPHY -->
-    <section class="section" id="type">
-      <div class="section-header">
-        <h2 class="section-title">Типографика</h2>
-        <p class="section-desc">Nunito — дисплей и заголовки. Nunito Sans — тело и UI. Оба с полной кириллицей.</p>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Семейства</div>
-        <div class="font-grid">
-          <div class="font-card">
-            <div class="font-sample" style="font-family:'Nunito'">Nunito</div>
-            <div class="font-body-sample" style="font-family:'Nunito'">Задача сделана — маленькая победа.<br>АБВГДЕЁЖЗИЙКЛМН abcdefghijk</div>
-            <div class="font-meta">Заголовки и дисплей · display 800</div>
-            <div class="font-token">--font-display</div>
-          </div>
-          <div class="font-card">
-            <div class="font-sample" style="font-family:'Nunito Sans'">Nunito Sans</div>
-            <div class="font-body-sample" style="font-family:'Nunito Sans'">Выбери одно дело — этого достаточно.<br>АБВГДЕЁЖЗИЙКЛМН abcdefghijk</div>
-            <div class="font-meta">Тело и UI · чистый гуманистический</div>
-            <div class="font-token">--font-body · --font-num</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Шкала размеров</div>
-        <div class="type-table">
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-display</span><span class="type-spec">40px · lh 1.12 · w-x 800</span></div>
-            <div style="font-family:var(--font-display);font-size:40px;line-height:1.12;font-weight:800;letter-spacing:-0.01em;color:var(--ink)">Сегодня</div>
-            <div class="type-class">.ad-display</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-h1</span><span class="type-spec">32px · lh 1.18 · w-x 800</span></div>
-            <div style="font-family:var(--font-display);font-size:32px;line-height:1.18;font-weight:800;letter-spacing:-0.01em;color:var(--ink)">Три шага</div>
-            <div class="type-class">.ad-h1</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-h2</span><span class="type-spec">26px · lh 1.22 · w-bold 700</span></div>
-            <div style="font-family:var(--font-display);font-size:26px;line-height:1.22;font-weight:700;letter-spacing:-0.01em;color:var(--ink)">Выбери одно</div>
-            <div class="type-class">.ad-h2</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-h3</span><span class="type-spec">21px · lh 1.3 · w-bold 700</span></div>
-            <div style="font-family:var(--font-display);font-size:21px;line-height:1.3;font-weight:700;color:var(--ink)">Маленькая победа</div>
-            <div class="type-class">.ad-h3</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-h4</span><span class="type-spec">18px · lh 1.35 · w-bold 700</span></div>
-            <div style="font-family:var(--font-display);font-size:18px;line-height:1.35;font-weight:700;color:var(--ink)">Сделать звонок</div>
-            <div class="type-class">.ad-h4</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-body-lg</span><span class="type-spec">18px · lh 1.55 · w-reg 400</span></div>
-            <div style="font-family:var(--font-body);font-size:18px;line-height:1.55;font-weight:400;color:var(--ink)">Не успел — ничего страшного.</div>
-            <div class="type-class">.ad-body-lg</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-body</span><span class="type-spec">16px · lh 1.55 · w-reg 400</span></div>
-            <div style="font-family:var(--font-body);font-size:16px;line-height:1.55;font-weight:400;color:var(--ink)">Начинаем с чистого листа.</div>
-            <div class="type-class">.ad-body</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-sm</span><span class="type-spec">14px · lh 1.5 · ink-soft</span></div>
-            <div style="font-family:var(--font-body);font-size:14px;line-height:1.5;color:var(--ink-soft)">Сегодня · 4 из 6 дел</div>
-            <div class="type-class">.ad-sm</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-cap</span><span class="type-spec">13px · lh 1.4 · w-semi 600</span></div>
-            <div style="font-family:var(--font-body);font-size:13px;line-height:1.4;font-weight:600;color:var(--ink-soft)">Серия · 5 дней</div>
-            <div class="type-class">.ad-cap</div>
-          </div>
-          <div class="type-row">
-            <div class="type-meta"><span class="type-token">--fs-micro</span><span class="type-spec">11px · lh 1.3 · overline</span></div>
-            <div style="font-family:var(--font-body);font-size:11px;line-height:1.3;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft)">Сегодня</div>
-            <div class="type-class">.ad-overline</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Насыщенность (Font Weight)</div>
-        <div class="weight-row">
-          <div class="weight-card">
-            <div class="weight-sample" style="font-weight:400">Нунито</div>
-            <div class="weight-label">Regular</div>
-            <div class="weight-token">--w-reg · 400</div>
-          </div>
-          <div class="weight-card">
-            <div class="weight-sample" style="font-weight:500">Нунито</div>
-            <div class="weight-label">Medium</div>
-            <div class="weight-token">--w-med · 500</div>
-          </div>
-          <div class="weight-card">
-            <div class="weight-sample" style="font-weight:600">Нунито</div>
-            <div class="weight-label">SemiBold</div>
-            <div class="weight-token">--w-semi · 600</div>
-          </div>
-          <div class="weight-card">
-            <div class="weight-sample" style="font-weight:700">Нунито</div>
-            <div class="weight-label">Bold</div>
-            <div class="weight-token">--w-bold · 700</div>
-          </div>
-          <div class="weight-card">
-            <div class="weight-sample" style="font-weight:800">Нунито</div>
-            <div class="weight-label">ExtraBold</div>
-            <div class="weight-token">--w-x · 800</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="subsection">
-        <div class="sub-label">Межбуквенный интервал (Tracking)</div>
-        <div class="tracking-list">
-          <div class="tracking-row">
-            <div class="tracking-sample" style="letter-spacing:-0.01em;font-weight:800;font-family:var(--font-display);font-size:22px">Выбери одно дело сегодня</div>
-            <div class="tracking-right">
-              <div class="weight-token">--tracking-tight</div>
-              <div class="swatch-note">-0.01em · заголовки</div>
+          <div class="subsection">
+            <div class="sub-label">Поверхности</div>
+            <div class="swatch-grid">
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #f5f3f0"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--cream</div>
+                  <div class="swatch-note">Фон приложения</div>
+                  <div class="swatch-hex">#F5F3F0</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #edeae5"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--cream-deep</div>
+                  <div class="swatch-note">Вдавленные поля</div>
+                  <div class="swatch-hex">#EDEAE5</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #ffffff"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--card</div>
+                  <div class="swatch-note">Карточки и шторки</div>
+                  <div class="swatch-hex">#FFFFFF</div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="tracking-row">
-            <div class="tracking-sample" style="letter-spacing:0.06em;font-size:11px;font-weight:700;text-transform:uppercase">Серия · 5 дней подряд</div>
-            <div class="tracking-right">
-              <div class="weight-token">--tracking-caps</div>
-              <div class="swatch-note">0.06em · оверлайны, метки</div>
+
+          <div class="subsection">
+            <div class="sub-label">Текст (Ink)</div>
+            <div class="swatch-grid">
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #2c3a33"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--ink</div>
+                  <div class="swatch-note">Основной текст</div>
+                  <div class="swatch-hex">#2C3A33</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #8a9a8f"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--ink-soft</div>
+                  <div class="swatch-note">Вторичный</div>
+                  <div class="swatch-hex">#8A9A8F</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #b4beb8"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--ink-faint</div>
+                  <div class="swatch-note">Плейсхолдеры</div>
+                  <div class="swatch-hex">#B4BEB8</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- THEMES -->
-    <section class="section" id="themes">
-      <div class="section-header">
-        <h2 class="section-title">Темы</h2>
-        <p class="section-desc">11 тем — одни и те же токены, разные значения. Переключается через <code style="font-family:monospace;font-size:13px;background:var(--cream-deep);padding:1px 5px;border-radius:4px">data-theme="…"</code></p>
-      </div>
-      <div class="themes-grid" id="themesGrid"></div>
-    </section>
+          <div class="subsection">
+            <div class="sub-label">Акцент — шалфей (Sage)</div>
+            <div class="swatch-grid">
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #7c9a92"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--sage</div>
+                  <div class="swatch-note">Основной акцент</div>
+                  <div class="swatch-hex">#7C9A92</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #6a8780"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--sage-press</div>
+                  <div class="swatch-note">Hover / нажатие</div>
+                  <div class="swatch-hex">#6A8780</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #5a746d"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--sage-deep</div>
+                  <div class="swatch-note">Акцентный текст</div>
+                  <div class="swatch-hex">#5A746D</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #e8efec"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--sage-tint</div>
+                  <div class="swatch-note">Выделенный фон</div>
+                  <div class="swatch-hex">#E8EFEC</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #d6e3de"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--sage-tint-2</div>
+                  <div class="swatch-note">Прогресс-трек</div>
+                  <div class="swatch-hex">#D6E3DE</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-  </main>
-</div>
+          <div class="subsection">
+            <div class="sub-label">Награда — абрикос (Apricot)</div>
+            <div class="swatch-grid">
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #e0a87e"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--apricot</div>
+                  <div class="swatch-note">Награда / серия</div>
+                  <div class="swatch-hex">#E0A87E</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #d2956a"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--apricot-press</div>
+                  <div class="swatch-note">Нажатие</div>
+                  <div class="swatch-hex">#D2956A</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #b97c53"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--apricot-deep</div>
+                  <div class="swatch-note">Текст награды</div>
+                  <div class="swatch-hex">#B97C53</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #f7e9dc"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--apricot-tint</div>
+                  <div class="swatch-note">Фон бейджа</div>
+                  <div class="swatch-hex">#F7E9DC</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-<script>
-  lucide.createIcons();
+          <div class="subsection">
+            <div class="sub-label">Заливки (Fill Tokens)</div>
+            <div class="fill-grid">
+              <div class="fill-card">
+                <div class="fill-swatch-accent"></div>
+                <div class="fill-body">
+                  <div class="fill-name">--accent-fill</div>
+                  <div class="fill-note">Кнопки, FAB, чекбокс — градиент в теме Киберпанк</div>
+                </div>
+              </div>
+              <div class="fill-card">
+                <div class="fill-swatch-reward"></div>
+                <div class="fill-body">
+                  <div class="fill-name">--reward-fill</div>
+                  <div class="fill-note">Награда — градиент в теме Киберпанк</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-  /* ── Themes data ──────────────────────────────────────── */
-  const THEMES = [
-    { attr: '',              label: 'Шалфей',      sub: 'default',                    bg: '#F5F3F0', card: '#FFFFFF', accent: '#7C9A92', reward: '#E0A87E', ink: '#2C3A33', soft: '#8A9A8F' },
-    { attr: 'dark',          label: 'Вечерний',    sub: 'data-theme="dark"',           bg: '#1A211D', card: '#242E29', accent: '#8FAEA5', reward: '#E6B088', ink: '#ECEEE9', soft: '#9CAAA0' },
-    { attr: 'lavender',      label: 'Лаванда',     sub: 'data-theme="lavender"',       bg: '#F4F1F8', card: '#FFFFFF', accent: '#8E84B8', reward: '#E0A87E', ink: '#353048', soft: '#8C86A2' },
-    { attr: 'lavender-dark', label: 'Ночное поле', sub: 'data-theme="lavender-dark"',  bg: '#1D1A28', card: '#27233A', accent: '#A49AD4', reward: '#E6B088', ink: '#EDE9F8', soft: '#9E98B8' },
-    { attr: 'cyberpunk',     label: 'Киберпанк',   sub: 'data-theme="cyberpunk"',      bg: '#0A0820', card: '#161334', accent: '#4D7CFF', reward: '#FF2D6E', ink: '#E4E6FF', soft: '#7E7FC8', accentFill: 'linear-gradient(135deg,#2F6BFF,#8A3DFF)', rewardFill: 'linear-gradient(135deg,#9D3DFF,#FF2D5E)' },
-    { attr: 'high-contrast', label: 'Контраст',    sub: 'data-theme="high-contrast"',  bg: '#FFFFFF', card: '#FFFFFF', accent: '#0B5FD4', reward: '#B85000', ink: '#000000', soft: '#2B2B2B' },
-    { attr: 'cloud',         label: 'Облака',      sub: 'data-theme="cloud"',          bg: '#F0EEE9', card: '#FAF8F3', accent: '#B08968', reward: '#C8A07E', ink: '#4A453D', soft: '#948C7E' },
-    { attr: 'eco',           label: 'Эко',         sub: 'data-theme="eco"',            bg: '#F0F1E9', card: '#FAFBF5', accent: '#6B8A56', reward: '#C57043', ink: '#2E3A2B', soft: '#74806B' },
-    { attr: 'silent',        label: 'Тихий',       sub: 'data-theme="silent"',         bg: '#F2F1EF', card: '#F9F8F6', accent: '#8E9090', reward: '#C4A78A', ink: '#3D3C3A', soft: '#888480' },
-    { attr: 'amber',         label: 'Янтарь',      sub: 'data-theme="amber"',          bg: '#1C1610', card: '#241C14', accent: '#C89018', reward: '#C85A28', ink: '#F0DEB8', soft: '#9C8C6C' },
-    { attr: 'amoled',        label: 'AMOLED',      sub: 'data-theme="amoled"',         bg: '#000000', card: '#0C0C0C', accent: '#5AB4A0', reward: '#E09A64', ink: '#FFFFFF', soft: '#999999' },
-  ];
+          <div class="subsection">
+            <div class="sub-label">Семантика</div>
+            <div class="swatch-grid">
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #84a98c"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--done</div>
+                  <div class="swatch-note">Выполнено</div>
+                  <div class="swatch-hex">#84A98C</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #e6efe7"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--done-tint</div>
+                  <div class="swatch-hex">#E6EFE7</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #d9b36a"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--gentle</div>
+                  <div class="swatch-note">Мягкое предупреждение</div>
+                  <div class="swatch-hex">#D9B36A</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #f4ebd6"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--gentle-tint</div>
+                  <div class="swatch-hex">#F4EBD6</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #c99a9a"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--softrose</div>
+                  <div class="swatch-note">Просрочено — мягко</div>
+                  <div class="swatch-hex">#C99A9A</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #f2e4e2"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--softrose-tint</div>
+                  <div class="swatch-hex">#F2E4E2</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-  /* Build theme tiles */
-  const grid = document.getElementById('themesGrid');
-  THEMES.forEach(t => {
-    const af = t.accentFill || t.accent;
-    const rf = t.rewardFill || t.reward;
-    const el = document.createElement('div');
-    el.className = 'theme-tile';
-    el.innerHTML = `
+          <div class="subsection">
+            <div class="sub-label">Категории (Category Dots)</div>
+            <div class="swatch-grid">
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #7c9a92"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--cat-sage</div>
+                  <div class="swatch-hex">#7C9A92</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #e0a87e"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--cat-apricot</div>
+                  <div class="swatch-hex">#E0A87E</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #93a8b5"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--cat-blue</div>
+                  <div class="swatch-hex">#93A8B5</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #c49a8a"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--cat-clay</div>
+                  <div class="swatch-hex">#C49A8A</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #d4b483"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--cat-gold</div>
+                  <div class="swatch-hex">#D4B483</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background: #b59cb0"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--cat-mauve</div>
+                  <div class="swatch-hex">#B59CB0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <div class="sub-label">Линии и границы</div>
+            <div class="swatch-grid">
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #e7e3de"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--line</div>
+                  <div class="swatch-note">Граница на cream</div>
+                  <div class="swatch-hex">#E7E3DE</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #efece7"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--line-card</div>
+                  <div class="swatch-note">Разделитель в карте</div>
+                  <div class="swatch-hex">#EFECE7</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color bordered" style="background: #d8d2ca"></div>
+                <div class="swatch-body">
+                  <div class="swatch-name">--line-strong</div>
+                  <div class="swatch-note">Акцентный</div>
+                  <div class="swatch-hex">#D8D2CA</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SHADOWS -->
+        <section class="section" id="shadows">
+          <div class="section-header">
+            <h2 class="section-title">Тени</h2>
+            <p class="section-desc">
+              Мягкие, тёплые, едва заметные. Четыре уровня высоты + кольца фокуса.
+            </p>
+          </div>
+
+          <div class="subsection">
+            <div class="sub-label">Elevation</div>
+            <div class="shadow-grid">
+              <div class="shadow-card" style="box-shadow: var(--shadow-sm)">
+                <div class="shadow-name">--shadow-sm</div>
+                <div class="shadow-desc">Чипы, иконки — минимальная высота</div>
+              </div>
+              <div class="shadow-card" style="box-shadow: var(--shadow-md)">
+                <div class="shadow-name">--shadow-md</div>
+                <div class="shadow-desc">Карточки задач, листы</div>
+              </div>
+              <div class="shadow-card" style="box-shadow: var(--shadow-lg)">
+                <div class="shadow-name">--shadow-lg</div>
+                <div class="shadow-desc">Модальные окна, шторки</div>
+              </div>
+              <div class="shadow-card" style="box-shadow: var(--shadow-pop)">
+                <div class="shadow-name">--shadow-pop</div>
+                <div class="shadow-desc">Всплывающие элементы, FAB</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <div class="sub-label">Кольца фокуса</div>
+            <div class="shadow-grid">
+              <div class="shadow-card" style="box-shadow: none">
+                <div
+                  class="ring-swatch"
+                  style="background: var(--sage-tint); box-shadow: var(--ring)"
+                ></div>
+                <div class="shadow-name">--ring</div>
+                <div class="shadow-desc">Sage-кольцо — спокойный фокус</div>
+              </div>
+              <div class="shadow-card" style="box-shadow: none">
+                <div
+                  class="ring-swatch"
+                  style="background: var(--apricot-tint); box-shadow: var(--ring-apr)"
+                ></div>
+                <div class="shadow-name">--ring-apr</div>
+                <div class="shadow-desc">Apricot-кольцо — для наград</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RADII -->
+        <section class="section" id="radii">
+          <div class="section-header">
+            <h2 class="section-title">Скругления</h2>
+            <p class="section-desc">Щедрые, мягкие, дружелюбные. Ничего с острыми углами.</p>
+          </div>
+
+          <div class="radius-grid">
+            <div class="radius-demo">
+              <div class="radius-shape" style="border-radius: 8px"></div>
+              <div class="radius-label">
+                <span class="radius-token">--r-xs</span>
+                <span class="radius-value">8px</span>
+              </div>
+            </div>
+            <div class="radius-demo">
+              <div class="radius-shape" style="border-radius: 12px"></div>
+              <div class="radius-label">
+                <span class="radius-token">--r-sm</span>
+                <span class="radius-value">12px</span>
+              </div>
+            </div>
+            <div class="radius-demo">
+              <div class="radius-shape" style="border-radius: 16px"></div>
+              <div class="radius-label">
+                <span class="radius-token">--r-md</span>
+                <span class="radius-value">16px</span>
+              </div>
+            </div>
+            <div class="radius-demo">
+              <div class="radius-shape" style="border-radius: 20px"></div>
+              <div class="radius-label">
+                <span class="radius-token">--r-lg</span>
+                <span class="radius-value">20px · карточки</span>
+              </div>
+            </div>
+            <div class="radius-demo">
+              <div class="radius-shape" style="border-radius: 28px"></div>
+              <div class="radius-label">
+                <span class="radius-token">--r-xl</span>
+                <span class="radius-value">28px · шторки</span>
+              </div>
+            </div>
+            <div class="radius-demo">
+              <div class="radius-pill-shape" style="border-radius: 999px"></div>
+              <div class="radius-label">
+                <span class="radius-token">--r-pill</span>
+                <span class="radius-value">999px · пилюли</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SPACING -->
+        <section class="section" id="spacing">
+          <div class="section-header">
+            <h2 class="section-title">Отступы</h2>
+            <p class="section-desc">4px база, применяется щедро. Воздух — это часть дизайна.</p>
+          </div>
+
+          <div class="spacing-list">
+            <div class="spacing-row">
+              <div class="spacing-token">--s-1</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 4px"></div>
+                <div class="spacing-val">4px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-2</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 8px"></div>
+                <div class="spacing-val">8px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-3</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 12px"></div>
+                <div class="spacing-val">12px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-4</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 16px"></div>
+                <div class="spacing-val">16px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-5</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 20px"></div>
+                <div class="spacing-val">20px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-6</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 24px"></div>
+                <div class="spacing-val">24px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-7</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 32px"></div>
+                <div class="spacing-val">32px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-8</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 40px"></div>
+                <div class="spacing-val">40px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-9</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 48px"></div>
+                <div class="spacing-val">48px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-10</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 64px"></div>
+                <div class="spacing-val">64px</div>
+              </div>
+            </div>
+            <div class="spacing-row">
+              <div class="spacing-token">--s-12</div>
+              <div class="spacing-track">
+                <div class="spacing-bar" style="width: 80px"></div>
+                <div class="spacing-val">80px</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TYPOGRAPHY -->
+        <section class="section" id="type">
+          <div class="section-header">
+            <h2 class="section-title">Типографика</h2>
+            <p class="section-desc">
+              Nunito — дисплей и заголовки. Nunito Sans — тело и UI. Оба с полной кириллицей.
+            </p>
+          </div>
+
+          <div class="subsection">
+            <div class="sub-label">Семейства</div>
+            <div class="font-grid">
+              <div class="font-card">
+                <div class="font-sample" style="font-family: 'Nunito'">Nunito</div>
+                <div class="font-body-sample" style="font-family: 'Nunito'">
+                  Задача сделана — маленькая победа.<br />АБВГДЕЁЖЗИЙКЛМН abcdefghijk
+                </div>
+                <div class="font-meta">Заголовки и дисплей · display 800</div>
+                <div class="font-token">--font-display</div>
+              </div>
+              <div class="font-card">
+                <div class="font-sample" style="font-family: 'Nunito Sans'">Nunito Sans</div>
+                <div class="font-body-sample" style="font-family: 'Nunito Sans'">
+                  Выбери одно дело — этого достаточно.<br />АБВГДЕЁЖЗИЙКЛМН abcdefghijk
+                </div>
+                <div class="font-meta">Тело и UI · чистый гуманистический</div>
+                <div class="font-token">--font-body · --font-num</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <div class="sub-label">Шкала размеров</div>
+            <div class="type-table">
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-display</span
+                  ><span class="type-spec">40px · lh 1.12 · w-x 800</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-display);
+                    font-size: 40px;
+                    line-height: 1.12;
+                    font-weight: 800;
+                    letter-spacing: -0.01em;
+                    color: var(--ink);
+                  "
+                >
+                  Сегодня
+                </div>
+                <div class="type-class">.ad-display</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-h1</span
+                  ><span class="type-spec">32px · lh 1.18 · w-x 800</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-display);
+                    font-size: 32px;
+                    line-height: 1.18;
+                    font-weight: 800;
+                    letter-spacing: -0.01em;
+                    color: var(--ink);
+                  "
+                >
+                  Три шага
+                </div>
+                <div class="type-class">.ad-h1</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-h2</span
+                  ><span class="type-spec">26px · lh 1.22 · w-bold 700</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-display);
+                    font-size: 26px;
+                    line-height: 1.22;
+                    font-weight: 700;
+                    letter-spacing: -0.01em;
+                    color: var(--ink);
+                  "
+                >
+                  Выбери одно
+                </div>
+                <div class="type-class">.ad-h2</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-h3</span
+                  ><span class="type-spec">21px · lh 1.3 · w-bold 700</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-display);
+                    font-size: 21px;
+                    line-height: 1.3;
+                    font-weight: 700;
+                    color: var(--ink);
+                  "
+                >
+                  Маленькая победа
+                </div>
+                <div class="type-class">.ad-h3</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-h4</span
+                  ><span class="type-spec">18px · lh 1.35 · w-bold 700</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-display);
+                    font-size: 18px;
+                    line-height: 1.35;
+                    font-weight: 700;
+                    color: var(--ink);
+                  "
+                >
+                  Сделать звонок
+                </div>
+                <div class="type-class">.ad-h4</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-body-lg</span
+                  ><span class="type-spec">18px · lh 1.55 · w-reg 400</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-body);
+                    font-size: 18px;
+                    line-height: 1.55;
+                    font-weight: 400;
+                    color: var(--ink);
+                  "
+                >
+                  Не успел — ничего страшного.
+                </div>
+                <div class="type-class">.ad-body-lg</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-body</span
+                  ><span class="type-spec">16px · lh 1.55 · w-reg 400</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-body);
+                    font-size: 16px;
+                    line-height: 1.55;
+                    font-weight: 400;
+                    color: var(--ink);
+                  "
+                >
+                  Начинаем с чистого листа.
+                </div>
+                <div class="type-class">.ad-body</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-sm</span
+                  ><span class="type-spec">14px · lh 1.5 · ink-soft</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-body);
+                    font-size: 14px;
+                    line-height: 1.5;
+                    color: var(--ink-soft);
+                  "
+                >
+                  Сегодня · 4 из 6 дел
+                </div>
+                <div class="type-class">.ad-sm</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-cap</span
+                  ><span class="type-spec">13px · lh 1.4 · w-semi 600</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-body);
+                    font-size: 13px;
+                    line-height: 1.4;
+                    font-weight: 600;
+                    color: var(--ink-soft);
+                  "
+                >
+                  Серия · 5 дней
+                </div>
+                <div class="type-class">.ad-cap</div>
+              </div>
+              <div class="type-row">
+                <div class="type-meta">
+                  <span class="type-token">--fs-micro</span
+                  ><span class="type-spec">11px · lh 1.3 · overline</span>
+                </div>
+                <div
+                  style="
+                    font-family: var(--font-body);
+                    font-size: 11px;
+                    line-height: 1.3;
+                    font-weight: 700;
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                    color: var(--ink-soft);
+                  "
+                >
+                  Сегодня
+                </div>
+                <div class="type-class">.ad-overline</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <div class="sub-label">Насыщенность (Font Weight)</div>
+            <div class="weight-row">
+              <div class="weight-card">
+                <div class="weight-sample" style="font-weight: 400">Нунито</div>
+                <div class="weight-label">Regular</div>
+                <div class="weight-token">--w-reg · 400</div>
+              </div>
+              <div class="weight-card">
+                <div class="weight-sample" style="font-weight: 500">Нунито</div>
+                <div class="weight-label">Medium</div>
+                <div class="weight-token">--w-med · 500</div>
+              </div>
+              <div class="weight-card">
+                <div class="weight-sample" style="font-weight: 600">Нунито</div>
+                <div class="weight-label">SemiBold</div>
+                <div class="weight-token">--w-semi · 600</div>
+              </div>
+              <div class="weight-card">
+                <div class="weight-sample" style="font-weight: 700">Нунито</div>
+                <div class="weight-label">Bold</div>
+                <div class="weight-token">--w-bold · 700</div>
+              </div>
+              <div class="weight-card">
+                <div class="weight-sample" style="font-weight: 800">Нунито</div>
+                <div class="weight-label">ExtraBold</div>
+                <div class="weight-token">--w-x · 800</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <div class="sub-label">Межбуквенный интервал (Tracking)</div>
+            <div class="tracking-list">
+              <div class="tracking-row">
+                <div
+                  class="tracking-sample"
+                  style="
+                    letter-spacing: -0.01em;
+                    font-weight: 800;
+                    font-family: var(--font-display);
+                    font-size: 22px;
+                  "
+                >
+                  Выбери одно дело сегодня
+                </div>
+                <div class="tracking-right">
+                  <div class="weight-token">--tracking-tight</div>
+                  <div class="swatch-note">-0.01em · заголовки</div>
+                </div>
+              </div>
+              <div class="tracking-row">
+                <div
+                  class="tracking-sample"
+                  style="
+                    letter-spacing: 0.06em;
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                  "
+                >
+                  Серия · 5 дней подряд
+                </div>
+                <div class="tracking-right">
+                  <div class="weight-token">--tracking-caps</div>
+                  <div class="swatch-note">0.06em · оверлайны, метки</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- THEMES -->
+        <section class="section" id="themes">
+          <div class="section-header">
+            <h2 class="section-title">Темы</h2>
+            <p class="section-desc">
+              11 тем — одни и те же токены, разные значения. Переключается через
+              <code
+                style="
+                  font-family: monospace;
+                  font-size: 13px;
+                  background: var(--cream-deep);
+                  padding: 1px 5px;
+                  border-radius: 4px;
+                "
+                >data-theme="…"</code
+              >
+            </p>
+          </div>
+          <div class="themes-grid" id="themesGrid"></div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      lucide.createIcons()
+
+      /* ── Themes data ──────────────────────────────────────── */
+      const THEMES = [
+        {
+          attr: '',
+          label: 'Шалфей',
+          sub: 'default',
+          bg: '#F5F3F0',
+          card: '#FFFFFF',
+          accent: '#7C9A92',
+          reward: '#E0A87E',
+          ink: '#2C3A33',
+          soft: '#8A9A8F',
+        },
+        {
+          attr: 'dark',
+          label: 'Вечерний',
+          sub: 'data-theme="dark"',
+          bg: '#1A211D',
+          card: '#242E29',
+          accent: '#8FAEA5',
+          reward: '#E6B088',
+          ink: '#ECEEE9',
+          soft: '#9CAAA0',
+        },
+        {
+          attr: 'lavender',
+          label: 'Лаванда',
+          sub: 'data-theme="lavender"',
+          bg: '#F4F1F8',
+          card: '#FFFFFF',
+          accent: '#8E84B8',
+          reward: '#E0A87E',
+          ink: '#353048',
+          soft: '#8C86A2',
+        },
+        {
+          attr: 'lavender-dark',
+          label: 'Ночное поле',
+          sub: 'data-theme="lavender-dark"',
+          bg: '#1D1A28',
+          card: '#27233A',
+          accent: '#A49AD4',
+          reward: '#E6B088',
+          ink: '#EDE9F8',
+          soft: '#9E98B8',
+        },
+        {
+          attr: 'cyberpunk',
+          label: 'Киберпанк',
+          sub: 'data-theme="cyberpunk"',
+          bg: '#0A0820',
+          card: '#161334',
+          accent: '#4D7CFF',
+          reward: '#FF2D6E',
+          ink: '#E4E6FF',
+          soft: '#7E7FC8',
+          accentFill: 'linear-gradient(135deg,#2F6BFF,#8A3DFF)',
+          rewardFill: 'linear-gradient(135deg,#9D3DFF,#FF2D5E)',
+        },
+        {
+          attr: 'high-contrast',
+          label: 'Контраст',
+          sub: 'data-theme="high-contrast"',
+          bg: '#FFFFFF',
+          card: '#FFFFFF',
+          accent: '#0B5FD4',
+          reward: '#B85000',
+          ink: '#000000',
+          soft: '#2B2B2B',
+        },
+        {
+          attr: 'cloud',
+          label: 'Облака',
+          sub: 'data-theme="cloud"',
+          bg: '#F0EEE9',
+          card: '#FAF8F3',
+          accent: '#B08968',
+          reward: '#C8A07E',
+          ink: '#4A453D',
+          soft: '#948C7E',
+        },
+        {
+          attr: 'eco',
+          label: 'Эко',
+          sub: 'data-theme="eco"',
+          bg: '#F0F1E9',
+          card: '#FAFBF5',
+          accent: '#6B8A56',
+          reward: '#C57043',
+          ink: '#2E3A2B',
+          soft: '#74806B',
+        },
+        {
+          attr: 'silent',
+          label: 'Тихий',
+          sub: 'data-theme="silent"',
+          bg: '#F2F1EF',
+          card: '#F9F8F6',
+          accent: '#8E9090',
+          reward: '#C4A78A',
+          ink: '#3D3C3A',
+          soft: '#888480',
+        },
+        {
+          attr: 'amber',
+          label: 'Янтарь',
+          sub: 'data-theme="amber"',
+          bg: '#1C1610',
+          card: '#241C14',
+          accent: '#C89018',
+          reward: '#C85A28',
+          ink: '#F0DEB8',
+          soft: '#9C8C6C',
+        },
+        {
+          attr: 'amoled',
+          label: 'AMOLED',
+          sub: 'data-theme="amoled"',
+          bg: '#000000',
+          card: '#0C0C0C',
+          accent: '#5AB4A0',
+          reward: '#E09A64',
+          ink: '#FFFFFF',
+          soft: '#999999',
+        },
+      ]
+
+      /* Build theme tiles */
+      const grid = document.getElementById('themesGrid')
+      THEMES.forEach((t) => {
+        const af = t.accentFill || t.accent
+        const rf = t.rewardFill || t.reward
+        const el = document.createElement('div')
+        el.className = 'theme-tile'
+        el.innerHTML = `
       <div class="theme-preview" style="background:${t.bg}">
         <div class="theme-dots">
           <div class="theme-dot" style="background:${t.accent}"></div>
@@ -1131,41 +1662,46 @@
       <div class="theme-info-bar" style="background:${t.card}">
         <div class="theme-name" style="color:${t.ink}">${t.label}</div>
         <div class="theme-attr" style="color:${t.soft}">${t.sub}</div>
-      </div>`;
-    grid.appendChild(el);
-  });
+      </div>`
+        grid.appendChild(el)
+      })
 
-  /* Build theme switcher pills */
-  const pillsEl = document.getElementById('themePills');
-  const root = document.getElementById('root');
+      /* Build theme switcher pills */
+      const pillsEl = document.getElementById('themePills')
+      const root = document.getElementById('root')
 
-  THEMES.forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'theme-pill' + (t.attr === '' ? ' active' : '');
-    btn.textContent = t.label;
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.theme-pill').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      if (t.attr) root.setAttribute('data-theme', t.attr);
-      else root.removeAttribute('data-theme');
-    });
-    pillsEl.appendChild(btn);
-  });
+      THEMES.forEach((t) => {
+        const btn = document.createElement('button')
+        btn.className = 'theme-pill' + (t.attr === '' ? ' active' : '')
+        btn.textContent = t.label
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.theme-pill').forEach((p) => p.classList.remove('active'))
+          btn.classList.add('active')
+          if (t.attr) root.setAttribute('data-theme', t.attr)
+          else root.removeAttribute('data-theme')
+        })
+        pillsEl.appendChild(btn)
+      })
 
-  /* Nav highlight on scroll */
-  const sections = document.querySelectorAll('.section');
-  const navLinks = document.querySelectorAll('.nav-item');
+      /* Nav highlight on scroll */
+      const sections = document.querySelectorAll('.section')
+      const navLinks = document.querySelectorAll('.nav-item')
 
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        const id = e.target.id;
-        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
-      }
-    });
-  }, { rootMargin: '-10% 0px -72% 0px', threshold: 0 });
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              const id = e.target.id
+              navLinks.forEach((a) =>
+                a.classList.toggle('active', a.getAttribute('href') === '#' + id),
+              )
+            }
+          })
+        },
+        { rootMargin: '-10% 0px -72% 0px', threshold: 0 },
+      )
 
-  sections.forEach(s => obs.observe(s));
-</script>
-</body>
+      sections.forEach((s) => obs.observe(s))
+    </script>
+  </body>
 </html>
