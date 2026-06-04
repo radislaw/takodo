@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>AddyDo — UI Components</title>
+    <title>TooToo — UI Components</title>
     <link rel="stylesheet" href="colors_and_type.css" />
     <style>
       *,
@@ -660,13 +660,13 @@
    DATA
 ═══════════════════════════════════════════════════ */
       const THEMES = [
-        { id: '', label: 'Шалфей', accent: '#7C9A92' },
         { id: 'dark', label: 'Тёмный', accent: '#8FAEA5' },
         { id: 'lavender', label: 'Лаванда', accent: '#8E84B8' },
         { id: 'lavender-dark', label: 'Ночное поле', accent: '#A49AD4' },
         { id: 'cyberpunk', label: 'Киберпанк', accent: '#4D7CFF' },
         { id: 'high-contrast', label: 'Контраст', accent: '#0B5FD4' },
-        { id: 'cloud', label: 'Облака', accent: '#B08968' },
+        { id: 'cloud', label: 'Облака', accent: '#6890BE' },
+        { id: 'ocean', label: 'Океан', accent: '#2E8FA8' },
         { id: 'eco', label: 'Эко', accent: '#6B8A56' },
         { id: 'silent', label: 'Тихий', accent: '#8E9090' },
         { id: 'amber', label: 'Янтарь', accent: '#C89018' },
@@ -820,10 +820,7 @@
                 </div>
                 <div
                   className="btn-ic-rnd"
-                  style={{
-                    background: 'var(--card)',
-                    boxShadow: 'var(--shadow-sm)',
-                  }}
+                  style={{ background: 'var(--card)', boxShadow: 'var(--shadow-sm)' }}
                 >
                   <Icon name="leaf" size={18} />
                 </div>
@@ -867,11 +864,7 @@
                   className="inp"
                   rows={3}
                   placeholder="Контекст или напоминание..."
-                  style={{
-                    resize: 'vertical',
-                    fontFamily: 'var(--font-body)',
-                    lineHeight: '1.55',
-                  }}
+                  style={{ resize: 'vertical', fontFamily: 'var(--font-body)', lineHeight: '1.55' }}
                 />
               </div>
             </div>
@@ -915,12 +908,7 @@
                 {tasks.map((t, i) => (
                   <div
                     key={t}
-                    style={{
-                      display: 'flex',
-                      gap: 10,
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                    }}
+                    style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer' }}
                     onClick={() => tog(i)}
                   >
                     <div
@@ -1068,12 +1056,7 @@
                     }}
                   >
                     <div
-                      style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 999,
-                        background: `var(${t})`,
-                      }}
+                      style={{ width: 20, height: 20, borderRadius: 999, background: `var(${t})` }}
                     />
                     <span
                       style={{
@@ -1144,14 +1127,7 @@
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className={'task-t' + (done[1] ? ' done' : '')}>Разобрать рабочий стол</div>
                   {!done[1] && (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        marginTop: 7,
-                      }}
-                    >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 7 }}>
                       <div className="task-bar">
                         <div className="task-fill" style={{ width: '40%' }} />
                       </div>
@@ -1252,12 +1228,7 @@
                   {done}/{total}
                 </span>
                 <span
-                  style={{
-                    fontSize: 8.5,
-                    color: 'var(--ink-soft)',
-                    fontWeight: 600,
-                    marginTop: 1,
-                  }}
+                  style={{ fontSize: 8.5, color: 'var(--ink-soft)', fontWeight: 600, marginTop: 1 }}
                 >
                   сегодня
                 </span>
@@ -1435,11 +1406,7 @@
               </div>
               <button
                 className="btn btn-pr"
-                style={{
-                  width: '100%',
-                  justifyContent: 'center',
-                  marginTop: 14,
-                }}
+                style={{ width: '100%', justifyContent: 'center', marginTop: 14 }}
               >
                 <Icon name="plus" size={17} color="#fff" />
                 Добавить в список
@@ -1507,13 +1474,7 @@
         const doneCount = 5
         return (
           <Sec title="Экранные паттерны" wide={true} appBg={true}>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr',
-                gap: 14,
-              }}
-            >
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
               {/* Summary card */}
               <div>
                 <div className="vr-lbl" style={{ marginBottom: 8 }}>
@@ -1701,13 +1662,7 @@
                     </div>
                   </div>
                   {/* Week dots */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      marginTop: 14,
-                    }}
-                  >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
                     {week.map((d, i) => (
                       <div
                         key={d}
@@ -1754,38 +1709,17 @@
             <div className="vr-lbl" style={{ marginBottom: 8 }}>
               Значки достижений
             </div>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4,1fr)',
-                gap: 10,
-              }}
-            >
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
               {[
-                {
-                  icon: 'sparkles',
-                  title: 'Первый шаг',
-                  sub: 'Закрыто первое дело',
-                  got: true,
-                },
-                {
-                  icon: 'flame',
-                  title: 'Серия 5 дней',
-                  sub: 'Понемногу каждый день',
-                  got: true,
-                },
+                { icon: 'sparkles', title: 'Первый шаг', sub: 'Закрыто первое дело', got: true },
+                { icon: 'flame', title: 'Серия 5 дней', sub: 'Понемногу каждый день', got: true },
                 {
                   icon: 'moon',
                   title: 'Бережный режим',
                   sub: 'Перенёс без вины 3 раза',
                   got: true,
                 },
-                {
-                  icon: 'award',
-                  title: 'Серия 7 дней',
-                  sub: 'Ещё 2 дня до цели',
-                  got: false,
-                },
+                { icon: 'award', title: 'Серия 7 дней', sub: 'Ещё 2 дня до цели', got: false },
               ].map((c) => (
                 <div key={c.title} className="rew-card" style={{ opacity: c.got ? 1 : 0.48 }}>
                   <div
@@ -1842,16 +1776,8 @@
           { lbl: 'h2', cls: 'ad-h2', text: 'Выбери одно' },
           { lbl: 'h3', cls: 'ad-h3', text: 'Шаги к цели' },
           { lbl: 'h4', cls: 'ad-h4', text: 'Категория: Здоровье' },
-          {
-            lbl: 'body-lg',
-            cls: 'ad-body-lg',
-            text: 'Сейчас только одно. Этого достаточно.',
-          },
-          {
-            lbl: 'body',
-            cls: 'ad-body',
-            text: 'Остальное подождёт — сделай только это.',
-          },
+          { lbl: 'body-lg', cls: 'ad-body-lg', text: 'Сейчас только одно. Этого достаточно.' },
+          { lbl: 'body', cls: 'ad-body', text: 'Остальное подождёт — сделай только это.' },
           { lbl: 'sm', cls: 'ad-sm', text: 'Опиши одним коротким шагом.' },
           { lbl: 'cap', cls: 'ad-cap', text: '2 из 6 · сегодня' },
           { lbl: 'overline', cls: 'ad-overline', text: 'Серия · 5 дней' },
@@ -1960,10 +1886,7 @@
 ═══════════════════════════════════════════════════ */
       function ColorsSec() {
         const groups = [
-          {
-            label: 'Поверхности',
-            tokens: ['--cream', '--cream-deep', '--card'],
-          },
+          { label: 'Поверхности', tokens: ['--cream', '--cream-deep', '--card'] },
           { label: 'Текст', tokens: ['--ink', '--ink-soft', '--ink-faint'] },
           {
             label: 'Акцент',
@@ -1995,10 +1918,7 @@
               '--cat-mauve',
             ],
           },
-          {
-            label: 'Линии',
-            tokens: ['--line', '--line-card', '--line-strong'],
-          },
+          { label: 'Линии', tokens: ['--line', '--line-card', '--line-strong'] },
         ]
         return (
           <Sec title="Цвета" wide={true}>
@@ -2087,22 +2007,10 @@
               <div className="row">
                 {[
                   { bg: 'var(--accent-fill)', c: '#fff', lbl: 'на акценте' },
-                  {
-                    bg: 'var(--sage-tint)',
-                    c: 'var(--sage-deep)',
-                    lbl: 'тинт',
-                  },
+                  { bg: 'var(--sage-tint)', c: 'var(--sage-deep)', lbl: 'тинт' },
                   { bg: 'var(--apricot)', c: '#fff', lbl: 'награда' },
-                  {
-                    bg: 'var(--apricot-tint)',
-                    c: 'var(--apricot-deep)',
-                    lbl: 'тинт апр.',
-                  },
-                  {
-                    bg: 'var(--cream-deep)',
-                    c: 'var(--ink-soft)',
-                    lbl: 'вторичн.',
-                  },
+                  { bg: 'var(--apricot-tint)', c: 'var(--apricot-deep)', lbl: 'тинт апр.' },
+                  { bg: 'var(--cream-deep)', c: 'var(--ink-soft)', lbl: 'вторичн.' },
                   { bg: 'var(--card)', c: 'var(--ink)', lbl: 'на карточке' },
                 ].map((x) => (
                   <div
@@ -2223,24 +2131,12 @@
             <div className="vr">
               <span className="vr-lbl">Focus ring</span>
               <div className="row">
-                <div
-                  style={{
-                    padding: 3,
-                    borderRadius: 999,
-                    boxShadow: 'var(--ring)',
-                  }}
-                >
+                <div style={{ padding: 3, borderRadius: 999, boxShadow: 'var(--ring)' }}>
                   <button className="btn btn-pr" style={{ pointerEvents: 'none' }}>
                     Sage ring
                   </button>
                 </div>
-                <div
-                  style={{
-                    padding: 3,
-                    borderRadius: 999,
-                    boxShadow: 'var(--ring-apr)',
-                  }}
-                >
+                <div style={{ padding: 3, borderRadius: 999, boxShadow: 'var(--ring-apr)' }}>
                   <button className="btn btn-dn" style={{ pointerEvents: 'none' }}>
                     Apricot ring
                   </button>
@@ -2320,14 +2216,10 @@
                 <LogoMark size={30} light={isDark} />
                 <div>
                   <div className="pg-logo">
-                    Addy<span>Do</span>{' '}
-                    <span
-                      style={{
-                        fontWeight: 400,
-                        color: 'var(--ink-soft)',
-                        fontSize: 17,
-                      }}
-                    >
+                    <span style={{ color: 'var(--ink)' }}>
+                      Too<span style={{ color: 'var(--sage-deep)' }}>Too</span>
+                    </span>{' '}
+                    <span style={{ fontWeight: 400, color: 'var(--ink-soft)', fontSize: 17 }}>
                       — UI Kit
                     </span>
                   </div>

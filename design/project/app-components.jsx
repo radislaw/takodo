@@ -1,4 +1,4 @@
-/* AddyDo — App UI kit · shared primitives
+/* TooToo — App UI kit · shared primitives
    Exports to window: Icon, Checkbox, TaskRow, ProgressRing, StreakBadge,
    BottomNav, FAB, Sheet, Toast, CategoryChip, AppHeader  */
 
@@ -48,12 +48,7 @@ function Icon({ name, size = 22, color = 'currentColor', strokeWidth = 2, style 
   }
   if (name === 'play')
     extra.push(
-      I('polygon', {
-        points: '6 3 20 12 6 21 6 3',
-        key: 'p',
-        fill: color,
-        stroke: 'none',
-      }),
+      I('polygon', { points: '6 3 20 12 6 21 6 3', key: 'p', fill: color, stroke: 'none' }),
     )
   if (name === 'list') extra.push(I('rect', { x: 3, y: 5, width: 6, height: 6, rx: 1, key: 'r' }))
   if (name === 'gift') extra.push(I('rect', { x: 3, y: 8, width: 18, height: 4, rx: 1, key: 'r' }))
@@ -102,13 +97,7 @@ function Checkbox({ done, reward, onClick, size = 28 }) {
         transform: done ? 'scale(1)' : 'scale(1)',
       },
     },
-    done &&
-      I(Icon, {
-        name: 'check',
-        size: size * 0.58,
-        color: '#fff',
-        strokeWidth: 3,
-      }),
+    done && I(Icon, { name: 'check', size: size * 0.58, color: '#fff', strokeWidth: 3 }),
   )
 }
 
@@ -168,13 +157,7 @@ function TaskRow({ task, onToggle }) {
         'div',
         {
           key: 'b',
-          style: {
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            minWidth: 0,
-          },
+          style: { flex: 1, display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 },
         },
         [
           I(
@@ -199,12 +182,7 @@ function TaskRow({ task, onToggle }) {
               'div',
               {
                 key: 'm',
-                style: {
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  flexWrap: 'wrap',
-                },
+                style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
               },
               [
                 catLabel &&
@@ -224,12 +202,7 @@ function TaskRow({ task, onToggle }) {
                     [
                       I('span', {
                         key: 'd',
-                        style: {
-                          width: 9,
-                          height: 9,
-                          borderRadius: 999,
-                          background: catColor,
-                        },
+                        style: { width: 9, height: 9, borderRadius: 999, background: catColor },
                       }),
                       catLabel,
                     ],
@@ -254,50 +227,43 @@ function TaskRow({ task, onToggle }) {
             ),
           !done &&
             steps &&
-            I(
-              'div',
-              {
-                key: 's',
-                style: { display: 'flex', alignItems: 'center', gap: 10 },
-              },
-              [
-                I(
-                  'div',
-                  {
-                    key: 'tr',
-                    style: {
-                      flex: 1,
-                      maxWidth: 150,
-                      height: 6,
-                      borderRadius: 999,
-                      background: 'var(--sage-tint-2)',
-                      overflow: 'hidden',
-                    },
+            I('div', { key: 's', style: { display: 'flex', alignItems: 'center', gap: 10 } }, [
+              I(
+                'div',
+                {
+                  key: 'tr',
+                  style: {
+                    flex: 1,
+                    maxWidth: 150,
+                    height: 6,
+                    borderRadius: 999,
+                    background: 'var(--sage-tint-2)',
+                    overflow: 'hidden',
                   },
-                  I('div', {
-                    style: {
-                      height: '100%',
-                      width: (steps.done / steps.total) * 100 + '%',
-                      background: 'var(--accent-fill)',
-                      borderRadius: 999,
-                    },
-                  }),
-                ),
-                I(
-                  'span',
-                  {
-                    key: 'n',
-                    style: {
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: 'var(--ink-soft)',
-                      whiteSpace: 'nowrap',
-                    },
+                },
+                I('div', {
+                  style: {
+                    height: '100%',
+                    width: (steps.done / steps.total) * 100 + '%',
+                    background: 'var(--accent-fill)',
+                    borderRadius: 999,
                   },
-                  steps.done + ' из ' + steps.total + ' шагов',
-                ),
-              ],
-            ),
+                }),
+              ),
+              I(
+                'span',
+                {
+                  key: 'n',
+                  style: {
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: 'var(--ink-soft)',
+                    whiteSpace: 'nowrap',
+                  },
+                },
+                steps.done + ' из ' + steps.total + ' шагов',
+              ),
+            ]),
           done &&
             rewarded &&
             I(
@@ -375,12 +341,7 @@ function ProgressRing({ done, total }) {
           'span',
           {
             key: 's',
-            style: {
-              fontSize: 10,
-              fontWeight: 600,
-              color: 'var(--ink-soft)',
-              marginTop: 2,
-            },
+            style: { fontSize: 10, fontWeight: 600, color: 'var(--ink-soft)', marginTop: 2 },
           },
           'сегодня',
         ),
@@ -483,22 +444,10 @@ function BottomNav({ active, onNav }) {
           },
         },
         [
-          I(Icon, {
-            key: 'i',
-            name: t.icon,
-            size: 23,
-            strokeWidth: active === t.id ? 2.4 : 2,
-          }),
+          I(Icon, { key: 'i', name: t.icon, size: 23, strokeWidth: active === t.id ? 2.4 : 2 }),
           I(
             'span',
-            {
-              key: 'l',
-              style: {
-                fontSize: 11,
-                fontWeight: 700,
-                fontFamily: 'var(--font-body)',
-              },
-            },
+            { key: 'l', style: { fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-body)' } },
             t.label,
           ),
         ],

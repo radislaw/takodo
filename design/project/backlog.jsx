@@ -1,5 +1,5 @@
-/* AddyDo — Backlog / Монетизация
-   S11 theme store · achievement badges · heatmap · AddyDo Plus
+/* TooToo — Backlog / Монетизация
+   S11 theme store · achievement badges · heatmap · TooToo Plus
    Exports: S11ThemeStore, BadgesScreen, HeatmapScreen, PlusScreen */
 const B = React.createElement
 
@@ -28,11 +28,7 @@ function ThemeSwatch({ theme, name, premium, selected }) {
           'div',
           {
             key: 'h',
-            style: {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            },
+            style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
           },
           [
             B('span', {
@@ -47,12 +43,7 @@ function ThemeSwatch({ theme, name, premium, selected }) {
             }),
             B('span', {
               key: 'd',
-              style: {
-                width: 14,
-                height: 14,
-                borderRadius: 999,
-                background: 'var(--reward-fill)',
-              },
+              style: { width: 14, height: 14, borderRadius: 999, background: 'var(--reward-fill)' },
             }),
           ],
         ),
@@ -162,13 +153,7 @@ function ThemeSwatch({ theme, name, premium, selected }) {
           name,
         ),
         selected &&
-          B(Icon, {
-            key: 'c',
-            name: 'check',
-            size: 16,
-            color: 'var(--sage-deep)',
-            strokeWidth: 3,
-          }),
+          B(Icon, { key: 'c', name: 'check', size: 16, color: 'var(--sage-deep)', strokeWidth: 3 }),
       ],
     ),
   ])
@@ -209,37 +194,23 @@ function S11ThemeStore() {
       'div',
       {
         key: 'g1',
-        style: {
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 14,
-          padding: '0 22px',
-        },
+        style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, padding: '0 22px' },
       },
       free.map((t, i) => B(ThemeSwatch, { key: i, ...t })),
     ),
-    B(SectionLabel, { key: 'l2', style: { margin: '26px 22px 12px' } }, 'AddyDo Plus'),
+    B(SectionLabel, { key: 'l2', style: { margin: '26px 22px 12px' } }, 'TooToo Plus'),
     B(
       'div',
       {
         key: 'g2',
-        style: {
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 14,
-          padding: '0 22px',
-        },
+        style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, padding: '0 22px' },
       },
       prem.map((t, i) => B(ThemeSwatch, { key: i, ...t })),
     ),
     B(
       'div',
       { key: 'cta', style: { padding: '20px 22px 0' } },
-      B(PrimaryBtn, {
-        reward: true,
-        icon: 'sparkles',
-        label: 'Открыть все темы · Plus',
-      }),
+      B(PrimaryBtn, { reward: true, icon: 'sparkles', label: 'Открыть все темы · Plus' }),
     ),
   ])
 }
@@ -247,30 +218,10 @@ function S11ThemeStore() {
 /* ============================== ЗНАЧКИ ДОСТИЖЕНИЙ ============================== */
 function BadgesScreen() {
   const cards = [
-    {
-      icon: 'sparkles',
-      title: 'Первый шаг',
-      sub: 'Закрыто первое дело',
-      got: true,
-    },
-    {
-      icon: 'flame',
-      title: 'Серия 5 дней',
-      sub: 'Понемногу каждый день',
-      got: true,
-    },
-    {
-      icon: 'moon',
-      title: 'Бережно к себе',
-      sub: 'Перенёс без вины 3 раза',
-      got: true,
-    },
-    {
-      icon: 'layers',
-      title: 'Разбиватель',
-      sub: 'Разбил 10 больших дел',
-      got: true,
-    },
+    { icon: 'sparkles', title: 'Первый шаг', sub: 'Закрыто первое дело', got: true },
+    { icon: 'flame', title: 'Серия 5 дней', sub: 'Понемногу каждый день', got: true },
+    { icon: 'moon', title: 'Бережно к себе', sub: 'Перенёс без вины 3 раза', got: true },
+    { icon: 'layers', title: 'Разбиватель', sub: 'Разбил 10 больших дел', got: true },
     { icon: 'award', title: 'Серия 7 дней', sub: 'Ещё 2 дня', got: false },
     { icon: 'gift', title: '100 шагов', sub: 'Сделано 64 из 100', got: false },
   ]
@@ -362,12 +313,7 @@ function BadgesScreen() {
       'div',
       {
         key: 'g',
-        style: {
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 12,
-          padding: '0 22px',
-        },
+        style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '0 22px' },
       },
       cards.map((c) =>
         B(
@@ -418,12 +364,7 @@ function BadgesScreen() {
               'div',
               {
                 key: 's',
-                style: {
-                  fontSize: 12.5,
-                  color: 'var(--ink-soft)',
-                  marginTop: 3,
-                  lineHeight: 1.35,
-                },
+                style: { fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 3, lineHeight: 1.35 },
               },
               c.sub,
             ),
@@ -476,10 +417,7 @@ function HeatmapScreen() {
     /* stat row */
     B(
       'div',
-      {
-        key: 'stats',
-        style: { margin: '0 22px 20px', display: 'flex', gap: 12 },
-      },
+      { key: 'stats', style: { margin: '0 22px 20px', display: 'flex', gap: 12 } },
       [
         ['flame', '6', 'дней серия'],
         ['check', '248', 'шагов всего'],
@@ -575,19 +513,11 @@ function HeatmapScreen() {
           Array.from({ length: weeks }).map((_, w) =>
             B(
               'div',
-              {
-                key: w,
-                style: { display: 'flex', flexDirection: 'column', gap: 5 },
-              },
+              { key: w, style: { display: 'flex', flexDirection: 'column', gap: 5 } },
               Array.from({ length: days }).map((_, d) =>
                 B('span', {
                   key: d,
-                  style: {
-                    width: 11,
-                    height: 11,
-                    borderRadius: 3,
-                    background: tints[lvl(w, d)],
-                  },
+                  style: { width: 11, height: 11, borderRadius: 3, background: tints[lvl(w, d)] },
                 }),
               ),
             ),
@@ -614,12 +544,7 @@ function HeatmapScreen() {
             ...tints.map((t, i) =>
               B('span', {
                 key: i,
-                style: {
-                  width: 11,
-                  height: 11,
-                  borderRadius: 3,
-                  background: t,
-                },
+                style: { width: 11, height: 11, borderRadius: 3, background: t },
               }),
             ),
             B('span', { key: 'b' }, 'чаще'),
@@ -630,7 +555,7 @@ function HeatmapScreen() {
   ])
 }
 
-/* ============================== ADDYDO PLUS (paywall) ============================== */
+/* ============================== TOOTOO PLUS (paywall) ============================== */
 function PlusFeature({ icon, title, sub }) {
   return B('div', { style: { display: 'flex', alignItems: 'flex-start', gap: 13 } }, [
     B(
@@ -686,14 +611,7 @@ function PlusScreen() {
   return B(Screen, { pad: 56 }, [
     B(
       'div',
-      {
-        key: 'top',
-        style: {
-          padding: '0 22px',
-          display: 'flex',
-          justifyContent: 'flex-end',
-        },
-      },
+      { key: 'top', style: { padding: '0 22px', display: 'flex', justifyContent: 'flex-end' } },
       B(
         'button',
         {
@@ -726,15 +644,10 @@ function PlusScreen() {
         },
         B(Icon, { name: 'sparkles', size: 40, color: '#fff' }),
       ),
-      B(
-        'div',
-        {
-          key: 't',
-          className: 'ad-h1',
-          style: { fontSize: 28, marginTop: 18 },
-        },
-        ['AddyDo ', B('span', { key: 'p', style: { color: 'var(--apricot-deep)' } }, 'Plus')],
-      ),
+      B('div', { key: 't', className: 'ad-h1', style: { fontSize: 28, marginTop: 18 } }, [
+        'TooToo ',
+        B('span', { key: 'p', style: { color: 'var(--apricot-deep)' } }, 'Plus'),
+      ]),
       B(
         'div',
         {
@@ -773,7 +686,7 @@ function PlusScreen() {
           key: 2,
           icon: 'sparkles',
           title: 'AI-разбивка на шаги',
-          sub: 'AddyDo предложит, с чего начать',
+          sub: 'TooToo предложит, с чего начать',
         }),
         B(PlusFeature, {
           key: 3,
@@ -793,28 +706,14 @@ function PlusScreen() {
       'div',
       {
         key: 'cta',
-        style: {
-          padding: '18px 22px 0',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 9,
-        },
+        style: { padding: '18px 22px 0', display: 'flex', flexDirection: 'column', gap: 9 },
       },
       [
-        B(PrimaryBtn, {
-          key: 'p',
-          reward: true,
-          label: '299 ₽ в месяц · 7 дней бесплатно',
-        }),
+        B(PrimaryBtn, { key: 'p', reward: true, label: '299 ₽ в месяц · 7 дней бесплатно' }),
         B(GhostBtn, { key: 'g', label: 'Может быть позже' }),
       ],
     ),
   ])
 }
 
-Object.assign(window, {
-  S11ThemeStore,
-  BadgesScreen,
-  HeatmapScreen,
-  PlusScreen,
-})
+Object.assign(window, { S11ThemeStore, BadgesScreen, HeatmapScreen, PlusScreen })

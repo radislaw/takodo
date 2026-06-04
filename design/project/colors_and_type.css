@@ -1,5 +1,5 @@
 /* ============================================================
-   AddyDo — Foundations: Color + Type
+   TooToo — Foundations: Color + Type
    "Спокойный шалфей и сливки" — calm sage & cream
    A low-stimulation, guilt-free system for ADHD minds.
    ============================================================ */
@@ -433,66 +433,128 @@
 
 /* ============================================================
    CLOUD DANCER THEME — "облачный танец"
-   Airy, matte, off-white — soft greys, warm beige, sandstone
-   and clay. Built around Pantone-ish Cloud Dancer #F0EEE9.
-   Calm, papery, low-contrast-but-readable.
+   Airy, matte — soft sky mist, pale aqua recess, periwinkle
+   blue accent. Quiet and light like an overcast morning.
    Opt in with <element data-theme="cloud">.
    ============================================================ */
 [data-theme='cloud'] {
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  /* Surfaces — matte cream, sandstone recess */
-  --cream: #f0eee9; /* Cloud Dancer */
-  --cream-deep: #e5e1d8; /* warm beige well */
-  --card: #faf8f3; /* lifted matte cream */
+  /* Surfaces — pale sky mist */
+  --cream: #eef2f6; /* soft cloud white */
+  --cream-deep: #e0e8f0; /* blue-grey well */
+  --card: #f7fafd; /* lifted cloud white */
 
-  /* Ink — warm taupe-brown, soft greys (never black) */
-  --ink: #4a453d;
-  --ink-soft: #948c7e;
-  --ink-faint: #beb7a9;
+  /* Ink — cool slate-blue, never harsh */
+  --ink: #334455;
+  --ink-soft: #7090a4;
+  --ink-faint: #aabece;
 
-  /* Accent — warm clay */
-  --sage: #b08968;
-  --sage-press: #9c785a;
-  --sage-deep: #7c5e45; /* accent text on cream */
-  --sage-tint: #eae2d7;
-  --sage-tint-2: #dcd1c1;
+  /* Accent — periwinkle sky blue */
+  --sage: #6890be;
+  --sage-press: #5478ac;
+  --sage-deep: #3d6494; /* accent text on light */
+  --sage-tint: #d8e8f5;
+  --sage-tint-2: #c0d8ee;
 
-  /* Reward — soft sandstone-apricot */
-  --apricot: #c8a07e;
-  --apricot-press: #b88e6b;
-  --apricot-deep: #8c6648;
-  --apricot-tint: #efe5d8;
+  /* Reward — warm coral-peach (warm/cool contrast) */
+  --apricot: #e09070;
+  --apricot-press: #cc7858;
+  --apricot-deep: #a85c3c;
+  --apricot-tint: #f5e4dc;
 
-  /* Soft semantic — muted earth */
-  --done: #9ca88e;
-  --done-tint: #e5e8dc;
-  --gentle: #c9a86e;
-  --gentle-tint: #efe6d1;
-  --softrose: #c49b95;
-  --softrose-tint: #eee2df;
+  /* Soft semantic — sky-tinted pastels */
+  --done: #6aa898;
+  --done-tint: #d8eee8;
+  --gentle: #c8a850;
+  --gentle-tint: #f0e8d4;
+  --softrose: #c09898;
+  --softrose-tint: #eee2e0;
 
-  /* Category dots — quiet earth tones */
-  --cat-sage: #9ca88e;
-  --cat-apricot: #c8a07e;
-  --cat-blue: #93a0a5;
-  --cat-clay: #b08968;
-  --cat-gold: #c9a86e;
-  --cat-mauve: #ae9ba4;
+  /* Category dots — sky & cloud spectrum */
+  --cat-sage: #78a8c8;
+  --cat-apricot: #e09070;
+  --cat-blue: #6890be;
+  --cat-clay: #c09888;
+  --cat-gold: #c8b070;
+  --cat-mauve: #9894bc;
 
   /* Lines & edges */
-  --line: #e0dace;
-  --line-card: #e8e2d7;
-  --line-strong: #cec6b7;
+  --line: #d0dcea;
+  --line-card: #dce8f2;
+  --line-strong: #bacad8;
 
-  /* Elevation — warm, papery, barely there */
-  --shadow-sm: 0 1px 2px rgba(74, 69, 61, 0.04), 0 1px 1px rgba(74, 69, 61, 0.03);
-  --shadow-md: 0 2px 6px rgba(74, 69, 61, 0.05), 0 4px 12px rgba(74, 69, 61, 0.04);
-  --shadow-lg: 0 6px 16px rgba(74, 69, 61, 0.06), 0 12px 32px rgba(74, 69, 61, 0.05);
-  --shadow-pop: 0 12px 40px rgba(74, 69, 61, 0.12);
-  --ring: 0 0 0 3px rgba(176, 137, 104, 0.32);
-  --ring-apr: 0 0 0 3px rgba(200, 160, 126, 0.34);
+  /* Elevation — airy, barely there */
+  --shadow-sm: 0 1px 2px rgba(51, 68, 85, 0.05), 0 1px 1px rgba(51, 68, 85, 0.03);
+  --shadow-md: 0 2px 6px rgba(51, 68, 85, 0.06), 0 4px 12px rgba(51, 68, 85, 0.04);
+  --shadow-lg: 0 6px 16px rgba(51, 68, 85, 0.07), 0 12px 32px rgba(51, 68, 85, 0.05);
+  --shadow-pop: 0 12px 40px rgba(51, 68, 85, 0.13);
+  --ring: 0 0 0 3px rgba(104, 144, 190, 0.32);
+  --ring-apr: 0 0 0 3px rgba(224, 144, 112, 0.34);
+}
+
+/* ============================================================
+   OCEAN THEME — "океан"
+   Deep teal waters, coral reward, pale seafoam surfaces.
+   Calm and expansive — like the sea on a quiet morning.
+   Opt in with <element data-theme="ocean">.
+   ============================================================ */
+[data-theme='ocean'] {
+  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  /* Surfaces — pale seafoam */
+  --cream: #e8f3f5; /* soft coastal mist */
+  --cream-deep: #d6e8ec; /* deeper tide pool */
+  --card: #f3fafb; /* lifted sea-white */
+
+  /* Ink — deep ocean navy */
+  --ink: #183444;
+  --ink-soft: #4e7888;
+  --ink-faint: #8aaabb;
+
+  /* Accent — teal ocean depth */
+  --sage: #2e8fa8;
+  --sage-press: #1e7c96;
+  --sage-deep: #106480; /* accent text on light */
+  --sage-tint: #cceaf0;
+  --sage-tint-2: #b4dce6;
+
+  /* Reward — warm coral sunset */
+  --apricot: #e07050;
+  --apricot-press: #c85c3e;
+  --apricot-deep: #a44430;
+  --apricot-tint: #fae0d8;
+
+  /* Soft semantic — ocean spectrum */
+  --done: #3a9a88;
+  --done-tint: #cceee6;
+  --gentle: #c89a38;
+  --gentle-tint: #f0e6cc;
+  --softrose: #be7878;
+  --softrose-tint: #eedddd;
+
+  /* Category dots — ocean & reef */
+  --cat-sage: #2e8fa8;
+  --cat-apricot: #e07050;
+  --cat-blue: #3870b8;
+  --cat-clay: #c08460;
+  --cat-gold: #c8a038;
+  --cat-mauve: #8878b8;
+
+  /* Lines & edges */
+  --line: #c4dae4;
+  --line-card: #d4e8f0;
+  --line-strong: #a8c8d8;
+
+  /* Elevation — cool ocean-tinted */
+  --shadow-sm: 0 1px 2px rgba(24, 52, 68, 0.05), 0 1px 1px rgba(24, 52, 68, 0.03);
+  --shadow-md: 0 2px 6px rgba(24, 52, 68, 0.07), 0 4px 12px rgba(24, 52, 68, 0.05);
+  --shadow-lg: 0 6px 16px rgba(24, 52, 68, 0.08), 0 12px 32px rgba(24, 52, 68, 0.06);
+  --shadow-pop: 0 12px 40px rgba(24, 52, 68, 0.14);
+  --ring: 0 0 0 3px rgba(46, 143, 168, 0.34);
+  --ring-apr: 0 0 0 3px rgba(224, 112, 80, 0.34);
 }
 
 /* ============================================================
@@ -563,7 +625,7 @@
    Near-monochrome. For moments of overwhelm: colour is drained
    almost to zero so nothing vibrates. Accent is a warm grey,
    category dots blend into the background, reward is a barely-
-   there dusty tan. On-brand with AddyDo's anti-stimulation ethos.
+   there dusty tan. On-brand with TooToo's anti-stimulation ethos.
    Opt in with <element data-theme="silent">.
    ============================================================ */
 [data-theme='silent'] {

@@ -1,4 +1,4 @@
-/* AddyDo — Планшет · iPad Portrait · 768 × 1024
+/* TooToo — Планшет · iPad Portrait · 768 × 1024
    TabletFrame, TabToday, TabTree, TabFocus, TabProjects
    Экспортируется в window. */
 const Tb = React.createElement
@@ -112,12 +112,7 @@ function TabToday() {
       catColor: 'var(--cat-sage)',
       time: '5 мин',
     },
-    {
-      id: 6,
-      title: 'Прогулка 30 минут',
-      catLabel: 'Себе',
-      catColor: 'var(--cat-mauve)',
-    },
+    { id: 6, title: 'Прогулка 30 минут', catLabel: 'Себе', catColor: 'var(--cat-mauve)' },
   ]
   return Tb(
     'div',
@@ -221,12 +216,7 @@ function TabToday() {
               },
             },
             [
-              Tb(Icon, {
-                key: 'p',
-                name: 'plus',
-                size: 17,
-                color: 'var(--ink-soft)',
-              }),
+              Tb(Icon, { key: 'p', name: 'plus', size: 17, color: 'var(--ink-soft)' }),
               'Выгрузи, что крутится в голове…',
             ],
           ),
@@ -234,11 +224,7 @@ function TabToday() {
       ),
       Tb(
         'div',
-        {
-          key: 'lbl',
-          className: 'ad-overline',
-          style: { margin: '0 32px 13px' },
-        },
+        { key: 'lbl', className: 'ad-overline', style: { margin: '0 32px 13px' } },
         'На сегодня · 6 дел',
       ),
       /* 2 колонки задач */
@@ -327,12 +313,7 @@ function TabTreeNode({ text, est, state, depth, hasChildren }) {
                   flexShrink: 0,
                 },
               },
-              Tb(Icon, {
-                name: 'check',
-                size: 13,
-                color: '#fff',
-                strokeWidth: 3,
-              }),
+              Tb(Icon, { name: 'check', size: 13, color: '#fff', strokeWidth: 3 }),
             )
           : Tb('span', {
               key: 'c',
@@ -349,11 +330,7 @@ function TabTreeNode({ text, est, state, depth, hasChildren }) {
           hasChildren &&
             Tb(
               'div',
-              {
-                key: 'lbl',
-                className: 'ad-overline',
-                style: { marginBottom: 2 },
-              },
+              { key: 'lbl', className: 'ad-overline', style: { marginBottom: 2 } },
               'Группа',
             ),
           Tb(
@@ -449,50 +426,43 @@ function TabTree() {
           { key: 't', className: 'ad-h1', style: { fontSize: 24 } },
           'Организовать переезд',
         ),
-        Tb(
-          'div',
-          {
-            key: 'pb',
-            style: { display: 'flex', alignItems: 'center', gap: 10 },
-          },
-          [
-            Tb(
-              'div',
-              {
-                key: 'tr',
-                style: {
-                  flex: 1,
-                  height: 8,
-                  borderRadius: 999,
-                  background: 'var(--sage-tint-2)',
-                  overflow: 'hidden',
-                },
+        Tb('div', { key: 'pb', style: { display: 'flex', alignItems: 'center', gap: 10 } }, [
+          Tb(
+            'div',
+            {
+              key: 'tr',
+              style: {
+                flex: 1,
+                height: 8,
+                borderRadius: 999,
+                background: 'var(--sage-tint-2)',
+                overflow: 'hidden',
               },
-              Tb('div', {
-                style: {
-                  height: '100%',
-                  width: '37%',
-                  background: 'var(--accent-fill)',
-                  borderRadius: 999,
-                },
-              }),
-            ),
-            Tb(
-              'span',
-              {
-                key: 'n',
-                style: {
-                  fontFamily: 'var(--font-num)',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: 'var(--sage-deep)',
-                  whiteSpace: 'nowrap',
-                },
+            },
+            Tb('div', {
+              style: {
+                height: '100%',
+                width: '37%',
+                background: 'var(--accent-fill)',
+                borderRadius: 999,
               },
-              '3 из 8',
-            ),
-          ],
-        ),
+            }),
+          ),
+          Tb(
+            'span',
+            {
+              key: 'n',
+              style: {
+                fontFamily: 'var(--font-num)',
+                fontSize: 13,
+                fontWeight: 700,
+                color: 'var(--sage-deep)',
+                whiteSpace: 'nowrap',
+              },
+            },
+            '3 из 8',
+          ),
+        ]),
         Tb(
           'div',
           { key: 'tree' },
@@ -505,22 +475,12 @@ function TabTree() {
       'div',
       {
         key: 'right',
-        style: {
-          flex: 1,
-          padding: '36px 28px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 18,
-        },
+        style: { flex: 1, padding: '36px 28px', display: 'flex', flexDirection: 'column', gap: 18 },
       },
       [
         Tb(
           'div',
-          {
-            key: 'now-lbl',
-            className: 'ad-overline',
-            style: { color: 'var(--sage-deep)' },
-          },
+          { key: 'now-lbl', className: 'ad-overline', style: { color: 'var(--sage-deep)' } },
           'Сейчас этот шаг',
         ),
         Tb(
@@ -613,21 +573,10 @@ function TabTree() {
             ),
           ],
         ),
+        Tb('div', { key: 'next-lbl', className: 'ad-overline', style: { marginTop: 6 } }, 'Дальше'),
         Tb(
           'div',
-          {
-            key: 'next-lbl',
-            className: 'ad-overline',
-            style: { marginTop: 6 },
-          },
-          'Дальше',
-        ),
-        Tb(
-          'div',
-          {
-            key: 'next-list',
-            style: { display: 'flex', flexDirection: 'column', gap: 8 },
-          },
+          { key: 'next-list', style: { display: 'flex', flexDirection: 'column', gap: 8 } },
           [
             ['Завернуть посуду', '40 мин'],
             ['Подписать коробки', '10 мин'],
@@ -755,14 +704,7 @@ function TabFocus() {
       /* кольцо */
       Tb(
         'div',
-        {
-          key: 'ring',
-          style: {
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: 30,
-          },
-        },
+        { key: 'ring', style: { display: 'flex', justifyContent: 'center', marginBottom: 30 } },
         Tb('div', { style: { position: 'relative', width: 340, height: 340 } }, [
           Tb(
             'svg',
@@ -828,11 +770,7 @@ function TabFocus() {
               ),
               Tb(
                 'div',
-                {
-                  key: 's',
-                  className: 'ad-overline',
-                  style: { marginTop: 10 },
-                },
+                { key: 's', className: 'ad-overline', style: { marginTop: 10 } },
                 'Фокус · помидор 2 из 4',
               ),
             ],
@@ -893,21 +831,11 @@ function TabFocus() {
             Tb('div', { style: { display: 'flex', gap: 7 } }, [
               Tb('span', {
                 key: 1,
-                style: {
-                  width: 8,
-                  height: 28,
-                  borderRadius: 4,
-                  background: '#fff',
-                },
+                style: { width: 8, height: 28, borderRadius: 4, background: '#fff' },
               }),
               Tb('span', {
                 key: 2,
-                style: {
-                  width: 8,
-                  height: 28,
-                  borderRadius: 4,
-                  background: '#fff',
-                },
+                style: { width: 8, height: 28, borderRadius: 4, background: '#fff' },
               }),
             ]),
           ),
@@ -969,11 +897,7 @@ function TabFocus() {
           Tb('div', { key: 'meta', style: { flex: 1 } }, [
             Tb(
               'div',
-              {
-                key: 'o',
-                className: 'ad-overline',
-                style: { color: 'var(--sage-deep)' },
-              },
+              { key: 'o', className: 'ad-overline', style: { color: 'var(--sage-deep)' } },
               'Lo-fi · фон',
             ),
             Tb(
@@ -1031,21 +955,11 @@ function TabFocus() {
             Tb('div', { style: { display: 'flex', gap: 5 } }, [
               Tb('span', {
                 key: 1,
-                style: {
-                  width: 5,
-                  height: 17,
-                  borderRadius: 3,
-                  background: 'var(--sage-deep)',
-                },
+                style: { width: 5, height: 17, borderRadius: 3, background: 'var(--sage-deep)' },
               }),
               Tb('span', {
                 key: 2,
-                style: {
-                  width: 5,
-                  height: 17,
-                  borderRadius: 3,
-                  background: 'var(--sage-deep)',
-                },
+                style: { width: 5, height: 17, borderRadius: 3, background: 'var(--sage-deep)' },
               }),
             ]),
           ),
@@ -1163,61 +1077,54 @@ function TabProjects() {
               },
             },
             [
-              Tb(
-                'div',
-                {
-                  key: 'top',
-                  style: { display: 'flex', alignItems: 'center', gap: 13 },
-                },
-                [
+              Tb('div', { key: 'top', style: { display: 'flex', alignItems: 'center', gap: 13 } }, [
+                Tb(
+                  'span',
+                  {
+                    key: 'i',
+                    style: {
+                      width: 48,
+                      height: 48,
+                      borderRadius: 14,
+                      background: p.tone[0],
+                      color: p.tone[1],
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    },
+                  },
+                  Tb(Icon, { name: p.icon, size: 24 }),
+                ),
+                Tb('div', { key: 't', style: { flex: 1 } }, [
                   Tb(
-                    'span',
+                    'div',
                     {
-                      key: 'i',
+                      key: 'n',
                       style: {
-                        width: 48,
-                        height: 48,
-                        borderRadius: 14,
-                        background: p.tone[0],
-                        color: p.tone[1],
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
+                        fontFamily: 'var(--font-display)',
+                        fontWeight: 800,
+                        fontSize: 18,
+                        color: 'var(--ink)',
                       },
                     },
-                    Tb(Icon, { name: p.icon, size: 24 }),
+                    p.name,
                   ),
-                  Tb('div', { key: 't', style: { flex: 1 } }, [
-                    Tb(
-                      'div',
-                      {
-                        key: 'n',
-                        style: {
-                          fontFamily: 'var(--font-display)',
-                          fontWeight: 800,
-                          fontSize: 18,
-                          color: 'var(--ink)',
-                        },
+                  Tb(
+                    'div',
+                    {
+                      key: 's',
+                      style: {
+                        fontSize: 13,
+                        color: 'var(--ink-soft)',
+                        fontWeight: 600,
+                        marginTop: 2,
                       },
-                      p.name,
-                    ),
-                    Tb(
-                      'div',
-                      {
-                        key: 's',
-                        style: {
-                          fontSize: 13,
-                          color: 'var(--ink-soft)',
-                          fontWeight: 600,
-                          marginTop: 2,
-                        },
-                      },
-                      p.done + ' из ' + p.total + ' шагов',
-                    ),
-                  ]),
-                ],
-              ),
+                    },
+                    p.done + ' из ' + p.total + ' шагов',
+                  ),
+                ]),
+              ]),
               Tb(
                 'div',
                 {
@@ -1253,12 +1160,7 @@ function TabProjects() {
                   },
                 },
                 [
-                  Tb(Icon, {
-                    key: 'i',
-                    name: 'play',
-                    size: 15,
-                    color: 'var(--sage-deep)',
-                  }),
+                  Tb(Icon, { key: 'i', name: 'play', size: 15, color: 'var(--sage-deep)' }),
                   Tb('span', { key: 't', style: { color: 'var(--ink)' } }, 'Дальше: ' + p.next),
                 ],
               ),
@@ -1296,10 +1198,4 @@ function TabProjects() {
   )
 }
 
-Object.assign(window, {
-  TabletFrame,
-  TabToday,
-  TabTree,
-  TabFocus,
-  TabProjects,
-})
+Object.assign(window, { TabletFrame, TabToday, TabTree, TabFocus, TabProjects })

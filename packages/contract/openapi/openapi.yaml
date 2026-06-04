@@ -16,12 +16,12 @@ paths:
       operationId: Daily_create
       parameters: []
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DailyList"
+                $ref: '#/components/schemas/DailyList'
       tags:
         - Daily
       requestBody:
@@ -29,7 +29,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/DailyListCreate"
+              $ref: '#/components/schemas/DailyListCreate'
   /daily/{date}:
     get:
       operationId: Daily_getByDate
@@ -42,18 +42,18 @@ paths:
             type: string
             format: date
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DailyListDetail"
+                $ref: '#/components/schemas/DailyListDetail'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Daily
   /daily/{date}/entries:
@@ -67,18 +67,18 @@ paths:
             type: string
             format: date
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DailyEntry"
+                $ref: '#/components/schemas/DailyEntry'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Daily
       requestBody:
@@ -86,7 +86,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AddEntry"
+              $ref: '#/components/schemas/AddEntry'
   /daily/{date}/entries/{entryId}:
     patch:
       operationId: Daily_updateEntry
@@ -103,18 +103,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DailyEntry"
+                $ref: '#/components/schemas/DailyEntry'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Daily
       requestBody:
@@ -122,7 +122,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EntryUpdate"
+              $ref: '#/components/schemas/EntryUpdate'
     delete:
       operationId: Daily_removeEntry
       parameters:
@@ -138,14 +138,14 @@ paths:
           schema:
             type: string
       responses:
-        "204":
-          description: "There is no content to send for this request, but the headers may be useful. "
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Daily
   /frequent:
@@ -161,14 +161,14 @@ paths:
             format: int32
           explode: false
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/FrequentTask"
+                  $ref: '#/components/schemas/FrequentTask'
       tags:
         - Frequent
   /tasks:
@@ -176,26 +176,26 @@ paths:
       operationId: Tasks_list
       parameters: []
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Task"
+                  $ref: '#/components/schemas/Task'
       tags:
         - Tasks
     post:
       operationId: Tasks_create
       parameters: []
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Task"
+                $ref: '#/components/schemas/Task'
       tags:
         - Tasks
       requestBody:
@@ -203,7 +203,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TaskCreate"
+              $ref: '#/components/schemas/TaskCreate'
   /tasks/{id}:
     get:
       operationId: Tasks_read
@@ -214,18 +214,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Task"
+                $ref: '#/components/schemas/Task'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
     patch:
@@ -237,18 +237,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Task"
+                $ref: '#/components/schemas/Task'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
       requestBody:
@@ -256,7 +256,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TaskUpdate"
+              $ref: '#/components/schemas/TaskUpdate'
     delete:
       operationId: Tasks_del
       parameters:
@@ -266,14 +266,14 @@ paths:
           schema:
             type: string
       responses:
-        "204":
-          description: "There is no content to send for this request, but the headers may be useful. "
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
   /tasks/{id}/complete:
@@ -287,18 +287,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Task"
+                $ref: '#/components/schemas/Task'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
   /tasks/{id}/reopen:
@@ -312,18 +312,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Task"
+                $ref: '#/components/schemas/Task'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
   /tasks/{id}/resolve-resistance:
@@ -337,18 +337,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Task"
+                $ref: '#/components/schemas/Task'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
   /tasks/{id}/tree:
@@ -362,18 +362,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TaskNode"
+                $ref: '#/components/schemas/TaskNode'
         default:
           description: An unexpected error response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
 components:
@@ -455,7 +455,7 @@ components:
         entries:
           type: array
           items:
-            $ref: "#/components/schemas/DailyEntry"
+            $ref: '#/components/schemas/DailyEntry'
     EntryUpdate:
       type: object
       properties:
@@ -507,9 +507,9 @@ components:
         estimateMinutes:
           type: integer
           format: int32
-          description: "Time estimate, minutes (CBT: externalize time)."
+          description: 'Time estimate, minutes (CBT: externalize time).'
         status:
-          $ref: "#/components/schemas/TaskStatus"
+          $ref: '#/components/schemas/TaskStatus'
         completedAt:
           type: string
           format: date-time
@@ -565,9 +565,9 @@ components:
         estimateMinutes:
           type: integer
           format: int32
-          description: "Time estimate, minutes (CBT: externalize time)."
+          description: 'Time estimate, minutes (CBT: externalize time).'
         status:
-          $ref: "#/components/schemas/TaskStatus"
+          $ref: '#/components/schemas/TaskStatus'
         completedAt:
           type: string
           format: date-time
@@ -581,7 +581,7 @@ components:
         children:
           type: array
           items:
-            $ref: "#/components/schemas/TaskNode"
+            $ref: '#/components/schemas/TaskNode'
       description: Task with its recursive subtree (unbounded depth).
     TaskStatus:
       type: string

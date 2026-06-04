@@ -1,4 +1,4 @@
-/* AddyDo — Фазы 1–3
+/* TooToo — Фазы 1–3
    S10 auth · S8 pomodoro+lofi · PushBanner · Projects · ProjectDetail(AI)
    Exports: S10Auth, S8Focus, PushBanner, ProjectsScreen, ProjectDetail */
 const Q = React.createElement
@@ -41,7 +41,7 @@ function S10Auth({ dark }) {
                 letterSpacing: '-0.02em',
               },
             },
-            ['Addy', Q('span', { key: 'd', style: { color: 'var(--sage-deep)' } }, 'Do')],
+            ['Too', Q('span', { key: 'd', style: { color: 'var(--sage-deep)' } }, 'Too')],
           ),
           Q(
             'div',
@@ -60,11 +60,7 @@ function S10Auth({ dark }) {
         /* email */
         Q(
           'label',
-          {
-            key: 'lbl',
-            className: 'ad-overline',
-            style: { display: 'block', marginBottom: 9 },
-          },
+          { key: 'lbl', className: 'ad-overline', style: { display: 'block', marginBottom: 9 } },
           'Почта',
         ),
         Q(
@@ -85,12 +81,7 @@ function S10Auth({ dark }) {
             },
           },
           [
-            Q(Icon, {
-              key: 'i',
-              name: 'bell',
-              size: 18,
-              color: 'var(--ink-soft)',
-            }),
+            Q(Icon, { key: 'i', name: 'bell', size: 18, color: 'var(--ink-soft)' }),
             Q('span', { key: 't' }, 'anya@mail.ru'),
           ],
         ),
@@ -119,18 +110,10 @@ function S10Auth({ dark }) {
           'div',
           {
             key: 'div',
-            style: {
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
-              margin: '24px 0',
-            },
+            style: { display: 'flex', alignItems: 'center', gap: 14, margin: '24px 0' },
           },
           [
-            Q('div', {
-              key: 'l',
-              style: { flex: 1, height: 1, background: 'var(--line)' },
-            }),
+            Q('div', { key: 'l', style: { flex: 1, height: 1, background: 'var(--line)' } }),
             Q(
               'span',
               {
@@ -144,19 +127,13 @@ function S10Auth({ dark }) {
               },
               'или',
             ),
-            Q('div', {
-              key: 'r',
-              style: { flex: 1, height: 1, background: 'var(--line)' },
-            }),
+            Q('div', { key: 'r', style: { flex: 1, height: 1, background: 'var(--line)' } }),
           ],
         ),
         Q(
           'div',
           { key: 'g' },
-          Q(SecondaryBtn, {
-            icon: Q(GoogleG, { key: 'g' }),
-            label: 'Продолжить с Google',
-          }),
+          Q(SecondaryBtn, { icon: Q(GoogleG, { key: 'g' }), label: 'Продолжить с Google' }),
         ),
       ],
     ),
@@ -311,10 +288,7 @@ function S8Focus() {
     ),
     Q(
       'div',
-      {
-        key: 'ring',
-        style: { display: 'flex', justifyContent: 'center', margin: '26px 0' },
-      },
+      { key: 'ring', style: { display: 'flex', justifyContent: 'center', margin: '26px 0' } },
       Q(Ring, { pct: 0.62 }),
     ),
     /* transport */
@@ -322,12 +296,7 @@ function S8Focus() {
       'div',
       {
         key: 'ctrl',
-        style: {
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 22,
-        },
+        style: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22 },
       },
       [
         Q(
@@ -370,21 +339,11 @@ function S8Focus() {
           Q('div', { style: { display: 'flex', gap: 6 } }, [
             Q('span', {
               key: 1,
-              style: {
-                width: 7,
-                height: 26,
-                borderRadius: 3,
-                background: '#fff',
-              },
+              style: { width: 7, height: 26, borderRadius: 3, background: '#fff' },
             }),
             Q('span', {
               key: 2,
-              style: {
-                width: 7,
-                height: 26,
-                borderRadius: 3,
-                background: '#fff',
-              },
+              style: { width: 7, height: 26, borderRadius: 3, background: '#fff' },
             }),
           ]),
         ),
@@ -448,11 +407,7 @@ function S8Focus() {
         Q('div', { key: 'meta', style: { flex: 1, minWidth: 0 } }, [
           Q(
             'div',
-            {
-              key: 'o',
-              className: 'ad-overline',
-              style: { color: 'var(--sage-deep)' },
-            },
+            { key: 'o', className: 'ad-overline', style: { color: 'var(--sage-deep)' } },
             'Lo-fi · фон',
           ),
           Q(
@@ -482,12 +437,7 @@ function S8Focus() {
               },
             },
             Q('div', {
-              style: {
-                height: '100%',
-                width: '45%',
-                background: 'var(--sage)',
-                borderRadius: 999,
-              },
+              style: { height: '100%', width: '45%', background: 'var(--sage)', borderRadius: 999 },
             }),
           ),
         ]),
@@ -511,21 +461,11 @@ function S8Focus() {
           Q('div', { style: { display: 'flex', gap: 4 } }, [
             Q('span', {
               key: 1,
-              style: {
-                width: 4,
-                height: 15,
-                borderRadius: 2,
-                background: 'var(--sage-deep)',
-              },
+              style: { width: 4, height: 15, borderRadius: 2, background: 'var(--sage-deep)' },
             }),
             Q('span', {
               key: 2,
-              style: {
-                width: 4,
-                height: 15,
-                borderRadius: 2,
-                background: 'var(--sage-deep)',
-              },
+              style: { width: 4, height: 15, borderRadius: 2, background: 'var(--sage-deep)' },
             }),
           ]),
         ),
@@ -538,13 +478,7 @@ function S8Focus() {
 function PushBanner() {
   return Q(
     'div',
-    {
-      style: {
-        position: 'relative',
-        minHeight: '100%',
-        background: 'var(--cream)',
-      },
-    },
+    { style: { position: 'relative', minHeight: '100%', background: 'var(--cream)' } },
     [
       Q(
         'div',
@@ -629,11 +563,7 @@ function PushBanner() {
             ),
             Q(
               'div',
-              {
-                key: 't',
-                className: 'ad-h2',
-                style: { fontSize: 22, marginTop: 20 },
-              },
+              { key: 't', className: 'ad-h2', style: { fontSize: 22, marginTop: 20 } },
               'Мягкие напоминания?',
             ),
             Q(
@@ -648,25 +578,16 @@ function PushBanner() {
                   lineHeight: 1.55,
                 },
               },
-              'AddyDo может тихо напомнить об одном деле. Без давления и без счётчиков — обещаем.',
+              'TooToo может тихо напомнить об одном деле. Без давления и без счётчиков — обещаем.',
             ),
             Q(
               'div',
               {
                 key: 'act',
-                style: {
-                  marginTop: 22,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                },
+                style: { marginTop: 22, display: 'flex', flexDirection: 'column', gap: 8 },
               },
               [
-                Q(PrimaryBtn, {
-                  key: 'p',
-                  icon: 'bell',
-                  label: 'Разрешить напоминания',
-                }),
+                Q(PrimaryBtn, { key: 'p', icon: 'bell', label: 'Разрешить напоминания' }),
                 Q(GhostBtn, { key: 'g', label: 'Не сейчас' }),
               ],
             ),
@@ -790,12 +711,7 @@ function ProjCard({ icon, name, done, total, next, tone }) {
           },
         },
         [
-          Q(Icon, {
-            key: 'i',
-            name: 'play',
-            size: 14,
-            color: 'var(--sage-deep)',
-          }),
+          Q(Icon, { key: 'i', name: 'play', size: 14, color: 'var(--sage-deep)' }),
           Q('span', { key: 't', style: { color: 'var(--ink)' } }, 'Дальше: ' + next),
         ],
       ),
@@ -839,13 +755,7 @@ function ProjectsScreen() {
       'div',
       {
         key: 'list',
-        style: {
-          padding: '0 22px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 13,
-          flex: 1,
-        },
+        style: { padding: '0 22px', display: 'flex', flexDirection: 'column', gap: 13, flex: 1 },
       },
       [
         Q(ProjCard, {
@@ -963,24 +873,12 @@ function ProjectDetail() {
       ]),
       Q(
         'div',
-        {
-          key: 't',
-          className: 'ad-h1',
-          style: { fontSize: 26, marginTop: 10 },
-        },
+        { key: 't', className: 'ad-h1', style: { fontSize: 26, marginTop: 10 } },
         'Запустить личный сайт',
       ),
       Q(
         'div',
-        {
-          key: 'pb',
-          style: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: 11,
-            marginTop: 12,
-          },
-        },
+        { key: 'pb', style: { display: 'flex', alignItems: 'center', gap: 11, marginTop: 12 } },
         [
           Q(
             'div',
@@ -1026,15 +924,7 @@ function ProjectDetail() {
       ['Купить домен', 'Выбрать платформу'].map((t, i) =>
         Q(
           'div',
-          {
-            key: i,
-            style: {
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '11px 0',
-            },
-          },
+          { key: i, style: { display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0' } },
           [
             Q(
               'span',
@@ -1051,12 +941,7 @@ function ProjectDetail() {
                   flexShrink: 0,
                 },
               },
-              Q(Icon, {
-                name: 'check',
-                size: 14,
-                color: '#fff',
-                strokeWidth: 3,
-              }),
+              Q(Icon, { name: 'check', size: 14, color: '#fff', strokeWidth: 3 }),
             ),
             Q(
               'span',
@@ -1090,15 +975,7 @@ function ProjectDetail() {
       [
         Q(
           'div',
-          {
-            key: 'h',
-            style: {
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              marginBottom: 4,
-            },
-          },
+          { key: 'h', style: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 } },
           [
             Q(
               'span',
@@ -1130,7 +1007,7 @@ function ProjectDetail() {
                     color: 'var(--sage-deep)',
                   },
                 },
-                'AddyDo предлагает шаги',
+                'TooToo предлагает шаги',
               ),
               Q(
                 'div',
@@ -1150,26 +1027,10 @@ function ProjectDetail() {
           ],
         ),
         Q('div', { key: 'list', style: { marginTop: 13 } }, [
-          Q(AISuggestRow, {
-            key: 1,
-            text: 'Набросать 3 страницы на бумаге',
-            est: '15 мин',
-          }),
-          Q(AISuggestRow, {
-            key: 2,
-            text: 'Собрать тексты «О себе»',
-            est: '30 мин',
-          }),
-          Q(AISuggestRow, {
-            key: 3,
-            text: 'Выбрать шаблон оформления',
-            est: '20 мин',
-          }),
-          Q(AISuggestRow, {
-            key: 4,
-            text: 'Опубликовать черновик',
-            est: '10 мин',
-          }),
+          Q(AISuggestRow, { key: 1, text: 'Набросать 3 страницы на бумаге', est: '15 мин' }),
+          Q(AISuggestRow, { key: 2, text: 'Собрать тексты «О себе»', est: '30 мин' }),
+          Q(AISuggestRow, { key: 3, text: 'Выбрать шаблон оформления', est: '20 мин' }),
+          Q(AISuggestRow, { key: 4, text: 'Опубликовать черновик', est: '10 мин' }),
         ]),
         Q(
           'div',
@@ -1195,13 +1056,7 @@ function ProjectDetail() {
               },
             },
             [
-              Q(Icon, {
-                key: 'i',
-                name: 'plus',
-                size: 18,
-                color: '#fff',
-                strokeWidth: 2.5,
-              }),
+              Q(Icon, { key: 'i', name: 'plus', size: 18, color: '#fff', strokeWidth: 2.5 }),
               'Добавить все шаги',
             ],
           ),
@@ -1231,10 +1086,4 @@ function ProjectDetail() {
   ])
 }
 
-Object.assign(window, {
-  S10Auth,
-  S8Focus,
-  PushBanner,
-  ProjectsScreen,
-  ProjectDetail,
-})
+Object.assign(window, { S10Auth, S8Focus, PushBanner, ProjectsScreen, ProjectDetail })

@@ -234,10 +234,7 @@ function DesignCanvas({ children, minScale, maxScale, style }) {
           ...s,
           sections: {
             ...s.sections,
-            [id]: {
-              ...s.sections[id],
-              ...(typeof p === 'function' ? p(s.sections[id] || {}) : p),
-            },
+            [id]: { ...s.sections[id], ...(typeof p === 'function' ? p(s.sections[id] || {}) : p) },
           },
         })),
       setFocus: (slotId) => setState((s) => ({ ...s, focus: slotId })),
@@ -333,11 +330,7 @@ function DCViewport({ children, minScale = 0.1, maxScale = 8, style = {} }) {
     try {
       const s = JSON.parse(localStorage.getItem(tfKey) || 'null')
       if (s && Number.isFinite(s.x) && Number.isFinite(s.y) && Number.isFinite(s.scale)) {
-        tf.current = {
-          x: s.x,
-          y: s.y,
-          scale: Math.min(maxScale, Math.max(minScale, s.scale)),
-        }
+        tf.current = { x: s.x, y: s.y, scale: Math.min(maxScale, Math.max(minScale, s.scale)) }
         apply()
       }
     } catch {}
@@ -597,10 +590,7 @@ function DCSection({ id, title, subtitle, children, gap = 48 }) {
   return (
     <div
       data-dc-section={sid}
-      style={{
-        marginBottom: 'calc(80px * var(--dc-inv-zoom, 1))',
-        position: 'relative',
-      }}
+      style={{ marginBottom: 'calc(80px * var(--dc-inv-zoom, 1))', position: 'relative' }}
     >
       <div style={{ padding: '0 60px' }}>
         <div className="dc-sectionhead" style={{ paddingBottom: 36 }}>
@@ -637,10 +627,7 @@ function DCSection({ id, title, subtitle, children, gap = 48 }) {
             order={order}
             label={(sec.labels || {})[k] ?? byId[k].props.label}
             onRename={(v) =>
-              ctx &&
-              ctx.patchSection(sid, (x) => ({
-                labels: { ...x.labels, [k]: v },
-              }))
+              ctx && ctx.patchSection(sid, (x) => ({ labels: { ...x.labels, [k]: v } }))
             }
             onReorder={(next) => ctx && ctx.patchSection(sid, { order: next })}
             onDelete={() =>
@@ -1013,12 +1000,7 @@ function DCArtboardFrame({
               value={label}
               onChange={onRename}
               onClick={(e) => e.stopPropagation()}
-              style={{
-                fontSize: 15,
-                fontWeight: 500,
-                color: DC.label,
-                lineHeight: 1,
-              }}
+              style={{ fontSize: 15, fontWeight: 500, color: DC.label, lineHeight: 1 }}
             />
           </div>
         </div>
@@ -1178,10 +1160,7 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
   })
 
   const { width = 260, height = 480, children } = artboard.props
-  const [vp, setVp] = React.useState({
-    w: window.innerWidth,
-    h: window.innerHeight,
-  })
+  const [vp, setVp] = React.useState({ w: window.innerWidth, h: window.innerHeight })
   React.useEffect(() => {
     const r = () => setVp({ w: window.innerWidth, h: window.innerHeight })
     window.addEventListener('resize', r)
@@ -1394,11 +1373,7 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          style={{
-            width: width * scale,
-            height: height * scale,
-            position: 'relative',
-          }}
+          style={{ width: width * scale, height: height * scale, position: 'relative' }}
         >
           <div
             style={{
@@ -1429,21 +1404,10 @@ function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
         </div>
         <div
           onClick={(e) => e.stopPropagation()}
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            opacity: 0.85,
-            textAlign: 'center',
-          }}
+          style={{ fontSize: 14, fontWeight: 500, opacity: 0.85, textAlign: 'center' }}
         >
           {(sec.labels || {})[aid] ?? artboard.props.label}
-          <span
-            style={{
-              opacity: 0.5,
-              marginLeft: 10,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
+          <span style={{ opacity: 0.5, marginLeft: 10, fontVariantNumeric: 'tabular-nums' }}>
             {idx + 1} / {peers.length}
           </span>
         </div>

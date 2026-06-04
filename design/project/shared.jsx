@@ -1,4 +1,4 @@
-/* AddyDo — shared screen primitives (exported to window)
+/* TooToo — shared screen primitives (exported to window)
    Reuses Icon/Checkbox/etc from app-components.jsx */
 const S = React.createElement
 
@@ -126,14 +126,7 @@ function PrimaryBtn({ icon, label, reward, onClick }) {
       },
     },
     [
-      icon &&
-        S(Icon, {
-          key: 'i',
-          name: icon,
-          size: 20,
-          color: '#fff',
-          strokeWidth: 2.5,
-        }),
+      icon && S(Icon, { key: 'i', name: icon, size: 20, color: '#fff', strokeWidth: 2.5 }),
       S('span', { key: 'l' }, label),
     ],
   )
@@ -321,12 +314,7 @@ function ChoiceRow({ icon, title, sub }) {
             sub,
           ),
       ]),
-      S(Icon, {
-        key: 'c',
-        name: 'chevronR',
-        size: 19,
-        color: 'var(--ink-faint)',
-      }),
+      S(Icon, { key: 'c', name: 'chevronR', size: 19, color: 'var(--ink-faint)' }),
     ],
   )
 }

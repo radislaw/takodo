@@ -1,4 +1,4 @@
-/* AddyDo — Фаза 0 · MVP screens
+/* TooToo — Фаза 0 · MVP screens
    S1 empty · S2 today/dump · S3 resistance · S4 subtask tree
    S5 reward overlay · S6 history · S7 frequently-postponed · S9 settings
    Exports: S1Empty, S2Today, S3Resistance, S4Tree, S5Reward, S6History, S7Stuck, S9Settings */
@@ -62,11 +62,7 @@ function S1Empty() {
         ),
         P(
           'div',
-          {
-            key: 't',
-            className: 'ad-h2',
-            style: { fontSize: 24, marginTop: 26 },
-          },
+          { key: 't', className: 'ad-h2', style: { fontSize: 24, marginTop: 26 } },
           'Здесь пока пусто',
         ),
         P(
@@ -99,11 +95,7 @@ function S1Empty() {
         },
       },
       [
-        P(PrimaryBtn, {
-          key: 'p',
-          icon: 'plus',
-          label: 'Добавить первое дело',
-        }),
+        P(PrimaryBtn, { key: 'p', icon: 'plus', label: 'Добавить первое дело' }),
         P(
           'div',
           {
@@ -130,30 +122,10 @@ function S1Empty() {
 /* ============================== S2 — СЕГОДНЯ / ВЫГРУЗКА ============================== */
 function S2Today() {
   const dump = [
-    {
-      id: 1,
-      title: 'Записаться к стоматологу',
-      catLabel: 'Здоровье',
-      catColor: 'var(--cat-blue)',
-    },
-    {
-      id: 2,
-      title: 'Ответить Лене про дачу',
-      catLabel: 'Себе',
-      catColor: 'var(--cat-mauve)',
-    },
-    {
-      id: 3,
-      title: 'Оплатить интернет',
-      catLabel: 'Дом',
-      catColor: 'var(--cat-sage)',
-    },
-    {
-      id: 4,
-      title: 'Купить корм коту',
-      catLabel: 'Дом',
-      catColor: 'var(--cat-sage)',
-    },
+    { id: 1, title: 'Записаться к стоматологу', catLabel: 'Здоровье', catColor: 'var(--cat-blue)' },
+    { id: 2, title: 'Ответить Лене про дачу', catLabel: 'Себе', catColor: 'var(--cat-mauve)' },
+    { id: 3, title: 'Оплатить интернет', catLabel: 'Дом', catColor: 'var(--cat-sage)' },
+    { id: 4, title: 'Купить корм коту', catLabel: 'Дом', catColor: 'var(--cat-sage)' },
   ]
   return P(Screen, { pad: 56 }, [
     P(
@@ -201,33 +173,26 @@ function S2Today() {
         },
       },
       [
-        P(
-          'div',
-          {
-            key: 'top',
-            style: { display: 'flex', alignItems: 'center', gap: 10 },
-          },
-          [
-            P(
-              'span',
-              {
-                key: 'i',
-                style: {
-                  width: 38,
-                  height: 38,
-                  borderRadius: 12,
-                  background: 'var(--sage-tint)',
-                  color: 'var(--sage-deep)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                },
+        P('div', { key: 'top', style: { display: 'flex', alignItems: 'center', gap: 10 } }, [
+          P(
+            'span',
+            {
+              key: 'i',
+              style: {
+                width: 38,
+                height: 38,
+                borderRadius: 12,
+                background: 'var(--sage-tint)',
+                color: 'var(--sage-deep)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               },
-              P(Icon, { name: 'zap', size: 20 }),
-            ),
-            P(Overline, { key: 'o', color: 'var(--sage-deep)' }, 'Выгрузка'),
-          ],
-        ),
+            },
+            P(Icon, { name: 'zap', size: 20 }),
+          ),
+          P(Overline, { key: 'o', color: 'var(--sage-deep)' }, 'Выгрузка'),
+        ]),
         P(
           'div',
           {
@@ -247,12 +212,7 @@ function S2Today() {
             },
           },
           [
-            P(Icon, {
-              key: 'p',
-              name: 'plus',
-              size: 18,
-              color: 'var(--ink-soft)',
-            }),
+            P(Icon, { key: 'p', name: 'plus', size: 18, color: 'var(--ink-soft)' }),
             'Выгрузи всё, что крутится в голове…',
           ],
         ),
@@ -277,12 +237,7 @@ function S2Today() {
       'div',
       {
         key: 'list',
-        style: {
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-          padding: '0 22px',
-        },
+        style: { display: 'flex', flexDirection: 'column', gap: 10, padding: '0 22px' },
       },
       dump.map((t) => P(TaskRow, { key: t.id, task: t, onToggle: () => {} })),
     ),
@@ -295,42 +250,22 @@ function S2Today() {
 /* ============================== S3 — ВОПРОС СОПРОТИВЛЕНИЯ ============================== */
 function S3Resistance() {
   const opts = [
-    {
-      icon: 'layers',
-      title: 'Слишком большое',
-      sub: 'Разобьём на маленькие шаги',
-    },
-    {
-      icon: 'eye',
-      title: 'Не знаю, с чего начать',
-      sub: 'Подскажу самый первый шаг',
-    },
+    { icon: 'layers', title: 'Слишком большое', sub: 'Разобьём на маленькие шаги' },
+    { icon: 'eye', title: 'Не знаю, с чего начать', sub: 'Подскажу самый первый шаг' },
     { icon: 'moon', title: 'Нет сил сегодня', sub: 'Перенесём без вины' },
-    {
-      icon: 'cloud',
-      title: 'Скучно, не хочу',
-      sub: 'Сделаем крошечную версию',
-    },
+    { icon: 'cloud', title: 'Скучно, не хочу', sub: 'Сделаем крошечную версию' },
   ]
   return P(Screen, { pad: 56 }, [
     P('div', { key: 'top', style: { padding: '0 22px' } }, P(BackBtn, {})),
     P('div', { key: 'head', style: { padding: '20px 26px 0', textAlign: 'center' } }, [
       P(
         Overline,
-        {
-          key: 'o',
-          color: 'var(--sage-deep)',
-          style: { textAlign: 'center' },
-        },
+        { key: 'o', color: 'var(--sage-deep)', style: { textAlign: 'center' } },
         'Без осуждения',
       ),
       P(
         'div',
-        {
-          key: 't',
-          className: 'ad-h1',
-          style: { fontSize: 25, marginTop: 12, lineHeight: 1.25 },
-        },
+        { key: 't', className: 'ad-h1', style: { fontSize: 25, marginTop: 12, lineHeight: 1.25 } },
         'Что мешает начать?',
       ),
       P(
@@ -380,10 +315,7 @@ function TreeNode({ text, est, state, depth, last, hasChildren }) {
     depth > 0 &&
       P(
         'div',
-        {
-          key: 'rail',
-          style: { width: depth * 26, flexShrink: 0, position: 'relative' },
-        },
+        { key: 'rail', style: { width: depth * 26, flexShrink: 0, position: 'relative' } },
         P('div', {
           style: {
             position: 'absolute',
@@ -397,14 +329,7 @@ function TreeNode({ text, est, state, depth, last, hasChildren }) {
       ),
     P(
       'div',
-      {
-        key: 'b',
-        style: {
-          flex: 1,
-          position: 'relative',
-          paddingLeft: depth > 0 ? 14 : 0,
-        },
-      },
+      { key: 'b', style: { flex: 1, position: 'relative', paddingLeft: depth > 0 ? 14 : 0 } },
       [
         depth > 0 &&
           P('div', {
@@ -451,12 +376,7 @@ function TreeNode({ text, est, state, depth, last, hasChildren }) {
                       flexShrink: 0,
                     },
                   },
-                  P(Icon, {
-                    name: 'check',
-                    size: 14,
-                    color: '#fff',
-                    strokeWidth: 3,
-                  }),
+                  P(Icon, { name: 'check', size: 14, color: '#fff', strokeWidth: 3 }),
                 )
               : P('span', {
                   key: 'm',
@@ -540,30 +460,12 @@ function S4Tree() {
   const nodes = [
     { text: 'Собрать документы', depth: 1, state: 'done', hasChildren: true },
     { text: 'Найти паспорт и СНИЛС', depth: 2, state: 'done', est: '5 мин' },
-    {
-      text: 'Сделать копии',
-      depth: 2,
-      state: 'done',
-      est: '10 мин',
-      last: true,
-    },
+    { text: 'Сделать копии', depth: 2, state: 'done', est: '10 мин', last: true },
     { text: 'Упаковать кухню', depth: 1, state: 'now', hasChildren: true },
     { text: 'Купить 10 коробок', depth: 2, state: 'now', est: '15 мин' },
     { text: 'Завернуть посуду', depth: 2, state: 'todo', est: '40 мин' },
-    {
-      text: 'Подписать коробки',
-      depth: 2,
-      state: 'todo',
-      est: '10 мин',
-      last: true,
-    },
-    {
-      text: 'Заказать машину',
-      depth: 1,
-      state: 'todo',
-      est: '10 мин',
-      last: true,
-    },
+    { text: 'Подписать коробки', depth: 2, state: 'todo', est: '10 мин', last: true },
+    { text: 'Заказать машину', depth: 1, state: 'todo', est: '10 мин', last: true },
   ]
   return P(Screen, { pad: 56 }, [
     P('div', { key: 'top', style: { padding: '0 22px' } }, P(BackBtn, {})),
@@ -571,12 +473,7 @@ function S4Tree() {
       'div',
       {
         key: 'head',
-        style: {
-          padding: '18px 22px 0',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-        },
+        style: { padding: '18px 22px 0', display: 'flex', flexDirection: 'column', gap: 10 },
       },
       [
         P(Pill, { key: 'p', tone: 'sage' }, [
@@ -584,49 +481,42 @@ function S4Tree() {
           'Большое дело · разбито',
         ]),
         P('div', { key: 't', className: 'ad-h1', style: { fontSize: 26 } }, 'Организовать переезд'),
-        P(
-          'div',
-          {
-            key: 'pb',
-            style: { display: 'flex', alignItems: 'center', gap: 11 },
-          },
-          [
-            P(
-              'div',
-              {
-                key: 'tr',
-                style: {
-                  flex: 1,
-                  height: 9,
-                  borderRadius: 999,
-                  background: 'var(--sage-tint-2)',
-                  overflow: 'hidden',
-                },
+        P('div', { key: 'pb', style: { display: 'flex', alignItems: 'center', gap: 11 } }, [
+          P(
+            'div',
+            {
+              key: 'tr',
+              style: {
+                flex: 1,
+                height: 9,
+                borderRadius: 999,
+                background: 'var(--sage-tint-2)',
+                overflow: 'hidden',
               },
-              P('div', {
-                style: {
-                  height: '100%',
-                  width: '37%',
-                  background: 'var(--accent-fill)',
-                  borderRadius: 999,
-                },
-              }),
-            ),
-            P(
-              'span',
-              {
-                key: 'n',
-                style: {
-                  fontFamily: 'var(--font-num)',
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  color: 'var(--sage-deep)',
-                },
+            },
+            P('div', {
+              style: {
+                height: '100%',
+                width: '37%',
+                background: 'var(--accent-fill)',
+                borderRadius: 999,
               },
-              '3 из 8',
-            ),
-          ],
-        ),
+            }),
+          ),
+          P(
+            'span',
+            {
+              key: 'n',
+              style: {
+                fontFamily: 'var(--font-num)',
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: 'var(--sage-deep)',
+              },
+            },
+            '3 из 8',
+          ),
+        ]),
       ],
     ),
     P(
@@ -638,12 +528,7 @@ function S4Tree() {
       'div',
       {
         key: 'foot',
-        style: {
-          padding: '6px 22px 0',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 13,
-        },
+        style: { padding: '6px 22px 0', display: 'flex', flexDirection: 'column', gap: 13 },
       },
       [
         P(
@@ -663,13 +548,7 @@ function S5Reward() {
   const filled = 6
   return P(
     'div',
-    {
-      style: {
-        position: 'relative',
-        minHeight: '100%',
-        background: 'var(--cream)',
-      },
-    },
+    { style: { position: 'relative', minHeight: '100%', background: 'var(--cream)' } },
     [
       /* faint task list behind */
       P(
@@ -753,20 +632,11 @@ function S5Reward() {
                   boxShadow: '0 12px 30px rgba(224,168,126,.5)',
                 },
               },
-              P(Icon, {
-                name: 'check',
-                size: 50,
-                color: '#fff',
-                strokeWidth: 2.6,
-              }),
+              P(Icon, { name: 'check', size: 50, color: '#fff', strokeWidth: 2.6 }),
             ),
             P(
               'div',
-              {
-                key: 't',
-                className: 'ad-h1',
-                style: { fontSize: 28, marginTop: 22 },
-              },
+              { key: 't', className: 'ad-h1', style: { fontSize: 28, marginTop: 22 } },
               'Готово',
             ),
             P(
@@ -807,12 +677,7 @@ function S5Reward() {
                     },
                   },
                   [
-                    P(Icon, {
-                      key: 'i',
-                      name: 'flame',
-                      size: 20,
-                      color: 'var(--apricot-deep)',
-                    }),
+                    P(Icon, { key: 'i', name: 'flame', size: 20, color: 'var(--apricot-deep)' }),
                     P(
                       'span',
                       {
@@ -832,11 +697,7 @@ function S5Reward() {
                   'div',
                   {
                     key: 'w',
-                    style: {
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      marginTop: 14,
-                    },
+                    style: { display: 'flex', justifyContent: 'space-between', marginTop: 14 },
                   },
                   week.map((d, i) =>
                     P(
@@ -866,12 +727,7 @@ function S5Reward() {
                             },
                           },
                           i < filled &&
-                            P(Icon, {
-                              name: 'check',
-                              size: 14,
-                              color: '#fff',
-                              strokeWidth: 3,
-                            }),
+                            P(Icon, { name: 'check', size: 14, color: '#fff', strokeWidth: 3 }),
                         ),
                         P(
                           'span',
@@ -896,19 +752,11 @@ function S5Reward() {
               'div',
               {
                 key: 'act',
-                style: {
-                  marginTop: 22,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                },
+                style: { marginTop: 22, display: 'flex', flexDirection: 'column', gap: 8 },
               },
               [
                 P(PrimaryBtn, { key: 'p', label: 'Продолжить' }),
-                P(GhostBtn, {
-                  key: 'g',
-                  label: 'На сегодня хватит — и это здорово',
-                }),
+                P(GhostBtn, { key: 'g', label: 'На сегодня хватит — и это здорово' }),
               ],
             ),
           ],
@@ -1003,12 +851,7 @@ function HistDay({ title, done, items, moved }) {
                     flexShrink: 0,
                   },
                 },
-                P(Icon, {
-                  name: 'check',
-                  size: 13,
-                  color: '#fff',
-                  strokeWidth: 3,
-                }),
+                P(Icon, { name: 'check', size: 13, color: '#fff', strokeWidth: 3 }),
               ),
               P(
                 'span',
@@ -1031,12 +874,7 @@ function HistDay({ title, done, items, moved }) {
             'div',
             {
               key: 'mv',
-              style: {
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '12px 16px',
-              },
+              style: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px' },
             },
             [
               P(
@@ -1207,21 +1045,12 @@ function StuckCard({ title, days, cat }) {
               },
             },
             [
-              P(Icon, {
-                key: 'i',
-                name: ic,
-                size: 18,
-                color: 'var(--sage-deep)',
-              }),
+              P(Icon, { key: 'i', name: ic, size: 18, color: 'var(--sage-deep)' }),
               P(
                 'span',
                 {
                   key: 'l',
-                  style: {
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 12.5,
-                    fontWeight: 700,
-                  },
+                  style: { fontFamily: 'var(--font-body)', fontSize: 12.5, fontWeight: 700 },
                 },
                 lb,
               ),
@@ -1255,13 +1084,7 @@ function S7Stuck() {
       'div',
       {
         key: 'list',
-        style: {
-          padding: '0 22px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 13,
-          flex: 1,
-        },
+        style: { padding: '0 22px', display: 'flex', flexDirection: 'column', gap: 13, flex: 1 },
       },
       [
         P(StuckCard, { key: 1, title: 'Записаться к стоматологу', days: 12 }),
@@ -1421,7 +1244,7 @@ function S9Settings({ dark }) {
           fontWeight: 600,
         },
       },
-      'AddyDo · версия 0.1',
+      'TooToo · версия 0.1',
     ),
   ])
 }

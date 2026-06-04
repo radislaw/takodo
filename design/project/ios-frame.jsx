@@ -480,14 +480,7 @@ function IOSKeyboard({ dark = false }) {
   )
 
   const row = (keys, pad = 0) => (
-    <div
-      style={{
-        display: 'flex',
-        gap: 6.5,
-        justifyContent: 'center',
-        padding: `0 ${pad}px`,
-      }}
-    >
+    <div style={{ display: 'flex', gap: 6.5, justifyContent: 'center', padding: `0 ${pad}px` }}>
       {keys.map((l) => key(l, { flex: true, k: l }))}
     </div>
   )
@@ -546,16 +539,7 @@ function IOSKeyboard({ dark = false }) {
       >
         {['"The"', 'the', 'to'].map((w, i) => (
           <React.Fragment key={i}>
-            {i > 0 && (
-              <div
-                style={{
-                  width: 1,
-                  height: 25,
-                  background: '#ccc',
-                  opacity: 0.3,
-                }}
-              />
-            )}
+            {i > 0 && <div style={{ width: 1, height: 25, background: '#ccc', opacity: 0.3 }} />}
             <div
               style={{
                 flex: 1,
