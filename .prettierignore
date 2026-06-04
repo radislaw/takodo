@@ -1,0 +1,7 @@
+.omc
+pnpm-lock.yaml
+node_modules
+coverage
+dist
+*.local
+packages/contract/openapi
