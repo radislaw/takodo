@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  themeId      String?
+  defaultTheme String      @default("default")
+  createdAt    DateTime    @default(now())
+  tasks        Task[]
+  dailyLists   DailyList[]
+}
+
+model Task {
+  id                 String       @id @default(cuid())
+  userId             String
+  parentId           String?
+  title              String
+  note               String?
+  resistanceResolved Boolean      @default(false)
+  estimateMinutes    Int?
+  status             TaskStatus   @default(open)
+  completedAt        DateTime?
+  normalizedTitle    String
+  createdAt          DateTime     @default(now())
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent             Task?        @relation("TaskChildren", fields: [parentId], references: [id])
+  children           Task[]       @relation("TaskChildren")
+  dailyEntries       DailyEntry[]
+}
+
+model DailyList {
+  id        String       @id @default(cuid())
+  userId    String
+  date      DateTime     @db.Date
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries   DailyEntry[]
+
+  @@unique([userId, date])
+}
+
+model DailyEntry {
+  id          String    @id @default(cuid())
+  dailyListId String
+  taskId      String
+  isMIT       Boolean   @default(false)
+  order       Int
+  dailyList   DailyList @relation(fields: [dailyListId], references: [id], onDelete: Cascade)
+  task        Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+enum TaskStatus {
+  open
+  done
+}

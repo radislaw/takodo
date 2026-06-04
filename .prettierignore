@@ -6,3 +6,4 @@ coverage
 dist
 *.local
 packages/contract/openapi
+apps/api/prisma/migrations
