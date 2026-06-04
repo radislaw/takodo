@@ -16,17 +16,13 @@ defineProps<{
     <div
       v-else-if="kind === 'radius'"
       class="swatch-box"
-      :style="{ borderRadius: `var(${cssVar})`, background: 'var(--sage-tint)' }"
+      :style="{
+        borderRadius: `var(${cssVar})`,
+        background: 'var(--sage-tint)',
+      }"
     />
-    <div
-      v-else-if="kind === 'spacing'"
-      class="swatch-bar"
-      :style="{ width: `var(${cssVar})` }"
-    />
-    <div
-      v-else-if="kind === 'text'"
-      class="swatch-text ad-body"
-    >
+    <div v-else-if="kind === 'spacing'" class="swatch-bar" :style="{ width: `var(${cssVar})` }" />
+    <div v-else-if="kind === 'text'" class="swatch-text ad-body">
       Съешь же ещё этих мягких французских булок
     </div>
     <div
