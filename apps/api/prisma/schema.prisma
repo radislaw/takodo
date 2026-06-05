@@ -59,3 +59,14 @@ enum TaskStatus {
   open
   done
 }
+
+model AnalyticsEvent {
+  id           String   @id @default(cuid())
+  pseudonymId  String
+  eventType    String
+  payload      Json
+  createdAt    DateTime @default(now())
+
+  @@index([pseudonymId])
+  @@index([eventType])
+}
