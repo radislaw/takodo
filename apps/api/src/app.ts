@@ -1,15 +1,49 @@
 import Fastify from 'fastify'
-import type { FastifyInstance } from 'fastify'
+import openapiGlue from 'fastify-openapi-glue'
+import addFormats from 'ajv-formats'
+import { fileURLToPath } from 'node:url'
+import { join, dirname } from 'node:path'
+import type { PrismaClient } from '@prisma/client'
+import { stubService } from './service/stub.js'
+import { buildTasksHandlers } from './service/tasks.js'
+import { buildDailyHandlers } from './service/daily.js'
+import { buildFrequentHandlers } from './service/frequent.js'
 
-export function buildApp(opts: { logger?: boolean } = {}): FastifyInstance {
-  const app = Fastify({ logger: opts.logger ?? false })
+const SPEC_PATH = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../packages/contract/openapi/openapi.yaml',
+)
 
-  app.get('/health', async () => {
-    return { status: 'ok' }
+export interface AppOptions {
+  logger?: boolean
+  prisma?: PrismaClient
+  getUserId?: () => Promise<string>
+}
+
+export function buildApp(opts: AppOptions = {}) {
+  const app = Fastify({
+    logger: opts.logger ?? false,
+    ajv: {
+      customOptions: { strict: false },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      plugins: [addFormats as any],
+    },
   })
 
-  app.get('/api/hello', async () => {
-    return { message: 'Hello World from tootoo API' }
+  app.get('/health', async () => ({ status: 'ok' }))
+
+  const service =
+    opts.prisma && opts.getUserId
+      ? {
+          ...buildTasksHandlers(opts.prisma, opts.getUserId),
+          ...buildDailyHandlers(opts.prisma, opts.getUserId),
+          ...buildFrequentHandlers(opts.prisma, opts.getUserId),
+        }
+      : stubService
+
+  void app.register(openapiGlue, {
+    specification: SPEC_PATH,
+    serviceHandlers: service,
   })
 
   return app

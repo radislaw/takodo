@@ -56,9 +56,15 @@ importers:
       '@prisma/client':
         specifier: ^6.9.0
         version: 6.19.3(prisma@6.19.3(typescript@6.0.3))(typescript@6.0.3)
+      ajv-formats:
+        specifier: ^3.0.1
+        version: 3.0.1(ajv@8.20.0)
       fastify:
         specifier: ^5.2.1
         version: 5.8.5
+      fastify-openapi-glue:
+        specifier: ^4.11.3
+        version: 4.11.3
     devDependencies:
       '@types/node':
         specifier: ^24.13.0
@@ -75,6 +81,9 @@ importers:
       vitest:
         specifier: ^4.1.8
         version: 4.1.8(@types/node@24.13.0)(happy-dom@20.10.1)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+      vitest-mock-extended:
+        specifier: ^4.0.0
+        version: 4.0.0(typescript@6.0.3)(vitest@4.1.8(@types/node@24.13.0)(happy-dom@20.10.1)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)))
 
   apps/web:
     dependencies:
@@ -1259,6 +1268,10 @@ packages:
     resolution: {integrity: sha512-pvEmfSCDNYR4+lygidUqfo+shzyp4OSh9+UgK110rzA8Oot6WbJBM03Fuq3M255G7G6R9iXyfsebB7MBUocPkw==}
     engines: {node: '>=22'}
 
+  '@seriousme/openapi-schema-validator@2.9.0':
+    resolution: {integrity: sha512-bP/48Il7RMxhohq36Vg0c25tnCKOO+oEv8XSxDefuUBj0W8fYzL2Yb6C8tji0WBXykZ1S/79AWbrzGLfCG2dYw==}
+    hasBin: true
+
   '@simple-libs/child-process-utils@1.0.2':
     resolution: {integrity: sha512-/4R8QKnd/8agJynkNdJmNw2MBxuFTRcNFnE5Sg/G+jkSsV8/UBgULMzhizWWW42p8L5H7flImV2ATi79Ove2Tw==}
     engines: {node: '>=18'}
@@ -2210,6 +2223,14 @@ packages:
 
   fast-wrap-ansi@0.2.2:
     resolution: {integrity: sha512-7F2Fl+TjRSenLqlU3UjSH0iyqopqoZIu7eZVpEirP2g1GtWa2G/ecEmBdgz31+Mxr+ELclgg6sokpSFIQiZ02Q==}
+
+  fastify-openapi-glue@4.11.3:
+    resolution: {integrity: sha512-LgxS6u7U2f0gAY4QhvxZj0o2NEIl5KQeTy77iFFTXLnHZ12LiVmQvy+x3lutA+ZoWcxxl98S66J/2/RXKw+hfg==}
+    engines: {node: '>=20.0.0'}
+    hasBin: true
+
+  fastify-plugin@5.1.0:
+    resolution: {integrity: sha512-FAIDA8eovSt5qcDgcBvDuX/v0Cjz0ohGhENZ/wpc3y+oZCY2afZ9Baqql3g/lC+OHRnciQol4ww7tuthOb9idw==}
 
   fastify@5.8.5:
     resolution: {integrity: sha512-Yqptv59pQzPgQUSIm87hMqHJmdkb1+GPxdE6vW6FRyVE9G86mt7rOghitiU4JHRaTyDUk9pfeKmDeu70lAwM4Q==}
@@ -3214,6 +3235,14 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
+  ts-essentials@10.2.1:
+    resolution: {integrity: sha512-+Id1fRkuir+CsgK2x04/icS2b4V1hQmq7ObzIrDjhN0ozfRYivnP7aaKMVJfLApQm0trjR39A6NIMVchiB9Erw==}
+    peerDependencies:
+      typescript: '>=4.5.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -3348,6 +3377,12 @@ packages:
         optional: true
       yaml:
         optional: true
+
+  vitest-mock-extended@4.0.0:
+    resolution: {integrity: sha512-m2FmH8JYfxzZoLsHuhXRY+Pv++a3zd91HYpSz81tpRLEHbtFkEL2QcWvJowucWuNTirzQURKfWbJJSXbYqkTsA==}
+    peerDependencies:
+      typescript: 3.x || 4.x || 5.x || 6.x
+      vitest: '>=4.0.0'
 
   vitest@4.1.8:
     resolution: {integrity: sha512-flY6ScbCIt9HThs+C5HS7jvGOB560DJtk/Z15IQROTA6zEy49Nh8T/dofWTQL+n3vswqn87sbJNiuqw1SDp5Ig==}
@@ -4583,6 +4618,13 @@ snapshots:
     dependencies:
       '@scalar/openapi-types': 0.8.0
 
+  '@seriousme/openapi-schema-validator@2.9.0':
+    dependencies:
+      ajv: 8.20.0
+      ajv-draft-04: 1.0.0(ajv@8.20.0)
+      ajv-formats: 3.0.1(ajv@8.20.0)
+      yaml: 2.9.0
+
   '@simple-libs/child-process-utils@1.0.2':
     dependencies:
       '@simple-libs/stream-utils': 1.2.0
@@ -5591,6 +5633,14 @@ snapshots:
     dependencies:
       fast-string-width: 3.0.2
 
+  fastify-openapi-glue@4.11.3:
+    dependencies:
+      '@seriousme/openapi-schema-validator': 2.9.0
+      fastify-plugin: 5.1.0
+      yaml: 2.9.0
+
+  fastify-plugin@5.1.0: {}
+
   fastify@5.8.5:
     dependencies:
       '@fastify/ajv-compiler': 4.0.5
@@ -6463,6 +6513,10 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
+  ts-essentials@10.2.1(typescript@6.0.3):
+    optionalDependencies:
+      typescript: 6.0.3
+
   tslib@2.8.1:
     optional: true
 
@@ -6593,6 +6647,12 @@ snapshots:
       jiti: 2.7.0
       tsx: 4.22.4
       yaml: 2.9.0
+
+  vitest-mock-extended@4.0.0(typescript@6.0.3)(vitest@4.1.8(@types/node@24.13.0)(happy-dom@20.10.1)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))):
+    dependencies:
+      ts-essentials: 10.2.1(typescript@6.0.3)
+      typescript: 6.0.3
+      vitest: 4.1.8(@types/node@24.13.0)(happy-dom@20.10.1)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
 
   vitest@4.1.8(@types/node@24.13.0)(happy-dom@20.10.1)(vite@8.0.16(@types/node@24.13.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:

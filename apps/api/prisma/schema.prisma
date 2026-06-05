@@ -39,6 +39,7 @@ model DailyList {
   id        String       @id @default(cuid())
   userId    String
   date      DateTime     @db.Date
+  createdAt DateTime     @default(now())
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   entries   DailyEntry[]
 

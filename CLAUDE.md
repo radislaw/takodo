@@ -99,8 +99,16 @@ All UI strings in `apps/web/src/locales/ru.json`. ESLint enforces `no-raw-text` 
 - TypeSpec: `/microsoft/typespec`
 - Pull docs via `ctx7` before implementing (see `~/.claude/rules/context7.md`).
 
-## Current state (Phase 0.3 complete)
+## Current state (Phase 0.4 complete)
 
-Infrastructure is in place. What exists: Prisma schema (`User`, `Task` tree, `DailyList`, `DailyEntry`, `AnalyticsEvent`), docker-compose (Postgres 17), contract codegen pipeline, openapi-fetch client, analytics no-op seam, Playwright E2E, `pnpm verify` Stop-hook, design system components (Button, Input, Badge, Checkbox, Chip, Icon, Sheet, Toast, ProgressBar, ProgressRing, BottomNav, LogoMark).
+API layer is in place. What exists: all Phase 0.3 infra plus — Fastify API with 15 operationId handlers (Tasks CRUD + tree + complete/reopen/resolveResistance, Daily CRUD + entry management, Frequent list), domain logic (`normalizeTitle`, `assembleTree`, `bubbleUp`, `reopenTask`, `aggregateFrequent`), mock-Prisma route tests (66 tests), `prisma/seed.ts` (MVP user upsert via `SEED_USER_EMAIL`), `db:seed` script wired in package.json.
 
-**Phase 0.4 next:** API CRUD routes (Tasks, Daily, Frequent), web screens, `prisma/seed.ts` MVP user seed.
+**API source layout** (`apps/api/src/`):
+
+```
+db/client.ts      — Prisma singleton
+domain/           — pure business logic (normalize, tree, task-status, frequent, types)
+service/          — Fastify handlers wiring domain + Prisma (tasks, daily, frequent, stub)
+```
+
+**Phase 0.5 next:** web screens (task list, daily view, frequent view) using `openapi-fetch` typed client and Pinia Colada for server state.
