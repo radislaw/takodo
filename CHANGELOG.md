@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-06-05 · Phase 0.4: API Layer
+
+### Added
+
+- **Fastify API handlers** — 15 operationId handlers: Tasks CRUD + tree + complete/reopen/resolveResistance (9), Daily CRUD + entry management (5), Frequent aggregation (1)
+- **Domain logic** — pure functions: `normalizeTitle`, `assembleTree`, `bubbleUp`, `reopenTask`, `aggregateFrequent`; TDD-driven with 66 passing tests
+- **Mock-Prisma route tests** — Fastify integration tests with mocked Prisma; validates OpenAPI contract enforcement and handler behavior
+- **`prisma/seed.ts`** — MVP user seeding via `SEED_USER_EMAIL` env var; `pnpm db:seed` wired in `package.json`
+- **ESLint rule enhancement** — `varsIgnorePattern: ^_` added for destructuring; fixes `ajv-formats` Plugin type incompatibility with TS cast
+
+### Changed
+
+- API source layout refined: `db/client.ts` (singleton), `domain/` (pure logic), `service/` (handlers)
+- `buildApp()` return type simplified (removed `FastifyInstance` annotation for flexibility)
+
 ## [0.3.0] — 2026-06-05 · Phase 0.3: Infrastructure
 
 ### Added
@@ -45,7 +60,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Git flow** — `main` / `develop` branches; conventional commits enforced
 - **CLAUDE.md** — project rules for AI agents
 
-[Unreleased]: https://github.com/radislavalilov/tootoo/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/radislavalilov/tootoo/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/radislavalilov/tootoo/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/radislavalilov/tootoo/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/radislavalilov/tootoo/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/radislavalilov/tootoo/releases/tag/v0.1.0
