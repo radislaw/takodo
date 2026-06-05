@@ -1,82 +1,106 @@
-# CLAUDE.md — tootoo
+# CLAUDE.md
 
-Project rules for agents. Full plan: `~/.claude/plans/todo-stateful-lynx.md`.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Language convention
 
-- **All development artifacts in English:** code, comments, identifiers, commit messages,
-  CLAUDE.md, README, TypeSpec doc-comments, in-repo docs.
-- **Product UI copy is Russian** (MVP language) — but only in i18n locale files
-  (`apps/web/src/locales/*.json`), never hardcoded.
+- **All development artifacts in English:** code, comments, identifiers, commit messages, CLAUDE.md, TypeSpec doc-comments, in-repo docs.
+- **Product UI copy is Russian** (MVP language) — only in `apps/web/src/locales/*.json`, never hardcoded.
 - Chat with the user is in Russian; the repo is English.
 
 ## Product purpose
 
-Todo app for people with ADHD. Core ideas: **daily brain dump** + **recursive task splitting**
-down to a level where the brain stops resisting. Wrapped in CBT mechanics (externalization,
-task chunking, cognitive restructuring) and dopamine feedback (gain-framing — praise what's done,
-never punish what isn't).
+Todo app for people with ADHD. Core ideas: **daily brain dump** + **recursive task splitting** down to a level where the brain stops resisting. CBT mechanics (externalization, task chunking) + dopamine feedback (gain-framing — praise what's done, never punish what isn't).
 
-## Architecture (monorepo, pnpm workspaces)
+## Architecture
 
-- `apps/web` — frontend: Vue 3 (`<script setup>`) + Vite + TypeScript. Later: Pinia Colada
-  (server-state), Pinia (UI-state), Tailwind, vue-i18n.
-- `apps/api` — backend: TypeScript + Fastify. Later: Prisma → PostgreSQL.
-- `packages/contract` — TypeSpec contract (single source of truth for the API) →
-  `openapi/openapi.yaml` (committed). Consumer codegen wiring (ajv on api, openapi-fetch on web)
-  happens when routes/queries are built.
+pnpm monorepo with three packages:
 
-TypeScript everywhere, `strict: true`. `typecheck` is part of `verify`.
+- `apps/web` — Vue 3 (`<script setup>`) + Vite + TypeScript + Tailwind 4 + vue-i18n
+- `apps/api` — Fastify + Prisma + PostgreSQL (via docker-compose)
+- `packages/contract` — TypeSpec → `openapi/openapi.yaml` + `openapi/types.gen.ts` (generated, do not edit)
 
-## Single-contract rule
+### Web source layout (`apps/web/src/`)
 
-The API changes **only** through TypeSpec (`.tsp`) → regen OpenAPI + types.
-Generated artifacts must **not** be edited by hand. **No manual Zod schemas** — validation comes
-from the contract (native Fastify ajv on the backend; `openapi-typescript` + `openapi-fetch` on the
-frontend).
+```
+app/          — App.vue, router, i18n setup
+pages/        — feature pages (design-tokens/, design-ui/ — dev only; app pages TBD)
+shared/ui/    — design system components (AppButton, AppInput, AppBadge, …)
+shared/styles/ — tokens.css (CSS custom properties), index.css
+locales/      — ru.json (all UI strings)
+api/client.ts — openapi-fetch typed client (uses types.gen.ts)
+analytics.ts  — track() no-op seam (intentionally deferred)
+```
 
-## TDD (mandatory)
+Each UI component lives in its own folder with `ComponentName.vue`, `ComponentName.spec.ts`, and `index.ts` barrel.
 
-Cycle per task: test first → fails for the right reason → minimal implementation → green →
-refactor. Runner — **Vitest** (web + api), E2E — **Playwright**.
+### API source layout (`apps/api/src/`)
 
-## Git flow
+```
+app.ts        — buildApp() factory (Fastify instance, routes)
+server.ts     — entry point (starts the server)
+analytics.ts  — track() no-op seam
+prisma/       — schema.prisma lives at apps/api/prisma/schema.prisma
+```
 
-- `main` — only tested functionality (stable releases).
-- `develop` — main development branch; all work merges here.
-- Each task = its own branch off `develop`: `feature/*`, `chore/*`, `fix/*`, `refactor/*`.
-  Merge into `develop` only on green `verify`.
-- `hotfix/*` — off `main` for urgent fixes; afterwards merge into `main` and back into `develop`.
-- Commits — **conventional commits** (`feat`, `fix`, `chore`, `refactor`, `docs`, `test`, ...).
+### Contract (`packages/contract/`)
 
-## i18n
-
-**vue-i18n** on the frontend. All UI strings live only in locale files
-(`apps/web/src/locales/*.json`). **Hardcoded strings are forbidden.** MVP is Russian; the structure
-is ready for more locales. Server texts (push, email) also go through keys. _(Infra — Phase 0.)_
+`main.tsp` defines all models and interfaces: `Tasks` (CRUD + tree + complete/reopen/resolve-resistance), `Daily` (DailyList + DailyEntry with MIT flag), `Frequent` (tasks undone across N days). Compiled to `openapi/openapi.yaml`.
 
 ## Commands
 
-- `pnpm dev` — run web + api in parallel.
-- `pnpm dev:web` / `pnpm dev:api` — individually (web → http://localhost:5173, api → http://localhost:3001).
-- `pnpm contract:build` — compile the TypeSpec contract → `openapi/openapi.yaml`.
-- `pnpm build` — build all packages.
-- _(Phase 0 will add:)_ `pnpm verify` (`contract:build` → `lint` → `format:check` → `typecheck` → `test`),
-  `pnpm contract:gen`, `pnpm test:e2e`.
+```bash
+pnpm dev               # web (5173) + api (3001) in parallel
+pnpm dev:web           # web only
+pnpm dev:api           # api only
+pnpm verify            # full pipeline: contract:build → contract:gen → lint → format:check → typecheck → test
+pnpm contract:build    # TypeSpec → openapi/openapi.yaml
+pnpm contract:gen      # openapi.yaml → packages/contract/openapi/types.gen.ts
+pnpm lint              # ESLint across all packages
+pnpm format            # Prettier write
+pnpm test              # Vitest (all packages)
+pnpm test:e2e          # Playwright smoke test
+```
 
-## Stack and docs
+Run a single test file:
 
-- Vue 3 + Vite + TypeScript.
-- Fastify + Prisma + PostgreSQL.
-- Pinia Colada — ctx7 ID `/posva/pinia-colada`.
-- TypeSpec — ctx7 ID `/microsoft/typespec`.
+```bash
+pnpm --filter @tootoo/web vitest run src/shared/ui/button/AppButton.spec.ts
+pnpm --filter @tootoo/api vitest run src/app.spec.ts
+```
+
+## Single-contract rule
+
+API changes **only** through TypeSpec (`.tsp`) → `pnpm contract:build` → `pnpm contract:gen`. Generated files (`openapi.yaml`, `types.gen.ts`) must not be edited by hand. No manual Zod schemas — validation comes from the contract (Fastify ajv on api, `openapi-fetch` on web).
+
+## TDD (mandatory)
+
+Cycle: test first → red → minimal implementation → green → refactor. Vitest for unit/integration, Playwright for E2E (`e2e/smoke.spec.ts`). Vitest excludes `e2e/` — do not move specs there.
+
+## i18n
+
+All UI strings in `apps/web/src/locales/ru.json`. ESLint enforces `no-raw-text` as error in `.vue` files. MVP is Russian; structure is ready for more locales.
+
+## Analytics seam
+
+`track(event: AnalyticsEvent)` exists as a no-op in both `apps/api/src/analytics.ts` and `apps/web/src/analytics.ts`. Call it from features; the real backend is deferred. `AnalyticsEvent` uses `pseudonymId` (not `userId`) by design for privacy.
+
+## Git flow
+
+- `main` — stable releases only.
+- `develop` — integration branch; all work merges here on green `verify`.
+- Branch naming: `feature/*`, `fix/*`, `chore/*`, `refactor/*` off `develop`.
+- `hotfix/*` off `main`; merge to `main` then back to `develop`.
+- Conventional commits: `feat`, `fix`, `chore`, `refactor`, `docs`, `test`, `perf`, `ci`.
+
+## Stack ctx7 IDs
+
+- Pinia Colada: `/posva/pinia-colada`
+- TypeSpec: `/microsoft/typespec`
 - Pull docs via `ctx7` before implementing (see `~/.claude/rules/context7.md`).
 
-## Current state
+## Current state (Phase 0.3 complete)
 
-Scaffold + contract. Done: git flow (`main`/`develop`), pnpm monorepo, Vue page,
-minimal Fastify (`/health`, `/api/hello`), CLAUDE.md, **TypeSpec contract** (`packages/contract`,
-Phase 0.4 surface: Task tree, DailyList/Entry, Frequent → `openapi/openapi.yaml`).
-**Deferred in Phase 0:** Prisma/Postgres/docker-compose, consumer codegen wiring (ajv on api,
-openapi-fetch/openapi-typescript on web), Tailwind + `tokens.css` + 11 themes, UI components,
-Pinia Colada, i18n, Vitest/Playwright, `verify` Stop-hook, analytics seam.
+Infrastructure is in place. What exists: Prisma schema (`User`, `Task` tree, `DailyList`, `DailyEntry`, `AnalyticsEvent`), docker-compose (Postgres 17), contract codegen pipeline, openapi-fetch client, analytics no-op seam, Playwright E2E, `pnpm verify` Stop-hook, design system components (Button, Input, Badge, Checkbox, Chip, Icon, Sheet, Toast, ProgressBar, ProgressRing, BottomNav, LogoMark).
+
+**Phase 0.4 next:** API CRUD routes (Tasks, Daily, Frequent), web screens, `prisma/seed.ts` MVP user seed.
