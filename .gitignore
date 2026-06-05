@@ -10,3 +10,5 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
