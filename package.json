@@ -21,6 +21,7 @@
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter @tootoo/web test:e2e",
     "verify": "pnpm contract:build && pnpm contract:gen && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
   },
   "simple-git-hooks": {
