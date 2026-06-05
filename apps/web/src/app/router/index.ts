@@ -4,7 +4,11 @@ import type { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/design/tokens',
+    redirect: '/today',
+  },
+  {
+    path: '/today',
+    component: () => import('@/pages/today').then((m) => m.TodayPage),
   },
   {
     path: '/design/tokens',

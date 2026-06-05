@@ -99,9 +99,15 @@ All UI strings in `apps/web/src/locales/ru.json`. ESLint enforces `no-raw-text` 
 - TypeSpec: `/microsoft/typespec`
 - Pull docs via `ctx7` before implementing (see `~/.claude/rules/context7.md`).
 
-## Current state (Phase 0.4 complete)
+## Current state (Phase 0.5 complete)
 
-API layer is in place. What exists: all Phase 0.3 infra plus — Fastify API with 15 operationId handlers (Tasks CRUD + tree + complete/reopen/resolveResistance, Daily CRUD + entry management, Frequent list), domain logic (`normalizeTitle`, `assembleTree`, `bubbleUp`, `reopenTask`, `aggregateFrequent`), mock-Prisma route tests (66 tests), `prisma/seed.ts` (MVP user upsert via `SEED_USER_EMAIL`), `db:seed` script wired in package.json.
+Today screen shipped. What exists: all Phase 0.4 plus —
+
+**API (live):** `server.ts` wires real Prisma singleton + cached `getUserId` (seed user lookup); `@fastify/cors` registered (origin `WEB_ORIGIN ?? http://localhost:5173`); `db:push` script added. Single-user MVP, no auth.
+
+**Web data layer:** Pinia + `@pinia/colada` installed; composables in `shared/api/` — `useDailyToday` (get-or-create via `fetchDailyByDate`), `useTasks`, `useCreateTask`, `useAddDailyEntry`, `useUpdateDailyEntry`, `useRemoveDailyEntry`, `useCompleteTask`, `useReopenTask`. Keys: `['daily', date]`, `['tasks']`.
+
+**Today screen** (`pages/today/`): brain dump input → task + daily entry; MIT toggle (limit 3, toast on overflow); done/reopen via checkbox; `AppProgressRing` (done/total); i18n `today.*`.
 
 **API source layout** (`apps/api/src/`):
 
@@ -111,4 +117,6 @@ domain/           — pure business logic (normalize, tree, task-status, frequen
 service/          — Fastify handlers wiring domain + Prisma (tasks, daily, frequent, stub)
 ```
 
-**Phase 0.5 next:** web screens (task list, daily view, frequent view) using `openapi-fetch` typed client and Pinia Colada for server state.
+**Dev DB bring-up:** `docker compose up -d` → `pnpm --filter @tootoo/api db:push` → `pnpm --filter @tootoo/api db:seed`.
+
+**Phase 0.6 next:** Tasks screen (list + create + recursive split + resolveResistance) and Frequent screen, bottom-nav wiring between all three screens.

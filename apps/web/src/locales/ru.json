@@ -2,6 +2,16 @@
   "app": {
     "name": "TooToo"
   },
+  "today": {
+    "title": "Сегодня",
+    "addPlaceholder": "Добавить дело...",
+    "addButton": "Добавить",
+    "mitLabel": "Главное",
+    "mitLimitToast": "Главных дел уже 3 — выбери самое важное",
+    "emptyState": "Список пуст — добавь первое дело дня",
+    "loading": "Загрузка...",
+    "progressAria": "{done} из {total} выполнено"
+  },
   "a11y": {
     "mainNav": "Основная навигация"
   },

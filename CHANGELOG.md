@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-06-06 · Phase 0.5: Today Screen
+
+### Added
+
+- **Live API wiring** — `server.ts` now passes real Prisma singleton + cached `getUserId` (seed-user lookup by `SEED_USER_EMAIL`); falls back with a clear error if seed not run
+- **CORS** — `@fastify/cors` registered in `buildApp()`; origin controlled via `WEB_ORIGIN` env (default `http://localhost:5173`)
+- **`db:push` script** — `prisma db push` added to `apps/api/package.json`; `.env` + `.env.example` with `DATABASE_URL` for docker-compose Postgres
+- **Pinia + Pinia Colada** — installed in `apps/web`; registered in `main.ts` before router/i18n
+- **`shared/api/` composables** — typed wrappers over `openapi-fetch` client: `useDailyToday` (get-or-create with 404 fallback), `useTasks`, `useCreateTask`, `useAddDailyEntry`, `useUpdateDailyEntry`, `useRemoveDailyEntry`, `useCompleteTask`, `useReopenTask`; each mutation invalidates relevant query keys
+- **Today screen** (`pages/today/`) — brain dump input → create task + add daily entry; MIT toggle (3-limit enforced, gentle toast on overflow); done/reopen via `AppCheckbox`; `AppProgressRing` (done/total); i18n `today.*` namespace
+- **Router** — `/today` route added; `/` redirect changed from `/design/tokens` to `/today`; design pages kept for dev
+
+### Changed
+
+- `apps/api/src/server.ts` — replaced `buildApp({ logger: true })` (→ stubService) with live prisma + getUserId wiring
+
 ## [0.4.0] — 2026-06-05 · Phase 0.4: API Layer
 
 ### Added

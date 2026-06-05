@@ -1,4 +1,5 @@
 import Fastify from 'fastify'
+import cors from '@fastify/cors'
 import openapiGlue from 'fastify-openapi-glue'
 import addFormats from 'ajv-formats'
 import { fileURLToPath } from 'node:url'
@@ -28,6 +29,10 @@ export function buildApp(opts: AppOptions = {}) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       plugins: [addFormats as any],
     },
+  })
+
+  void app.register(cors, {
+    origin: process.env.WEB_ORIGIN ?? 'http://localhost:5173',
   })
 
   app.get('/health', async () => ({ status: 'ok' }))
