@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "pnpm verify || exit 2"
+            "command": "cd \"$(git rev-parse --show-toplevel)\" && pnpm verify || exit 2"
           }
         ]
       }
