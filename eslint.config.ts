@@ -15,6 +15,7 @@ export default tseslint.config(
       'apps/web/src/assets',
       '.remember',
       'apps/api/prisma/migrations',
+      'packages/contract/openapi/**',
     ],
   },
   {
