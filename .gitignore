@@ -6,6 +6,7 @@ coverage/
 .omc/
 .env
 # Playwright
+.playwright-mcp
 test-results/
 playwright-report/
 blob-report/
