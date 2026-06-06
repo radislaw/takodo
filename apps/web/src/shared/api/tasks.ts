@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
 import { apiClient } from '@/api/client'
+import { useReward } from '@/shared/lib/useReward'
 
 export function useTasks() {
   return useQuery({
@@ -33,6 +34,7 @@ export function useCreateTask() {
 
 export function useCompleteTask() {
   const queryCache = useQueryCache()
+  const { celebrate } = useReward()
   return useMutation({
     mutation: async (id: string) => {
       const { data, error } = await apiClient.POST('/tasks/{id}/complete', {
@@ -40,6 +42,9 @@ export function useCompleteTask() {
       })
       if (error) throw new Error(error.message)
       return data!
+    },
+    onSuccess: () => {
+      celebrate()
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['tasks'], exact: true })
