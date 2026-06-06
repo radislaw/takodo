@@ -6,4 +6,12 @@ export {
   todayDate,
   fetchDailyByDate,
 } from './daily'
-export { useTasks, useCreateTask, useCompleteTask, useReopenTask } from './tasks'
+export {
+  useTasks,
+  useCreateTask,
+  useCompleteTask,
+  useReopenTask,
+  useUpdateTask,
+  useDeleteTask,
+  useResolveResistance,
+} from './tasks'

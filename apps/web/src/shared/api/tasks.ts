@@ -62,3 +62,59 @@ export function useReopenTask() {
     },
   })
 }
+
+export function useUpdateTask() {
+  const queryCache = useQueryCache()
+  return useMutation({
+    mutation: async ({
+      id,
+      ...body
+    }: {
+      id: string
+      title?: string
+      note?: string
+      estimateMinutes?: number
+    }) => {
+      const { data, error } = await apiClient.PATCH('/tasks/{id}', {
+        params: { path: { id } },
+        body,
+      })
+      if (error) throw new Error('Failed to update task')
+      return data!
+    },
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+    },
+  })
+}
+
+export function useDeleteTask() {
+  const queryCache = useQueryCache()
+  return useMutation({
+    mutation: async (id: string) => {
+      const { error } = await apiClient.DELETE('/tasks/{id}', {
+        params: { path: { id } },
+      })
+      if (error) throw new Error('Failed to delete task')
+    },
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+    },
+  })
+}
+
+export function useResolveResistance() {
+  const queryCache = useQueryCache()
+  return useMutation({
+    mutation: async (id: string) => {
+      const { data, error } = await apiClient.POST('/tasks/{id}/resolve-resistance', {
+        params: { path: { id } },
+      })
+      if (error) throw new Error('Failed to resolve resistance')
+      return data!
+    },
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+    },
+  })
+}

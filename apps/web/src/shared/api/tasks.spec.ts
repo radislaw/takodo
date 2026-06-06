@@ -13,6 +13,8 @@ import { apiClient } from '@/api/client'
 
 const mockGet = apiClient.GET as ReturnType<typeof vi.fn>
 const mockPost = apiClient.POST as ReturnType<typeof vi.fn>
+const mockPatch = apiClient.PATCH as ReturnType<typeof vi.fn>
+const mockDelete = apiClient.DELETE as ReturnType<typeof vi.fn>
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -68,5 +70,40 @@ describe('apiClient POST /tasks/{id}/reopen', () => {
       params: { path: { id: 't1' } },
     })
     expect(data?.status).toBe('open')
+  })
+})
+
+describe('apiClient PATCH /tasks/{id}', () => {
+  it('updates task title and returns updated task', async () => {
+    const updated = { ...fakeTask, title: 'Updated title' }
+    mockPatch.mockResolvedValueOnce({ data: updated, error: null })
+    const { data } = await apiClient.PATCH('/tasks/{id}', {
+      params: { path: { id: 't1' } },
+      body: { title: 'Updated title' },
+    })
+    expect(mockPatch).toHaveBeenCalledWith('/tasks/{id}', {
+      params: { path: { id: 't1' } },
+      body: { title: 'Updated title' },
+    })
+    expect(data?.title).toBe('Updated title')
+  })
+})
+
+describe('apiClient DELETE /tasks/{id}', () => {
+  it('calls delete endpoint with task id', async () => {
+    mockDelete.mockResolvedValueOnce({ error: null })
+    await apiClient.DELETE('/tasks/{id}', { params: { path: { id: 't1' } } })
+    expect(mockDelete).toHaveBeenCalledWith('/tasks/{id}', { params: { path: { id: 't1' } } })
+  })
+})
+
+describe('apiClient POST /tasks/{id}/resolve-resistance', () => {
+  it('returns task with resistanceResolved true', async () => {
+    const resolved = { ...fakeTask, resistanceResolved: true }
+    mockPost.mockResolvedValueOnce({ data: resolved, error: null })
+    const { data } = await apiClient.POST('/tasks/{id}/resolve-resistance', {
+      params: { path: { id: 't1' } },
+    })
+    expect(data?.resistanceResolved).toBe(true)
   })
 })

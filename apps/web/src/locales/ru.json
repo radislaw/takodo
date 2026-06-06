@@ -5,7 +5,16 @@
     "frequent": "Частые"
   },
   "tasks": {
-    "title": "Задачи"
+    "title": "Задачи",
+    "addPlaceholder": "Добавить задачу...",
+    "addButton": "Добавить",
+    "addStep": "+ добавить шаг",
+    "resolveResistance": "Я могу это",
+    "estimateLabel": "мин",
+    "edit": "Изменить",
+    "delete": "Удалить",
+    "empty": "Задач нет — добавь первую",
+    "loading": "Загрузка..."
   },
   "frequent": {
     "title": "Частые"
