@@ -15,3 +15,4 @@ export {
   useDeleteTask,
   useResolveResistance,
 } from './tasks'
+export { useFrequent } from './frequent'

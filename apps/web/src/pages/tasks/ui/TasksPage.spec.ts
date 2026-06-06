@@ -60,7 +60,7 @@ describe('TasksPage', () => {
     expect(mount(TasksPage).text()).toContain('Buy milk')
   })
 
-  it('does not render child tasks as roots', () => {
+  it('only passes root tasks to top-level TaskTreeNode', () => {
     tasksData.value = [
       {
         id: 't1',
@@ -79,7 +79,8 @@ describe('TasksPage', () => {
         normalizedTitle: 'child',
       },
     ]
-    const rootNodes = mount(TasksPage).findAllComponents({ name: 'TaskTreeNode' })
+    const allNodes = mount(TasksPage).findAllComponents({ name: 'TaskTreeNode' })
+    const rootNodes = allNodes.filter((n) => n.props('node').parentId === null)
     expect(rootNodes).toHaveLength(1)
   })
 

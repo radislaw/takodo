@@ -18,20 +18,30 @@ vi.mock('@/shared/api', () => ({
   useUpdateTask: () => ({ mutate: mockUpdate }),
 }))
 
-const openTask = {
+interface Task {
+  id: string
+  parentId: string | null
+  title: string
+  status: 'open' | 'done'
+  resistanceResolved: boolean
+  normalizedTitle: string
+  estimateMinutes?: number
+}
+
+const openTask: Task = {
   id: 't1',
   parentId: null,
   title: 'Parent task',
-  status: 'open' as const,
+  status: 'open',
   resistanceResolved: false,
   normalizedTitle: 'parent task',
 }
 
-const childTask = {
+const childTask: Task = {
   id: 't2',
   parentId: 't1',
   title: 'Child task',
-  status: 'open' as const,
+  status: 'open',
   resistanceResolved: false,
   normalizedTitle: 'child task',
 }
@@ -54,7 +64,7 @@ describe('TaskTreeNode', () => {
   })
 
   it('calls reopenTask on checkbox toggle for done task', async () => {
-    const done = { ...openTask, status: 'done' as const }
+    const done: Task = { ...openTask, status: 'done' }
     const wrapper = mountNode(done, [done])
     await wrapper.findComponent({ name: 'AppCheckbox' }).vm.$emit('update:modelValue', false)
     expect(mockReopen).toHaveBeenCalledWith('t1')
@@ -80,7 +90,7 @@ describe('TaskTreeNode', () => {
   })
 
   it('shows resolved check icon when resistanceResolved', () => {
-    const resolved = { ...openTask, resistanceResolved: true }
+    const resolved: Task = { ...openTask, resistanceResolved: true }
     const wrapper = mountNode(resolved, [resolved])
     expect(wrapper.findComponent({ name: 'AppChip' }).exists()).toBe(false)
   })
