@@ -2,12 +2,14 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppBottomNav } from '@/shared/ui'
+import { AppBottomNav, RewardBurst } from '@/shared/ui'
 import type { IconName } from '@/shared/ui/icon/icons'
+import { useReward } from '@/shared/lib/useReward'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
+const { isVisible, hide } = useReward()
 
 const navItems = computed<{ id: string; icon: IconName; label: string }[]>(() => [
   { id: 'today', icon: 'home', label: t('nav.today') },
@@ -39,5 +41,6 @@ function handleTabChange(id: string) {
       :items="navItems"
       @update:model-value="handleTabChange"
     />
+    <RewardBurst :show="isVisible" @close="hide" />
   </div>
 </template>

@@ -5,6 +5,38 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-06-07 · Phase 0-reward: RewardBurst
+
+### Added
+
+- **`canvas-confetti`** — runtime dep + `@types/canvas-confetti` dev dep in `apps/web`
+- **`shared/lib/confetti.ts`** — seam over `canvas-confetti`; exports `fireConfetti()` (single burst, apricot palette) and `fireFireworks()` (rAF loop, bilateral origin); future swap to `@tsparticles/confetti` rewrites only this file
+- **`shared/lib/useReward.ts`** — module-level singleton composable `{ isVisible, celebrate(), hide() }`; UI/i18n-free
+- **`RewardBurst.vue`** (`shared/ui/reward-burst/`) — `<Teleport to="body">` overlay, `pointer-events-none`; shows random praise phrase + random emoji from i18n; `fireConfetti` + `fireFireworks` on show; `prefers-reduced-motion` → particles skipped, soft fade only; auto-close 1800 ms; spring-pop entry animation; `role="status"` + `aria-live="polite"`
+- **`reward.*` i18n keys** — 50 motivating praise phrases + 15 emoji variants + `aria` label in `ru.json`
+- **`window.matchMedia` mock** in `apps/web/src/test/setup.ts` — fixes jsdom missing API for RewardBurst specs
+- **`useCompleteTask.onSuccess`** → `celebrate()` — single trigger per user action, covers Today + Tasks + any future screen automatically
+- **`<RewardBurst>` in `AppLayout.vue`** — mounted globally once, wired to `useReward` singleton
+
+### Changed
+
+- `shared/ui/index.ts` — exports `RewardBurst`
+
+## [0.6.0] — 2026-06-06 · Phase 0.6: Tasks + Frequent screens
+
+### Added
+
+- **Tasks screen** (`pages/tasks/`) — full task tree with recursive `TaskTreeNode` component; inline create, edit, delete, complete/reopen, `resolveResistance`; i18n `tasks.*` namespace
+- **Frequent screen** (`pages/frequent/`) — aggregated view of tasks undone across N days; re-add to today action; i18n `frequent.*` namespace with Russian plural rules
+- **Bottom navigation** (`AppBottomNav`) — wired in `AppLayout`; routes: `/today`, `/tasks`, `/frequent`; active-tab computed from `route.path`
+- **`useResolveResistance`, `useUpdateTask`, `useDeleteTask`** composables in `shared/api/tasks.ts`
+- **`useFrequent`** composable in `shared/api/`
+
+### Changed
+
+- Router default redirect changed from `/today` to `/today` (preserved); `AppLayout` now wraps all routes with `chrome` meta flag support
+- `useI18n({ useScope: 'global' })` applied to all 10 Vue components to fix console warnings
+
 ## [0.5.0] — 2026-06-06 · Phase 0.5: Today Screen
 
 ### Added
