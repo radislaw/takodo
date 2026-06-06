@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.1] — 2026-06-07 · Bottom nav: iOS safe-area + frosted glass
+
+### Added
+
+- **`--nav-bg` token** in `tokens.css` — `color-mix(in srgb, var(--card) 80%, transparent)` adapts to every theme automatically; cyberpunk override: solid `#161334`
+- **`surface-nav` utility** — frosted `backdrop-filter: blur(16px)` surface using `--nav-bg`
+- **`pb-nav` utility** — `calc(5rem + env(safe-area-inset-bottom))` keeps content above nav on iOS
+
+### Changed
+
+- `index.html` — added `viewport-fit=cover` to meta viewport (required for `env(safe-area-inset-*)` on iOS)
+- `AppLayout.vue` — switched to app-shell model: `h-dvh overflow-hidden` wrapper + `absolute inset-0 overflow-y-auto` scroll container + `AppBottomNav` as `absolute inset-x-0 bottom-0` overlay
+- `AppBottomNav.vue` — `surface-card rounded-b-3xl pb-4` → `surface-nav` with safe-area padding; inner `max-w-xl` wrapper centers buttons on wide screens; touch targets `min-h-[44px]`; label `text-[11px]`; icon size 22
+- `TodayPage`, `TasksPage`, `FrequentPage` — `min-h-dvh` → `min-h-full`; bottom padding → `pb-nav`
+
 ## [0.7.0] — 2026-06-07 · Phase 0-reward: RewardBurst
 
 ### Added
