@@ -11,11 +11,21 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/today').then((m) => m.TodayPage),
   },
   {
+    path: '/tasks',
+    component: () => import('@/pages/tasks').then((m) => m.TasksPage),
+  },
+  {
+    path: '/frequent',
+    component: () => import('@/pages/frequent').then((m) => m.FrequentPage),
+  },
+  {
     path: '/design/tokens',
+    meta: { chrome: false },
     component: () => import('@/pages/design-tokens').then((m) => m.DesignTokensPage),
   },
   {
     path: '/design/ui',
+    meta: { chrome: false },
     component: () => import('@/pages/design-ui').then((m) => m.DesignUiPage),
   },
 ]

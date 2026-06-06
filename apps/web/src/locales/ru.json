@@ -1,4 +1,15 @@
 {
+  "nav": {
+    "today": "Сегодня",
+    "tasks": "Задачи",
+    "frequent": "Частые"
+  },
+  "tasks": {
+    "title": "Задачи"
+  },
+  "frequent": {
+    "title": "Частые"
+  },
   "app": {
     "name": "TooToo"
   },
