@@ -70,6 +70,15 @@
 @utility fill-reward {
   background: var(--reward-fill);
 }
+@utility surface-nav {
+  background: var(--card);
+  background: var(--nav-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+@utility pb-nav {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
 
 /* ── Bridge extension: warm shadows, ring, press colors, font families ── */
 @theme inline {

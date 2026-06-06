@@ -88,7 +88,7 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
 </script>
 
 <template>
-  <div class="surface-app min-h-dvh pb-8">
+  <div class="surface-app pb-nav min-h-full">
     <!-- Header -->
     <header class="surface-card border-line sticky top-0 z-10 border-b shadow-sm">
       <div class="flex items-center justify-between px-5 py-4">

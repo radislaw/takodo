@@ -31,12 +31,13 @@ function handleTabChange(id: string) {
 </script>
 
 <template>
-  <div class="surface-app flex min-h-dvh flex-col">
-    <div class="flex-1 overflow-y-auto">
+  <div class="surface-app relative h-dvh overflow-hidden">
+    <div class="absolute inset-0 overflow-y-auto">
       <RouterView />
     </div>
     <AppBottomNav
       v-if="showChrome"
+      class="absolute inset-x-0 bottom-0"
       :model-value="activeTab"
       :items="navItems"
       @update:model-value="handleTabChange"

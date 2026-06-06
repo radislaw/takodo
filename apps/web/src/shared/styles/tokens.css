@@ -35,6 +35,9 @@
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
+  /* Nav background — frosted, auto-adapts to each theme via --card */
+  --nav-bg: color-mix(in srgb, var(--card) 80%, transparent);
+
   /* Soft semantic — kept low-saturation to stay calm */
   --done: #84a98c; /* completed / positive            */
   --done-tint: #e6efe7;
@@ -331,6 +334,9 @@
   /* GRADIENT FILLS — the signature of this theme */
   --accent-fill: linear-gradient(135deg, #2f6bff 0%, #8a3dff 100%); /* blue → violet */
   --reward-fill: linear-gradient(135deg, #9d3dff 0%, #ff2d5e 100%); /* violet → red  */
+
+  /* Nav — solid, color-mix is invalid with gradient --card */
+  --nav-bg: #161334;
 
   /* Soft semantic */
   --done: #00e0b8;
