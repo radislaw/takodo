@@ -15,7 +15,7 @@ const props = withDefaults(
   },
 )
 
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 
 const pct = computed(() => (props.total ? Math.round((props.done / props.total) * 100) : 0))
 const isReward = computed(() => props.reward || pct.value >= 100)

@@ -21,7 +21,7 @@ import {
   useReopenTask,
 } from '@/shared/api'
 
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 
 const { data: daily, isPending } = useDailyToday()
 const { data: taskList } = useTasks()

@@ -16,7 +16,7 @@ import {
   AppBottomNav,
 } from '@/shared/ui'
 
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 
 const themes = [
   { id: '', label: 'Sage' },

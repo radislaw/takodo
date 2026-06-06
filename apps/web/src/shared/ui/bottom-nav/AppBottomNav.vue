@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n'
 import AppIcon from '../icon/AppIcon.vue'
 import type { IconName } from '../icon/icons'
 
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 const model = defineModel<string>({ required: true })
 
 defineProps<{

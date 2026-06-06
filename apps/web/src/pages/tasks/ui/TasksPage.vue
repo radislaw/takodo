@@ -5,7 +5,7 @@ import { AppButton, AppInput, AppIcon } from '@/shared/ui'
 import { useTasks, useCreateTask } from '@/shared/api'
 import TaskTreeNode from './TaskTreeNode.vue'
 
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 const { data: taskList, isPending } = useTasks()
 const { mutateAsync: createTask } = useCreateTask()
 

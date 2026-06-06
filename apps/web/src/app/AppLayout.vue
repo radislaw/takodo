@@ -7,7 +7,7 @@ import type { IconName } from '@/shared/ui/icon/icons'
 
 const route = useRoute()
 const router = useRouter()
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 
 const navItems = computed<{ id: string; icon: IconName; label: string }[]>(() => [
   { id: 'today', icon: 'home', label: t('nav.today') },

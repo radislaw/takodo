@@ -4,7 +4,7 @@ import { useQueryCache } from '@pinia/colada'
 import { AppIcon, AppButton } from '@/shared/ui'
 import { useFrequent, useCreateTask, useAddDailyEntry } from '@/shared/api'
 
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 const queryCache = useQueryCache()
 const { data: frequent, isPending } = useFrequent()
 const { mutateAsync: createTask } = useCreateTask()

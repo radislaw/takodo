@@ -28,7 +28,7 @@ const props = defineProps<{
   depth?: number
 }>()
 
-const { t } = useI18n()
+const { t } = useI18n({ useScope: 'global' })
 const { mutateAsync: createTask } = useCreateTask()
 const { mutate: completeTask } = useCompleteTask()
 const { mutate: reopenTask } = useReopenTask()
