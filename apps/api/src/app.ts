@@ -33,6 +33,7 @@ export function buildApp(opts: AppOptions = {}) {
 
   void app.register(cors, {
     origin: process.env.WEB_ORIGIN ?? 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   })
 
   app.get('/health', async () => ({ status: 'ok' }))
