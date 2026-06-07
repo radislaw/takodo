@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TaskTreeNode from './TaskTreeNode.vue'
 import { AppCheckbox, AppIcon, AppChip, AppInput } from '@/shared/ui'
@@ -29,6 +30,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n({ useScope: 'global' })
+const router = useRouter()
 const { mutateAsync: createTask } = useCreateTask()
 const { mutate: completeTask } = useCompleteTask()
 const { mutate: reopenTask } = useReopenTask()
@@ -90,12 +92,14 @@ function handleEstimateBlur() {
         @update:model-value="handleToggle"
       />
 
-      <span
-        class="font-body text-ink min-w-0 flex-1 truncate text-sm"
+      <button
+        type="button"
+        class="font-body text-ink min-w-0 flex-1 truncate text-left text-sm"
         :class="{ 'line-through opacity-50': node.status === 'done' }"
+        @click="router.push(`/tasks/${node.id}`)"
       >
         {{ node.title }}
-      </span>
+      </button>
 
       <input
         v-if="editingEstimate"

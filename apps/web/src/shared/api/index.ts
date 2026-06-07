@@ -8,6 +8,7 @@ export {
 } from './daily'
 export {
   useTasks,
+  useTaskTree,
   useCreateTask,
   useCompleteTask,
   useReopenTask,

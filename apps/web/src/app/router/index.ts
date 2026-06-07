@@ -15,6 +15,10 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/tasks').then((m) => m.TasksPage),
   },
   {
+    path: '/tasks/:id',
+    component: () => import('@/pages/tasks').then((m) => m.TaskDetailPage),
+  },
+  {
     path: '/frequent',
     component: () => import('@/pages/frequent').then((m) => m.FrequentPage),
   },

@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
+import { toValue } from 'vue'
+import type { Ref } from 'vue'
 import { apiClient } from '@/api/client'
 import { useReward } from '@/shared/lib/useReward'
 
@@ -9,6 +11,19 @@ export function useTasks() {
       const { data } = await apiClient.GET('/tasks')
       if (!data) throw new Error('Failed to fetch tasks')
       return data
+    },
+  })
+}
+
+export function useTaskTree(id: Ref<string> | string) {
+  return useQuery({
+    key: () => ['tasks', toValue(id), 'tree'],
+    query: async () => {
+      const { data, error } = await apiClient.GET('/tasks/{id}/tree', {
+        params: { path: { id: toValue(id) } },
+      })
+      if (error) throw new Error('Task not found')
+      return data!
     },
   })
 }
@@ -27,7 +42,7 @@ export function useCreateTask() {
       return data
     },
     onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
     },
   })
 }
@@ -47,7 +62,7 @@ export function useCompleteTask() {
       celebrate()
     },
     onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
     },
   })
 }
@@ -63,7 +78,7 @@ export function useReopenTask() {
       return data!
     },
     onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
     },
   })
 }
@@ -88,7 +103,7 @@ export function useUpdateTask() {
       return data!
     },
     onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
     },
   })
 }
@@ -103,7 +118,7 @@ export function useDeleteTask() {
       if (error) throw new Error('Failed to delete task')
     },
     onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
     },
   })
 }
@@ -119,7 +134,7 @@ export function useResolveResistance() {
       return data!
     },
     onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: true })
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
     },
   })
 }
