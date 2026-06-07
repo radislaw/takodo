@@ -1,25 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  AppButton,
-  AppInput,
-  AppCheckbox,
-  AppBadge,
-  AppIcon,
-  AppProgressRing,
-  AppToast,
-} from '@/shared/ui'
+import { AppButton, AppInput, AppProgressRing, AppToast } from '@/shared/ui'
 import {
   useDailyToday,
   useAddDailyEntry,
   useUpdateDailyEntry,
-  useRemoveDailyEntry,
   useTasks,
   useCreateTask,
   useCompleteTask,
   useReopenTask,
 } from '@/shared/api'
+import TodayTaskCard from './TodayTaskCard.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -31,7 +23,6 @@ const { mutateAsync: addEntryAsync } = useAddDailyEntry()
 const { mutate: completeTask } = useCompleteTask()
 const { mutate: reopenTask } = useReopenTask()
 const { mutateAsync: updateEntryAsync } = useUpdateDailyEntry()
-const { mutate: removeEntry } = useRemoveDailyEntry()
 
 const newTitle = ref('')
 const isAdding = ref(false)
@@ -40,7 +31,19 @@ let mitToastTimer: ReturnType<typeof setTimeout> | null = null
 
 const taskMap = computed(() => {
   const map = new Map<string, { id: string; title: string; status: string }>()
-  for (const t of taskList.value ?? []) map.set(t.id, t)
+  for (const task of taskList.value ?? []) map.set(task.id, task)
+  return map
+})
+
+const childProgress = computed(() => {
+  const map = new Map<string, { done: number; total: number }>()
+  for (const task of taskList.value ?? []) {
+    if (!task.parentId) continue
+    const entry = map.get(task.parentId) ?? { done: 0, total: 0 }
+    entry.total++
+    if (task.status === 'done') entry.done++
+    map.set(task.parentId, entry)
+  }
   return map
 })
 
@@ -145,46 +148,18 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
       </div>
 
       <!-- Entry list -->
-      <ul v-else class="flex flex-col gap-2">
-        <li
+      <div v-else class="flex flex-col">
+        <TodayTaskCard
           v-for="entry in entries"
           :key="entry.id"
-          class="surface-card flex items-center gap-3 rounded-2xl px-4 py-3 shadow-sm"
-        >
-          <AppCheckbox
-            :model-value="taskMap.get(entry.taskId)?.status === 'done'"
-            :label="taskMap.get(entry.taskId)?.title ?? '...'"
-            @update:model-value="
-              handleToggleDone(entry.taskId, taskMap.get(entry.taskId)?.status ?? 'open')
-            "
-          />
-
-          <span class="font-body text-ink min-w-0 flex-1 truncate text-sm">
-            {{ taskMap.get(entry.taskId)?.title ?? '...' }}
-          </span>
-
-          <button
-            class="text-ink-soft hover:text-sage cursor-pointer transition-colors"
-            :aria-label="t('today.mitLabel')"
-            @click="handleToggleMIT(entry.id, entry.isMIT)"
-          >
-            <AppBadge v-if="entry.isMIT" variant="done">
-              <template #icon>
-                <AppIcon name="zap" :size="12" />
-              </template>
-              {{ t('today.mitLabel') }}
-            </AppBadge>
-            <AppIcon v-else name="zap" :size="16" />
-          </button>
-
-          <button
-            class="text-ink-soft hover:text-danger cursor-pointer transition-colors"
-            @click="removeEntry(entry.id)"
-          >
-            <AppIcon name="x" :size="16" />
-          </button>
-        </li>
-      </ul>
+          :entry="entry"
+          :task="taskMap.get(entry.taskId)"
+          :child-done="childProgress.get(entry.taskId)?.done"
+          :child-total="childProgress.get(entry.taskId)?.total"
+          @toggle-done="handleToggleDone"
+          @toggle-mit="handleToggleMIT"
+        />
+      </div>
     </main>
   </div>
 </template>

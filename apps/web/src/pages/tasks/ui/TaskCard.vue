@@ -99,11 +99,11 @@ function handleDelete() {
 
     <button
       type="button"
-      class="text-ink-faint hover:text-ink flex-shrink-0 cursor-pointer transition-colors"
+      class="text-ink-soft hover:text-ink flex-shrink-0 cursor-pointer transition-colors"
       :aria-label="t('tasks.actions.title')"
       @click="openActions"
     >
-      <AppIcon name="more" :size="18" />
+      <AppIcon name="more" :size="20" />
     </button>
   </div>
 

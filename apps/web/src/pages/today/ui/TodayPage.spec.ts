@@ -8,7 +8,6 @@ const mockAddEntry = vi.fn()
 const mockCompleteTask = vi.fn()
 const mockReopenTask = vi.fn()
 const mockUpdateEntry = vi.fn()
-const mockRemoveEntry = vi.fn()
 
 const dailyData = ref<
   | {
@@ -20,7 +19,7 @@ const dailyData = ref<
   | undefined
 >(undefined)
 
-const tasksData = ref<{ id: string; title: string; status: string }[]>([])
+const tasksData = ref<{ id: string; parentId: string | null; title: string; status: string }[]>([])
 
 vi.mock('@/shared/api', () => ({
   useDailyToday: () => ({ data: dailyData, isPending: ref(false) }),
@@ -30,7 +29,6 @@ vi.mock('@/shared/api', () => ({
   useCompleteTask: () => ({ mutate: mockCompleteTask }),
   useReopenTask: () => ({ mutate: mockReopenTask }),
   useUpdateDailyEntry: () => ({ mutateAsync: mockUpdateEntry }),
-  useRemoveDailyEntry: () => ({ mutate: mockRemoveEntry }),
 }))
 
 function mountPage() {
@@ -60,7 +58,7 @@ describe('TodayPage', () => {
   })
 
   it('renders entries when daily has entries', async () => {
-    tasksData.value = [{ id: 't1', title: 'Buy milk', status: 'open' }]
+    tasksData.value = [{ id: 't1', parentId: null, title: 'Buy milk', status: 'open' }]
     dailyData.value = {
       id: 'list-1',
       date: '2026-06-05',
@@ -90,7 +88,7 @@ describe('TodayPage', () => {
   })
 
   it('calls completeTask when checkbox checked for open task', async () => {
-    tasksData.value = [{ id: 't1', title: 'Buy milk', status: 'open' }]
+    tasksData.value = [{ id: 't1', parentId: null, title: 'Buy milk', status: 'open' }]
     dailyData.value = {
       id: 'list-1',
       date: '2026-06-05',
@@ -106,7 +104,7 @@ describe('TodayPage', () => {
   })
 
   it('shows MIT limit toast when updateEntry throws mit_limit', async () => {
-    tasksData.value = [{ id: 't1', title: 'Task', status: 'open' }]
+    tasksData.value = [{ id: 't1', parentId: null, title: 'Task', status: 'open' }]
     dailyData.value = {
       id: 'list-1',
       date: '2026-06-05',
