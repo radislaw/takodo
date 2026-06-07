@@ -86,10 +86,15 @@ function handleKeydown(e: KeyboardEvent) {
           class="flex-1"
           @keydown="handleKeydown"
         />
-        <AppButton variant="primary" :disabled="isAdding || !newTitle.trim()" @click="handleAdd">
+        <AppButton
+          variant="primary"
+          :disabled="isAdding || !newTitle.trim()"
+          class="!px-3 sm:!px-5"
+          @click="handleAdd"
+        >
           <AppIcon v-if="isAdding" name="sparkles" :size="16" color="#fff" />
           <AppIcon v-else name="plus" :size="16" color="#fff" :stroke-width="2.4" />
-          {{ t('tasks.addButton') }}
+          <span class="hidden sm:inline">{{ t('tasks.addButton') }}</span>
         </AppButton>
       </div>
 

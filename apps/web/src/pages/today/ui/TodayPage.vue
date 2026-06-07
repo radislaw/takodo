@@ -127,10 +127,15 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
           class="flex-1"
           @keydown="handleKeydown"
         />
-        <AppButton variant="primary" :disabled="isAdding || !newTitle.trim()" @click="handleAdd">
+        <AppButton
+          variant="primary"
+          :disabled="isAdding || !newTitle.trim()"
+          class="!px-3 sm:!px-5"
+          @click="handleAdd"
+        >
           <AppIcon v-if="isAdding" name="sparkles" :size="16" color="#fff" />
           <AppIcon v-else name="plus" :size="16" color="#fff" :stroke-width="2.4" />
-          {{ t('today.addButton') }}
+          <span class="hidden sm:inline">{{ t('today.addButton') }}</span>
         </AppButton>
       </div>
 
