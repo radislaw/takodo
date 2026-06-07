@@ -12,9 +12,12 @@ const tasksData = ref<
     status: string
     resistanceResolved: boolean
     normalizedTitle: string
+    createdAt: string
   }[]
 >([])
 const isPending = ref(false)
+
+const TODAY = new Date().toISOString()
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -71,6 +74,7 @@ describe('TasksPage', () => {
         status: 'open',
         resistanceResolved: false,
         normalizedTitle: 'buy milk',
+        createdAt: TODAY,
       },
     ]
     wrapper = mount(TasksPage)
@@ -86,6 +90,7 @@ describe('TasksPage', () => {
         status: 'open',
         resistanceResolved: false,
         normalizedTitle: 'parent',
+        createdAt: TODAY,
       },
       {
         id: 't2',
@@ -94,6 +99,7 @@ describe('TasksPage', () => {
         status: 'open',
         resistanceResolved: false,
         normalizedTitle: 'child',
+        createdAt: TODAY,
       },
     ]
     wrapper = mount(TasksPage)
@@ -111,6 +117,7 @@ describe('TasksPage', () => {
         status: 'open',
         resistanceResolved: false,
         normalizedTitle: 'parent',
+        createdAt: TODAY,
       },
       {
         id: 't2',
@@ -119,6 +126,7 @@ describe('TasksPage', () => {
         status: 'done',
         resistanceResolved: false,
         normalizedTitle: 'done child',
+        createdAt: TODAY,
       },
       {
         id: 't3',
@@ -127,12 +135,29 @@ describe('TasksPage', () => {
         status: 'open',
         resistanceResolved: false,
         normalizedTitle: 'open child',
+        createdAt: TODAY,
       },
     ]
     wrapper = mount(TasksPage)
     const card = wrapper.findComponent({ name: 'TaskCard' })
     expect(card.props('childDone')).toBe(1)
     expect(card.props('childTotal')).toBe(2)
+  })
+
+  it('groups tasks by date with today label', () => {
+    tasksData.value = [
+      {
+        id: 't1',
+        parentId: null,
+        title: 'Task today',
+        status: 'open',
+        resistanceResolved: false,
+        normalizedTitle: 'task today',
+        createdAt: TODAY,
+      },
+    ]
+    wrapper = mount(TasksPage)
+    expect(wrapper.text()).toContain('Сегодня')
   })
 
   it('calls createTask on add button click', async () => {

@@ -103,6 +103,10 @@
     "empty": "Задач нет — добавь первую",
     "loading": "Загрузка...",
     "progress": "{done}/{total}",
+    "dateGroup": {
+      "today": "Сегодня",
+      "yesterday": "Вчера"
+    },
     "actions": {
       "title": "Действия",
       "estimate": "Оценка",

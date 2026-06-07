@@ -12,7 +12,7 @@ const { mutateAsync: createTask } = useCreateTask()
 const newTitle = ref('')
 const isAdding = ref(false)
 
-const rootTasks = computed(() => (taskList.value ?? []).filter((t) => !t.parentId))
+const rootTasks = computed(() => (taskList.value ?? []).filter((task) => !task.parentId))
 
 const childProgress = computed(() => {
   const map = new Map<string, { done: number; total: number }>()
@@ -24,6 +24,31 @@ const childProgress = computed(() => {
     map.set(task.parentId, entry)
   }
   return map
+})
+
+function formatDateLabel(dateStr: string): string {
+  const now = new Date()
+  const today = now.toISOString().slice(0, 10)
+  const yesterday = new Date(now.getTime() - 86400000).toISOString().slice(0, 10)
+  if (dateStr === today) return t('tasks.dateGroup.today')
+  if (dateStr === yesterday) return t('tasks.dateGroup.yesterday')
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+  })
+}
+
+const groupedTasks = computed(() => {
+  const groups = new Map<string, typeof rootTasks.value>()
+  for (const task of rootTasks.value) {
+    const date = (task.createdAt ?? '').slice(0, 10) || 'unknown'
+    const arr = groups.get(date) ?? []
+    arr.push(task)
+    groups.set(date, arr)
+  }
+  return [...groups.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([date, tasks]) => ({ date, label: formatDateLabel(date), tasks }))
 })
 
 async function handleAdd() {
@@ -79,14 +104,23 @@ function handleKeydown(e: KeyboardEvent) {
         {{ t('tasks.empty') }}
       </div>
 
-      <div v-else class="flex flex-col">
-        <TaskCard
-          v-for="task in rootTasks"
-          :key="task.id"
-          :task="task"
-          :child-done="childProgress.get(task.id)?.done"
-          :child-total="childProgress.get(task.id)?.total"
-        />
+      <div v-else class="flex flex-col gap-4">
+        <section v-for="group in groupedTasks" :key="group.date">
+          <h2
+            class="font-body text-ink-soft mb-2 px-1 text-xs font-semibold tracking-widest uppercase"
+          >
+            {{ group.label }}
+          </h2>
+          <div class="flex flex-col">
+            <TaskCard
+              v-for="task in group.tasks"
+              :key="task.id"
+              :task="task"
+              :child-done="childProgress.get(task.id)?.done"
+              :child-total="childProgress.get(task.id)?.total"
+            />
+          </div>
+        </section>
       </div>
     </main>
   </div>
