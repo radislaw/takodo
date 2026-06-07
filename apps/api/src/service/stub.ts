@@ -20,6 +20,9 @@ export const stubService = {
   Daily_updateEntry: notImplemented,
   Daily_removeEntry: notImplemented,
   Frequent_list: notImplemented,
+  Me_get: notImplemented,
+  Me_update: notImplemented,
+  Rewards_get: notImplemented,
 }
 
 export type ServiceHandlers = typeof stubService

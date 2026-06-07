@@ -10,6 +10,8 @@ datasource db {
 model User {
   id           String      @id @default(cuid())
   email        String      @unique
+  name         String      @default("")
+  theme        String      @default("light")
   themeId      String?
   defaultTheme String      @default("default")
   createdAt    DateTime    @default(now())
@@ -26,6 +28,7 @@ model Task {
   resistanceResolved Boolean      @default(false)
   estimateMinutes    Int?
   status             TaskStatus   @default(open)
+  category           String?
   completedAt        DateTime?
   normalizedTitle    String
   createdAt          DateTime     @default(now())
