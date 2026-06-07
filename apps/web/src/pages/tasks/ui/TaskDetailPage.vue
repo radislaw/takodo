@@ -176,7 +176,7 @@ function handleDeleteConfirmed() {
               <button
                 v-else
                 type="button"
-                class="font-display text-ink w-full text-left text-2xl leading-tight font-extrabold break-words"
+                class="font-display text-ink break-anywhere w-full text-left text-2xl leading-tight font-extrabold"
                 :class="{ 'line-through opacity-50': tree.status === 'done' }"
                 @click="startEditTitle"
               >
