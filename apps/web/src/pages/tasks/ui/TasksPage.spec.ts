@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
 import TasksPage from './TasksPage.vue'
@@ -16,6 +16,10 @@ const tasksData = ref<
 >([])
 const isPending = ref(false)
 
+vi.mock('vue-router', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}))
+
 vi.mock('@/shared/api', () => ({
   useTasks: () => ({ data: tasksData, isPending }),
   useCreateTask: () => ({ mutateAsync: mockCreateTask }),
@@ -26,24 +30,36 @@ vi.mock('@/shared/api', () => ({
   useUpdateTask: () => ({ mutate: vi.fn() }),
 }))
 
+let wrapper: ReturnType<typeof mount> | null = null
+
 beforeEach(() => {
   vi.clearAllMocks()
   tasksData.value = []
   isPending.value = false
+  document.body.style.overflow = ''
+})
+
+afterEach(() => {
+  wrapper?.unmount()
+  wrapper = null
+  document.body.style.overflow = ''
 })
 
 describe('TasksPage', () => {
   it('renders title from i18n', () => {
-    expect(mount(TasksPage).find('h1').text()).toContain('Задачи')
+    wrapper = mount(TasksPage)
+    expect(wrapper.find('h1').text()).toContain('Задачи')
   })
 
   it('shows empty state when no tasks', () => {
-    expect(mount(TasksPage).text()).toContain('Задач нет')
+    wrapper = mount(TasksPage)
+    expect(wrapper.text()).toContain('Задач нет')
   })
 
   it('shows loading state', () => {
     isPending.value = true
-    expect(mount(TasksPage).text()).toContain('Загрузка')
+    wrapper = mount(TasksPage)
+    expect(wrapper.text()).toContain('Загрузка')
   })
 
   it('renders root tasks', () => {
@@ -57,10 +73,11 @@ describe('TasksPage', () => {
         normalizedTitle: 'buy milk',
       },
     ]
-    expect(mount(TasksPage).text()).toContain('Buy milk')
+    wrapper = mount(TasksPage)
+    expect(wrapper.text()).toContain('Buy milk')
   })
 
-  it('only passes root tasks to top-level TaskTreeNode', () => {
+  it('does not show child tasks in flat list', () => {
     tasksData.value = [
       {
         id: 't1',
@@ -79,14 +96,48 @@ describe('TasksPage', () => {
         normalizedTitle: 'child',
       },
     ]
-    const allNodes = mount(TasksPage).findAllComponents({ name: 'TaskTreeNode' })
-    const rootNodes = allNodes.filter((n) => n.props('node').parentId === null)
-    expect(rootNodes).toHaveLength(1)
+    wrapper = mount(TasksPage)
+    const cards = wrapper.findAllComponents({ name: 'TaskCard' })
+    expect(cards).toHaveLength(1)
+    expect(cards.at(0)!.props('task').id).toBe('t1')
+  })
+
+  it('shows correct child progress on root task', () => {
+    tasksData.value = [
+      {
+        id: 't1',
+        parentId: null,
+        title: 'Parent',
+        status: 'open',
+        resistanceResolved: false,
+        normalizedTitle: 'parent',
+      },
+      {
+        id: 't2',
+        parentId: 't1',
+        title: 'Done child',
+        status: 'done',
+        resistanceResolved: false,
+        normalizedTitle: 'done child',
+      },
+      {
+        id: 't3',
+        parentId: 't1',
+        title: 'Open child',
+        status: 'open',
+        resistanceResolved: false,
+        normalizedTitle: 'open child',
+      },
+    ]
+    wrapper = mount(TasksPage)
+    const card = wrapper.findComponent({ name: 'TaskCard' })
+    expect(card.props('childDone')).toBe(1)
+    expect(card.props('childTotal')).toBe(2)
   })
 
   it('calls createTask on add button click', async () => {
     mockCreateTask.mockResolvedValueOnce({ id: 't-new', title: 'Test task' })
-    const wrapper = mount(TasksPage)
+    wrapper = mount(TasksPage)
     await wrapper.find('input').setValue('Test task')
     await wrapper.vm.$nextTick()
     const addBtn = wrapper.findAll('button').find((b) => b.text().includes('Добавить'))

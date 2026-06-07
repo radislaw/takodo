@@ -2,9 +2,10 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppCheckbox, AppIcon, AppChip, AppInput } from '@/shared/ui'
+import { AppCheckbox, AppIcon, AppInput, AppProgressRing, AppActionSheet } from '@/shared/ui'
 import {
   useTaskTree,
+  useTasks,
   useCompleteTask,
   useReopenTask,
   useDeleteTask,
@@ -12,6 +13,7 @@ import {
   useUpdateTask,
   useCreateTask,
 } from '@/shared/api'
+import TaskCard from './TaskCard.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -21,12 +23,35 @@ const id = computed(() => route.params.id as string)
 const { data: tree, isPending, status } = useTaskTree(id)
 const isError = computed(() => status.value === 'error')
 
+const { data: taskList } = useTasks()
+
 const { mutate: completeTask } = useCompleteTask()
 const { mutate: reopenTask } = useReopenTask()
 const { mutate: deleteTask } = useDeleteTask()
 const { mutate: resolveResistance } = useResolveResistance()
 const { mutate: updateTask } = useUpdateTask()
 const { mutateAsync: createTask } = useCreateTask()
+
+// Breadcrumbs: walk up parentId chain from the current task
+const ancestors = computed(() => {
+  if (!tree.value) return []
+  const taskMap = new Map((taskList.value ?? []).map((t) => [t.id, t]))
+  const chain: { id: string; title: string }[] = []
+  let parentId: string | null = tree.value.parentId
+  while (parentId) {
+    const parent = taskMap.get(parentId)
+    if (!parent) break
+    chain.unshift({ id: parent.id, title: parent.title })
+    parentId = parent.parentId
+  }
+  return chain
+})
+
+// Progress for direct children
+const childDoneCount = computed(
+  () => tree.value?.children.filter((c) => c.status === 'done').length ?? 0,
+)
+const childTotal = computed(() => tree.value?.children.length ?? 0)
 
 const editingTitle = ref(false)
 const titleValue = ref('')
@@ -36,6 +61,7 @@ const editingEstimate = ref(false)
 const estimateValue = ref('')
 const addingSubtask = ref(false)
 const subtaskTitle = ref('')
+const confirmDeleteOpen = ref(false)
 
 function handleToggle() {
   if (!tree.value) return
@@ -86,24 +112,46 @@ function handleSubtaskKeydown(e: KeyboardEvent) {
     subtaskTitle.value = ''
   }
 }
+
+function handleDeleteConfirmed() {
+  deleteTask(id.value)
+  confirmDeleteOpen.value = false
+  router.push('/tasks')
+}
 </script>
 
 <template>
   <div class="surface-app pb-nav min-h-full">
     <header class="surface-card border-line sticky top-0 z-10 border-b shadow-sm">
-      <div class="px-5 py-4">
-        <button
-          type="button"
-          class="text-ink-soft hover:text-ink mb-2 flex items-center gap-1 text-sm transition-colors"
-          @click="router.push('/tasks')"
-        >
-          <AppIcon name="chevronR" :size="14" class="rotate-180" />
-          {{ t('tasks.detail.back') }}
-        </button>
+      <div class="px-5 py-3">
+        <!-- Breadcrumbs -->
+        <nav class="flex flex-wrap items-center gap-1 text-sm" aria-label="breadcrumb">
+          <button
+            type="button"
+            class="text-ink-soft hover:text-ink transition-colors"
+            @click="router.push('/tasks')"
+          >
+            {{ t('tasks.detail.breadcrumbRoot') }}
+          </button>
+          <template v-for="ancestor in ancestors" :key="ancestor.id">
+            <AppIcon name="chevronR" :size="12" class="text-ink-faint flex-shrink-0" />
+            <button
+              type="button"
+              class="text-ink-soft hover:text-ink max-w-[120px] truncate transition-colors"
+              @click="router.push(`/tasks/${ancestor.id}`)"
+            >
+              {{ ancestor.title }}
+            </button>
+          </template>
+          <template v-if="tree">
+            <AppIcon name="chevronR" :size="12" class="text-ink-faint flex-shrink-0" />
+            <span class="text-ink max-w-[140px] truncate font-semibold">{{ tree.title }}</span>
+          </template>
+        </nav>
       </div>
     </header>
 
-    <main class="mx-auto max-w-xl px-4 pt-6">
+    <main class="mx-auto max-w-xl px-4 pt-5">
       <div v-if="isPending" class="text-ink-soft font-body py-12 text-center text-sm">
         {{ t('tasks.loading') }}
       </div>
@@ -113,18 +161,14 @@ function handleSubtaskKeydown(e: KeyboardEvent) {
       </div>
 
       <template v-else-if="tree">
-        <div class="surface-card mb-4 rounded-2xl p-4 shadow-sm">
-          <div class="mb-3 flex items-start gap-3">
-            <AppCheckbox
-              :model-value="tree.status === 'done'"
-              :label="tree.title"
-              @update:model-value="handleToggle"
-            />
-            <div class="min-w-0 flex-1">
+        <!-- Hero card -->
+        <div class="surface-card mb-4 rounded-2xl p-5 shadow-sm">
+          <div class="mb-4 flex items-start gap-4">
+            <div class="flex-1">
               <input
                 v-if="editingTitle"
                 v-model="titleValue"
-                class="font-body text-ink w-full bg-transparent text-base font-semibold outline-none"
+                class="font-display text-ink w-full bg-transparent text-2xl leading-tight font-extrabold outline-none"
                 @blur="commitTitle"
                 @keydown.enter="commitTitle"
                 @keydown.escape="editingTitle = false"
@@ -132,103 +176,112 @@ function handleSubtaskKeydown(e: KeyboardEvent) {
               <button
                 v-else
                 type="button"
-                class="font-body text-ink w-full text-left text-base font-semibold"
+                class="font-display text-ink w-full text-left text-2xl leading-tight font-extrabold"
                 :class="{ 'line-through opacity-50': tree.status === 'done' }"
                 @click="startEditTitle"
               >
                 {{ tree.title }}
               </button>
             </div>
+            <AppProgressRing
+              v-if="childTotal > 0"
+              :done="childDoneCount"
+              :total="childTotal"
+              class="!h-14 !w-14 flex-shrink-0"
+            />
           </div>
 
-          <textarea
-            v-if="editingNote"
-            v-model="noteValue"
-            rows="3"
-            class="font-body text-ink-soft border-line w-full rounded-lg border bg-transparent p-2 text-sm outline-none"
-            :placeholder="t('tasks.detail.notePlaceholder')"
-            @blur="commitNote"
-          />
-          <button
-            v-else
-            type="button"
-            class="font-body text-ink-soft w-full text-left text-sm"
-            @click="startEditNote"
-          >
-            {{ tree.note || t('tasks.detail.notePlaceholder') }}
-          </button>
+          <!-- Meta row -->
+          <div class="flex flex-wrap items-center gap-3">
+            <AppCheckbox
+              :model-value="tree.status === 'done'"
+              :size="22"
+              :aria-label="tree.title"
+              @update:model-value="handleToggle"
+            />
 
-          <div class="mt-3 flex flex-wrap items-center gap-2">
-            <input
-              v-if="editingEstimate"
-              v-model="estimateValue"
-              type="number"
-              min="1"
-              class="border-line w-16 rounded border px-1 text-xs"
-              @blur="commitEstimate"
-              @keydown.enter="commitEstimate"
+            <div class="flex items-center gap-1">
+              <input
+                v-if="editingEstimate"
+                v-model="estimateValue"
+                type="number"
+                min="1"
+                class="border-line w-16 rounded-lg border px-2 py-1 text-sm"
+                @blur="commitEstimate"
+                @keydown.enter="commitEstimate"
+              />
+              <button
+                v-else
+                type="button"
+                class="text-ink-faint hover:text-ink cursor-pointer text-xs transition-colors"
+                @click="
+                  () => {
+                    estimateValue = String(tree!.estimateMinutes ?? '')
+                    editingEstimate = true
+                  }
+                "
+              >
+                {{
+                  tree.estimateMinutes
+                    ? `${tree.estimateMinutes} ${t('tasks.estimateLabel')}`
+                    : t('tasks.estimateLabel')
+                }}
+              </button>
+            </div>
+
+            <button
+              v-if="!tree.resistanceResolved"
+              type="button"
+              class="font-body text-apricot-deep border-apricot-tint bg-apricot-tint inline-flex cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-xs font-semibold transition-colors"
+              @click="resolveResistance(tree.id)"
+            >
+              <AppIcon name="flame" :size="12" class="text-apricot" />
+              {{ t('tasks.resolveResistance') }}
+            </button>
+            <AppIcon v-else name="check" :size="14" class="text-sage flex-shrink-0" />
+
+            <button
+              type="button"
+              class="text-ink-faint hover:text-softrose ml-auto transition-colors"
+              :aria-label="t('tasks.actions.delete')"
+              @click="confirmDeleteOpen = true"
+            >
+              <AppIcon name="x" :size="16" />
+            </button>
+          </div>
+
+          <!-- Note -->
+          <div class="border-line-card mt-4 border-t pt-3">
+            <p class="text-ink-faint mb-1 text-xs font-semibold tracking-wide uppercase">
+              {{ t('tasks.detail.notePlaceholder') }}
+            </p>
+            <textarea
+              v-if="editingNote"
+              v-model="noteValue"
+              rows="3"
+              class="font-body text-ink border-line w-full rounded-lg border bg-transparent p-2 text-sm outline-none"
+              @blur="commitNote"
             />
             <button
               v-else
               type="button"
-              class="text-ink-faint hover:text-ink cursor-pointer text-xs transition-colors"
-              @click="
-                () => {
-                  estimateValue = String(tree!.estimateMinutes ?? '')
-                  editingEstimate = true
-                }
-              "
+              class="font-body text-ink-soft w-full text-left text-sm"
+              @click="startEditNote"
             >
-              {{
-                tree.estimateMinutes
-                  ? `${tree.estimateMinutes} ${t('tasks.estimateLabel')}`
-                  : t('tasks.estimateLabel')
-              }}
+              {{ tree.note || '—' }}
             </button>
-
-            <AppChip v-if="!tree.resistanceResolved" @click="resolveResistance(tree.id)">
-              {{ t('tasks.resolveResistance') }}
-            </AppChip>
-            <AppIcon v-else name="check" :size="14" class="text-sage flex-shrink-0" />
           </div>
         </div>
 
-        <section v-if="tree.children.length || true">
+        <!-- Subtasks -->
+        <section>
           <h2
             class="font-body text-ink-soft mb-2 px-1 text-xs font-semibold tracking-wide uppercase"
           >
             {{ t('tasks.detail.subtasks') }}
           </h2>
 
-          <div
-            v-for="child in tree.children"
-            :key="child.id"
-            class="surface-card mb-2 flex items-center gap-2 rounded-2xl px-3 py-2 shadow-sm"
-          >
-            <AppCheckbox
-              :model-value="child.status === 'done'"
-              :label="child.title"
-              @update:model-value="
-                child.status === 'done' ? reopenTask(child.id) : completeTask(child.id)
-              "
-            />
-            <button
-              type="button"
-              class="font-body text-ink min-w-0 flex-1 truncate text-left text-sm"
-              :class="{ 'line-through opacity-50': child.status === 'done' }"
-              @click="router.push(`/tasks/${child.id}`)"
-            >
-              {{ child.title }}
-            </button>
-            <button
-              type="button"
-              class="text-ink-soft hover:text-danger flex-shrink-0 cursor-pointer transition-colors"
-              :aria-label="t('tasks.delete')"
-              @click="deleteTask(child.id)"
-            >
-              <AppIcon name="x" :size="14" />
-            </button>
-          </div>
+          <TaskCard v-for="child in tree.children" :key="child.id" :task="child" />
 
           <div class="mb-2">
             <div v-if="addingSubtask" class="flex gap-2">
@@ -251,5 +304,29 @@ function handleSubtaskKeydown(e: KeyboardEvent) {
         </section>
       </template>
     </main>
+
+    <!-- Confirm delete task -->
+    <AppActionSheet
+      :open="confirmDeleteOpen"
+      :title="t('tasks.confirmDelete.title')"
+      @close="confirmDeleteOpen = false"
+    >
+      <div class="flex flex-col gap-2 pt-2">
+        <button
+          type="button"
+          class="font-body text-softrose bg-softrose-tint flex min-h-[44px] w-full items-center justify-center rounded-xl text-sm font-bold transition-colors"
+          @click="handleDeleteConfirmed"
+        >
+          {{ t('tasks.confirmDelete.confirm') }}
+        </button>
+        <button
+          type="button"
+          class="font-body text-ink-soft flex min-h-[44px] w-full items-center justify-center rounded-xl text-sm font-semibold transition-colors"
+          @click="confirmDeleteOpen = false"
+        >
+          {{ t('tasks.confirmDelete.cancel') }}
+        </button>
+      </div>
+    </AppActionSheet>
   </div>
 </template>

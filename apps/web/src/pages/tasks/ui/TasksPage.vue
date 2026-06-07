@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppButton, AppInput, AppIcon } from '@/shared/ui'
 import { useTasks, useCreateTask } from '@/shared/api'
-import TaskTreeNode from './TaskTreeNode.vue'
+import TaskCard from './TaskCard.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const { data: taskList, isPending } = useTasks()
@@ -13,6 +13,18 @@ const newTitle = ref('')
 const isAdding = ref(false)
 
 const rootTasks = computed(() => (taskList.value ?? []).filter((t) => !t.parentId))
+
+const childProgress = computed(() => {
+  const map = new Map<string, { done: number; total: number }>()
+  for (const task of taskList.value ?? []) {
+    if (!task.parentId) continue
+    const entry = map.get(task.parentId) ?? { done: 0, total: 0 }
+    entry.total++
+    if (task.status === 'done') entry.done++
+    map.set(task.parentId, entry)
+  }
+  return map
+})
 
 async function handleAdd() {
   const title = newTitle.value.trim()
@@ -68,11 +80,12 @@ function handleKeydown(e: KeyboardEvent) {
       </div>
 
       <div v-else class="flex flex-col">
-        <TaskTreeNode
+        <TaskCard
           v-for="task in rootTasks"
           :key="task.id"
-          :node="task"
-          :all-tasks="taskList ?? []"
+          :task="task"
+          :child-done="childProgress.get(task.id)?.done"
+          :child-total="childProgress.get(task.id)?.total"
         />
       </div>
     </main>
