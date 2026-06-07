@@ -17,6 +17,29 @@ enum TaskStatus {
   done,
 }
 
+enum TaskCategory {
+  home,
+  health,
+  work,
+  self,
+}
+
+/** Matches data-theme attribute values in tokens.css. */
+enum Theme {
+  light,
+  lavender,
+  cloud,
+  eco,
+  ocean,
+  silent,
+  highContrast: "high-contrast",
+  dark,
+  lavenderDark: "lavender-dark",
+  cyberpunk,
+  amber,
+  amoled,
+}
+
 // ─── Errors ─────────────────────────────────────────────────────
 
 @error
@@ -44,6 +67,7 @@ model Task {
   estimateMinutes?: int32;
 
   status: TaskStatus;
+  category?: TaskCategory;
 
   completedAt: utcDateTime | null;
 
@@ -66,12 +90,14 @@ model TaskCreate {
   /** Parent when splitting; absent = root task of the day. */
   parentId?: string;
   estimateMinutes?: int32;
+  category?: TaskCategory;
 }
 
 model TaskUpdate {
   title?: string;
   note?: string;
   estimateMinutes?: int32;
+  category?: TaskCategory;
 }
 
 @route("/tasks")
@@ -155,6 +181,58 @@ interface Daily {
     @path date: plainDate,
     @path entryId: string,
   ): void | ApiError;
+}
+
+// ─── Profile / Me ───────────────────────────────────────────────
+
+model Profile {
+  /** Display name used in the greeting. */
+  name: string;
+  theme: Theme;
+}
+
+model ProfileUpdate {
+  name?: string;
+  theme?: Theme;
+}
+
+@route("/me")
+@tag("Profile")
+interface Me {
+  @get get(): Profile;
+  @patch update(@body body: ProfileUpdate): Profile | ApiError;
+}
+
+// ─── Rewards ────────────────────────────────────────────────────
+
+/** One day cell in the weekly streak strip. */
+model DayActivity {
+  date: plainDate;
+  /** User completed at least one task that day. */
+  active: boolean;
+}
+
+/** Achievement badge. Title/description live in web i18n, keyed by id. */
+model Badge {
+  /** Stable id → maps to localized copy on the web. */
+  id: string;
+  earned: boolean;
+  /** Units left before earning (e.g. days remaining for a streak badge). */
+  remaining?: int32;
+}
+
+model RewardsSummary {
+  streak: int32;
+  longestStreak: int32;
+  /** Last 7 days, Monday-first. */
+  week: DayActivity[];
+  badges: Badge[];
+}
+
+@route("/rewards")
+@tag("Rewards")
+interface Rewards {
+  @get get(): RewardsSummary;
 }
 
 // ─── Frequently undone ──────────────────────────────────────────

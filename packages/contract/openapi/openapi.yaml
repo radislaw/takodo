@@ -9,6 +9,8 @@ info:
 tags:
   - name: Tasks
   - name: Daily
+  - name: Profile
+  - name: Rewards
   - name: Frequent
 paths:
   /daily:
@@ -171,6 +173,56 @@ paths:
                   $ref: '#/components/schemas/FrequentTask'
       tags:
         - Frequent
+  /me:
+    get:
+      operationId: Me_get
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+      tags:
+        - Profile
+    patch:
+      operationId: Me_update
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+  /rewards:
+    get:
+      operationId: Rewards_get
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardsSummary'
+      tags:
+        - Rewards
   /tasks:
     get:
       operationId: Tasks_list
@@ -395,6 +447,22 @@ components:
           type: string
         message:
           type: string
+    Badge:
+      type: object
+      required:
+        - id
+        - earned
+      properties:
+        id:
+          type: string
+          description: Stable id → maps to localized copy on the web.
+        earned:
+          type: boolean
+        remaining:
+          type: integer
+          format: int32
+          description: Units left before earning (e.g. days remaining for a streak badge).
+      description: Achievement badge. Title/description live in web i18n, keyed by id.
     DailyEntry:
       type: object
       required:
@@ -456,6 +524,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DailyEntry'
+    DayActivity:
+      type: object
+      required:
+        - date
+        - active
+      properties:
+        date:
+          type: string
+          format: date
+        active:
+          type: boolean
+          description: User completed at least one task that day.
+      description: One day cell in the weekly streak strip.
     EntryUpdate:
       type: object
       properties:
@@ -479,6 +560,47 @@ components:
           type: integer
           format: int32
           description: In how many past days the task stayed undone.
+    Profile:
+      type: object
+      required:
+        - name
+        - theme
+      properties:
+        name:
+          type: string
+          description: Display name used in the greeting.
+        theme:
+          $ref: '#/components/schemas/Theme'
+    ProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        theme:
+          $ref: '#/components/schemas/Theme'
+    RewardsSummary:
+      type: object
+      required:
+        - streak
+        - longestStreak
+        - week
+        - badges
+      properties:
+        streak:
+          type: integer
+          format: int32
+        longestStreak:
+          type: integer
+          format: int32
+        week:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayActivity'
+          description: Last 7 days, Monday-first.
+        badges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Badge'
     Task:
       type: object
       required:
@@ -510,6 +632,8 @@ components:
           description: 'Time estimate, minutes (CBT: externalize time).'
         status:
           $ref: '#/components/schemas/TaskStatus'
+        category:
+          $ref: '#/components/schemas/TaskCategory'
         completedAt:
           type: string
           format: date-time
@@ -521,6 +645,13 @@ components:
           type: string
           format: date-time
       description: Task (read shape). Fields not client-writable are set by the server.
+    TaskCategory:
+      type: string
+      enum:
+        - home
+        - health
+        - work
+        - self
     TaskCreate:
       type: object
       required:
@@ -536,6 +667,8 @@ components:
         estimateMinutes:
           type: integer
           format: int32
+        category:
+          $ref: '#/components/schemas/TaskCategory'
     TaskNode:
       type: object
       required:
@@ -568,6 +701,8 @@ components:
           description: 'Time estimate, minutes (CBT: externalize time).'
         status:
           $ref: '#/components/schemas/TaskStatus'
+        category:
+          $ref: '#/components/schemas/TaskCategory'
         completedAt:
           type: string
           format: date-time
@@ -598,3 +733,21 @@ components:
         estimateMinutes:
           type: integer
           format: int32
+        category:
+          $ref: '#/components/schemas/TaskCategory'
+    Theme:
+      type: string
+      enum:
+        - light
+        - lavender
+        - cloud
+        - eco
+        - ocean
+        - silent
+        - high-contrast
+        - dark
+        - lavender-dark
+        - cyberpunk
+        - amber
+        - amoled
+      description: Matches data-theme attribute values in tokens.css.

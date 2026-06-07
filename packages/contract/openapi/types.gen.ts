@@ -86,6 +86,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["Me_update"];
+        trace?: never;
+    };
+    "/rewards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Rewards_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tasks": {
         parameters: {
             query?: never;
@@ -197,6 +229,17 @@ export interface components {
             code: string;
             message: string;
         };
+        /** @description Achievement badge. Title/description live in web i18n, keyed by id. */
+        Badge: {
+            /** @description Stable id → maps to localized copy on the web. */
+            id: string;
+            earned: boolean;
+            /**
+             * Format: int32
+             * @description Units left before earning (e.g. days remaining for a streak badge).
+             */
+            remaining?: number;
+        };
         DailyEntry: {
             id: string;
             taskId: string;
@@ -224,6 +267,13 @@ export interface components {
             createdAt: string;
             entries: components["schemas"]["DailyEntry"][];
         };
+        /** @description One day cell in the weekly streak strip. */
+        DayActivity: {
+            /** Format: date */
+            date: string;
+            /** @description User completed at least one task that day. */
+            active: boolean;
+        };
         EntryUpdate: {
             isMIT?: boolean;
             /** Format: int32 */
@@ -237,6 +287,24 @@ export interface components {
              * @description In how many past days the task stayed undone.
              */
             undoneDays: number;
+        };
+        Profile: {
+            /** @description Display name used in the greeting. */
+            name: string;
+            theme: components["schemas"]["Theme"];
+        };
+        ProfileUpdate: {
+            name?: string;
+            theme?: components["schemas"]["Theme"];
+        };
+        RewardsSummary: {
+            /** Format: int32 */
+            streak: number;
+            /** Format: int32 */
+            longestStreak: number;
+            /** @description Last 7 days, Monday-first. */
+            week: components["schemas"]["DayActivity"][];
+            badges: components["schemas"]["Badge"][];
         };
         /** @description Task (read shape). Fields not client-writable are set by the server. */
         Task: {
@@ -253,6 +321,7 @@ export interface components {
              */
             estimateMinutes?: number;
             status: components["schemas"]["TaskStatus"];
+            category?: components["schemas"]["TaskCategory"];
             /** Format: date-time */
             completedAt: string | null;
             /** @description lower+trim of the title — used to match "frequently undone" tasks. */
@@ -260,6 +329,8 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        /** @enum {string} */
+        TaskCategory: "home" | "health" | "work" | "self";
         TaskCreate: {
             title: string;
             note?: string;
@@ -267,6 +338,7 @@ export interface components {
             parentId?: string;
             /** Format: int32 */
             estimateMinutes?: number;
+            category?: components["schemas"]["TaskCategory"];
         };
         /** @description Task with its recursive subtree (unbounded depth). */
         TaskNode: {
@@ -283,6 +355,7 @@ export interface components {
              */
             estimateMinutes?: number;
             status: components["schemas"]["TaskStatus"];
+            category?: components["schemas"]["TaskCategory"];
             /** Format: date-time */
             completedAt: string | null;
             /** @description lower+trim of the title — used to match "frequently undone" tasks. */
@@ -298,7 +371,13 @@ export interface components {
             note?: string;
             /** Format: int32 */
             estimateMinutes?: number;
+            category?: components["schemas"]["TaskCategory"];
         };
+        /**
+         * @description Matches data-theme attribute values in tokens.css.
+         * @enum {string}
+         */
+        Theme: "light" | "lavender" | "cloud" | "eco" | "ocean" | "silent" | "high-contrast" | "dark" | "lavender-dark" | "cyberpunk" | "amber" | "amoled";
     };
     responses: never;
     parameters: never;
@@ -482,6 +561,79 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FrequentTask"][];
+                };
+            };
+        };
+    };
+    Me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Profile"];
+                };
+            };
+        };
+    };
+    Me_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Profile"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Rewards_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RewardsSummary"];
                 };
             };
         };
