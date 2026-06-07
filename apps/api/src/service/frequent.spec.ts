@@ -17,6 +17,7 @@ function makeTask(id: string, normalizedTitle: string, status: 'open' | 'done' =
     resistanceResolved: false,
     estimateMinutes: null,
     status,
+    category: null,
     completedAt: null,
     normalizedTitle,
     createdAt: new Date('2024-01-01T00:00:00Z'),

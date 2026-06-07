@@ -17,6 +17,7 @@ function makeTask(overrides: Partial<Task> = {}): Task {
     resistanceResolved: false,
     estimateMinutes: null,
     status: 'open',
+    category: null,
     completedAt: null,
     normalizedTitle: 'buy milk',
     createdAt: new Date('2024-01-01T00:00:00Z'),

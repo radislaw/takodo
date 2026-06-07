@@ -54,6 +54,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
         note?: string
         parentId?: string
         estimateMinutes?: number
+        category?: string
       }
       const task = await prisma.task.create({
         data: {
@@ -62,6 +63,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
           note: body.note,
           parentId: body.parentId ?? null,
           estimateMinutes: body.estimateMinutes,
+          category: body.category,
           normalizedTitle: normalizeTitle(body.title),
         },
       })
@@ -85,13 +87,19 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       if (!existing || existing.userId !== userId) {
         return reply.status(404).send({ code: 'not_found', message: 'Task not found' })
       }
-      const body = req.body as { title?: string; note?: string; estimateMinutes?: number }
+      const body = req.body as {
+        title?: string
+        note?: string
+        estimateMinutes?: number
+        category?: string
+      }
       const task = await prisma.task.update({
         where: { id },
         data: {
           title: body.title,
           note: body.note,
           estimateMinutes: body.estimateMinutes,
+          category: body.category,
           ...(body.title ? { normalizedTitle: normalizeTitle(body.title) } : {}),
         },
       })
