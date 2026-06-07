@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
 import { apiClient } from '@/api/client'
 
-export function todayDate(): string {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+export function todayDate(timeZone?: string): string {
+  const tz = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+  return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
 }
 
 export async function fetchDailyByDate(date: string) {

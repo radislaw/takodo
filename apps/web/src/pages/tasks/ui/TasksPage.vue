@@ -28,8 +28,8 @@ const childProgress = computed(() => {
 
 function formatDateLabel(dateStr: string): string {
   const now = new Date()
-  const today = now.toISOString().slice(0, 10)
-  const yesterday = new Date(now.getTime() - 86400000).toISOString().slice(0, 10)
+  const today = now.toLocaleDateString('en-CA')
+  const yesterday = new Date(now.getTime() - 86400000).toLocaleDateString('en-CA')
   if (dateStr === today) return t('tasks.dateGroup.today')
   if (dateStr === yesterday) return t('tasks.dateGroup.yesterday')
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('ru-RU', {
@@ -41,7 +41,7 @@ function formatDateLabel(dateStr: string): string {
 const groupedTasks = computed(() => {
   const groups = new Map<string, typeof rootTasks.value>()
   for (const task of rootTasks.value) {
-    const date = (task.createdAt ?? '').slice(0, 10) || 'unknown'
+    const date = task.createdAt ? new Date(task.createdAt).toLocaleDateString('en-CA') : 'unknown'
     const arr = groups.get(date) ?? []
     arr.push(task)
     groups.set(date, arr)
