@@ -72,7 +72,7 @@ function handleToggleMit() {
         <template #icon>
           <AppIcon name="zap" :size="12" />
         </template>
-        {{ t('today.mitLabel') }}
+        <span class="hidden sm:inline">{{ t('today.mitLabel') }}</span>
       </AppBadge>
       <AppIcon v-else name="zap" :size="16" />
     </button>
