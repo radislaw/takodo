@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-06-07 · Task card redesign with action sheet and breadcrumbs
+
+### Added
+
+- **`AppActionSheet`** (`shared/ui/action-sheet/`) — teleport-based modal with backdrop, Esc dismiss, and scroll-lock; reusable shared primitive; full spec + barrel export
+- **`TaskCard.vue`** (`pages/tasks/ui/`) — flat task card with checkbox, title, child progress counter (`done/total`), and `⋯` action sheet trigger; replaces `TaskTreeNode` on all screens
+- **`more` icon** added to shared icon registry (`shared/ui/icon/`)
+- **`tasks.card.*` i18n keys** — `progress`, `actions.estimate`, `actions.resolve`, `actions.delete`, `confirmDelete.*`, `breadcrumb.*` in `ru.json`
+
+### Changed
+
+- **`TasksPage`** — renders root tasks only via flat list; child progress computed from flat task array (done/total); `TaskTreeNode` → `TaskCard`
+- **`TaskDetailPage`** — gained breadcrumb trail, hero block with `AppProgressRing`, subtask list via `TaskCard`, and confirm-delete action sheet
+- **`TaskTreeNode.vue`** and **`TaskTreeNode.spec.ts`** deleted — fully replaced by `TaskCard`
+
 ## [0.8.0] — 2026-06-07 · Task detail page with subtask drill-down
 
 ### Added
