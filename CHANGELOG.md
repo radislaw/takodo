@@ -5,6 +5,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-06-07 · AMOLED default theme, task date groups, today task cards
+
+### Added
+
+- **`TodayTaskCard.vue`** (`pages/today/ui/`) — task card for Today screen matching Tasks page style; checkbox, title (nav to detail), subtask progress counter, MIT (⚡ Главное) badge/button; no action sheet; full spec (7 tests)
+
+### Changed
+
+- **Default theme** — `AppLayout` now applies `data-theme="amoled"` by default; pure-black surfaces, near-black cards, crisp sage-teal accent
+- **`TasksPage`** — root tasks grouped by creation date (`createdAt`); sections labelled "Сегодня" / "Вчера" / formatted date (`d MMMM` ru-RU); newest groups first; `tasks.dateGroup.*` i18n keys added
+- **`TaskCard`** — `⋯` action icon colour lifted from `text-ink-faint` → `text-ink-soft`, size 18 → 20 px for improved visibility
+- **`TodayPage`** — entry list replaced with `TodayTaskCard`; `childProgress` computed added from flat task list; `AppCheckbox` / `AppBadge` / `useRemoveDailyEntry` removed from page-level (moved into card)
+
 ## [0.9.0] — 2026-06-07 · Task card redesign with action sheet and breadcrumbs
 
 ### Added
