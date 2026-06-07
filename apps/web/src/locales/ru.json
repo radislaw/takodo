@@ -102,7 +102,21 @@
     "delete": "Удалить",
     "empty": "Задач нет — добавь первую",
     "loading": "Загрузка...",
+    "progress": "{done}/{total}",
+    "actions": {
+      "title": "Действия",
+      "estimate": "Оценка",
+      "estimateOk": "ОК",
+      "resolve": "Я могу это",
+      "delete": "Удалить"
+    },
+    "confirmDelete": {
+      "title": "Удалить задачу?",
+      "confirm": "Удалить",
+      "cancel": "Отмена"
+    },
     "detail": {
+      "breadcrumbRoot": "Задачи",
       "back": "Задачи",
       "subtasks": "Подзадачи",
       "addSubtask": "+ подзадача",
