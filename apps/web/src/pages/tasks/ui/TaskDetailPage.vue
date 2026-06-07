@@ -164,7 +164,7 @@ function handleDeleteConfirmed() {
         <!-- Hero card -->
         <div class="surface-card mb-4 rounded-2xl p-5 shadow-sm">
           <div class="mb-4 flex items-start gap-4">
-            <div class="flex-1">
+            <div class="min-w-0 flex-1">
               <input
                 v-if="editingTitle"
                 v-model="titleValue"
