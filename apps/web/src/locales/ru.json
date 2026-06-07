@@ -101,7 +101,15 @@
     "edit": "Изменить",
     "delete": "Удалить",
     "empty": "Задач нет — добавь первую",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "detail": {
+      "back": "Задачи",
+      "subtasks": "Подзадачи",
+      "addSubtask": "+ подзадача",
+      "addSubtaskPlaceholder": "Новый шаг...",
+      "notePlaceholder": "Заметка...",
+      "notFound": "Задача не найдена"
+    }
   },
   "frequent": {
     "title": "Частые",

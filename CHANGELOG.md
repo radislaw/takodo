@@ -5,6 +5,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-06-07 · Task detail page with subtask drill-down
+
+### Added
+
+- **`TaskDetailPage`** (`pages/tasks/ui/`) — dedicated screen at `/tasks/:id`; shows task title (inline-editable), note, estimate, resistance chip; subtask list with complete/reopen/delete; inline add-subtask input; loading + not-found states
+- **`useTaskTree(id)`** composable in `shared/api/tasks.ts` — calls `GET /tasks/{id}/tree`; reactive key `['tasks', id, 'tree']` via function form; throws on 404
+- **`tasks.detail.*` i18n keys** — `back`, `subtasks`, `addSubtask`, `addSubtaskPlaceholder`, `notePlaceholder`, `notFound` in `ru.json`
+
+### Changed
+
+- `TaskTreeNode` title — `<span>` → `<button>` that calls `router.push('/tasks/:id')` for drill-down navigation
+- `router/index.ts` — route `/tasks/:id` added before `/frequent`
+- All mutations in `shared/api/tasks.ts` — `exact: true` → `exact: false` so prefix-match invalidates both `['tasks']` and `['tasks', id, 'tree']` on any write
+
 ## [0.7.1] — 2026-06-07 · Bottom nav: iOS safe-area + frosted glass
 
 ### Added
