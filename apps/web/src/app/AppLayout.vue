@@ -31,7 +31,7 @@ function handleTabChange(id: string) {
 </script>
 
 <template>
-  <div class="surface-app relative h-dvh overflow-hidden">
+  <div class="surface-app relative h-dvh overflow-hidden" data-theme="amoled">
     <div class="absolute inset-0 overflow-y-auto">
       <RouterView />
     </div>
