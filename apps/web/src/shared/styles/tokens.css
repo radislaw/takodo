@@ -807,6 +807,9 @@
   --line-card: #141414;
   --line-strong: #2a2a2a;
 
+  /* Nav — solid black, no frosted glass (OLED pixel savings) */
+  --nav-bg: #000000;
+
   /* Elevation — card borders (shadow on black = invisible) */
   --shadow-sm: 0 0 0 1px #1a1a1a;
   --shadow-md: 0 0 0 1px #222222, 0 2px 10px rgba(0, 0, 0, 0.95);
