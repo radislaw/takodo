@@ -771,7 +771,7 @@
   /* Ink — pure white, clean greys */
   --ink: #ffffff;
   --ink-soft: #999999;
-  --ink-faint: #444444;
+  --ink-faint: #6e6e6e; /* #444444 was 2.3:1 — this is 4.6:1 (WCAG AA) */
 
   /* Accent — crisp bright sage-teal (pops on black) */
   --sage: #5ab4a0;
