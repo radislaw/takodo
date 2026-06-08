@@ -47,7 +47,7 @@ const weekdayLabel = computed(() => {
             </div>
             <div>
               <div class="font-display text-apricot-deep text-2xl font-extrabold">
-                {{ t('rewards.streakHero', { days: rewards.streak }) }}
+                {{ t('rewards.streakHero', rewards.streak) }}
               </div>
               <div class="text-apricot-deep mt-0.5 text-sm font-semibold opacity-80">
                 {{ t('rewards.streakSub') }}
