@@ -29,6 +29,8 @@ vi.mock('@/shared/api', () => ({
   useCompleteTask: () => ({ mutate: mockCompleteTask }),
   useReopenTask: () => ({ mutate: mockReopenTask }),
   useUpdateDailyEntry: () => ({ mutateAsync: mockUpdateEntry }),
+  useProfile: () => ({ data: ref({ name: '', theme: 'amoled' }) }),
+  useRewards: () => ({ data: ref({ streak: 0, longestStreak: 0, week: [], badges: [] }) }),
 }))
 
 function mountPage() {
@@ -47,9 +49,10 @@ beforeEach(() => {
 })
 
 describe('TodayPage', () => {
-  it('renders title from i18n', () => {
+  it('renders greeting section', () => {
     const wrapper = mountPage()
-    expect(wrapper.find('h1').text()).toContain('Сегодня')
+    expect(wrapper.find('h1').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Спокойно. Шаг за шагом.')
   })
 
   it('shows empty state when no entries', () => {
@@ -75,13 +78,26 @@ describe('TodayPage', () => {
     mockAddEntry.mockResolvedValueOnce({ id: 'e-new', taskId: 't-new', isMIT: false, order: 0 })
 
     const wrapper = mountPage()
-    const input = wrapper.find('input')
-    await input.setValue('Test task')
+
+    // Open sheet via FAB (teleported to body)
+    const fab = document.body.querySelector('button[aria-label]') as HTMLButtonElement | null
+    fab?.click()
     await wrapper.vm.$nextTick()
-    const buttons = wrapper.findAll('button')
-    const addBtn = buttons.find((b) => b.text().includes('Добавить'))
-    await addBtn?.trigger('click')
+
+    // Fill input inside sheet
+    const input = document.body.querySelector('input') as HTMLInputElement | null
+    if (input) {
+      input.value = 'Test task'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
     await wrapper.vm.$nextTick()
+
+    // Click "Добавить в список"
+    const btns = Array.from(document.body.querySelectorAll('button'))
+    const addBtn = btns.find((b) => b.textContent?.includes('Добавить в список'))
+    addBtn?.click()
+    await wrapper.vm.$nextTick()
+    await new Promise((r) => setTimeout(r, 10))
 
     expect(mockCreateTask).toHaveBeenCalledWith({ title: 'Test task' })
     expect(mockAddEntry).toHaveBeenCalledWith('t-new')
@@ -117,7 +133,6 @@ describe('TodayPage', () => {
     const wrapper = mountPage()
     await wrapper.vm.$nextTick()
 
-    // trigger MIT toggle — click the zap icon button
     const buttons = wrapper.findAll('button')
     const mitBtn = buttons.find((b) => b.attributes('aria-label') === 'Главное')
     await mitBtn?.trigger('click')

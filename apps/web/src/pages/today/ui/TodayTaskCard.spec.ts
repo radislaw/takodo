@@ -23,7 +23,7 @@ describe('TodayTaskCard', () => {
 
   it('applies strikethrough when task is done', () => {
     const wrapper = mountCard({ task: { ...TASK, status: 'done' } })
-    const btn = wrapper.find('button.flex-1')
+    const btn = wrapper.find('button.w-full')
     expect(btn.classes()).toContain('line-through')
   })
 

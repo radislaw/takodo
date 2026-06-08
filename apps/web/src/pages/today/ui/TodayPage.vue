@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppButton, AppInput, AppProgressRing, AppToast } from '@/shared/ui'
+import { AppProgressRing, AppToast, AppIcon, AppButton, AppInput } from '@/shared/ui'
 import {
   useDailyToday,
   useAddDailyEntry,
@@ -10,6 +10,8 @@ import {
   useCreateTask,
   useCompleteTask,
   useReopenTask,
+  useProfile,
+  useRewards,
 } from '@/shared/api'
 import TodayTaskCard from './TodayTaskCard.vue'
 
@@ -17,6 +19,8 @@ const { t } = useI18n({ useScope: 'global' })
 
 const { data: daily, isPending } = useDailyToday()
 const { data: taskList } = useTasks()
+const { data: profile } = useProfile()
+const { data: rewards } = useRewards()
 
 const { mutateAsync: createTaskAsync } = useCreateTask()
 const { mutateAsync: addEntryAsync } = useAddDailyEntry()
@@ -24,13 +28,43 @@ const { mutate: completeTask } = useCompleteTask()
 const { mutate: reopenTask } = useReopenTask()
 const { mutateAsync: updateEntryAsync } = useUpdateDailyEntry()
 
+const showSheet = ref(false)
 const newTitle = ref('')
+const newCategory = ref<'home' | 'health' | 'work' | 'self' | null>(null)
 const isAdding = ref(false)
 const showMitLimitToast = ref(false)
 let mitToastTimer: ReturnType<typeof setTimeout> | null = null
 
+const CATEGORIES = ['home', 'health', 'work', 'self'] as const
+
+const CAT_COLORS: Record<string, string> = {
+  home: 'var(--cat-sage)',
+  health: 'var(--cat-apricot)',
+  work: 'var(--cat-blue)',
+  self: 'var(--cat-mauve)',
+}
+
+const greetingKey = computed(() => {
+  const h = new Date().getHours()
+  if (h < 5) return 'greeting.night'
+  if (h < 12) return 'greeting.morning'
+  if (h < 18) return 'greeting.afternoon'
+  return 'greeting.evening'
+})
+
+const userName = computed(() => profile.value?.name ?? '')
+const streak = computed(() => rewards.value?.streak ?? 0)
+
+const greetingFull = computed(() => {
+  const base = t(greetingKey.value)
+  return userName.value ? `${base}, ${userName.value}` : base
+})
+
 const taskMap = computed(() => {
-  const map = new Map<string, { id: string; title: string; status: string }>()
+  const map = new Map<
+    string,
+    { id: string; title: string; status: string; category?: string | null }
+  >()
   for (const task of taskList.value ?? []) map.set(task.id, task)
   return map
 })
@@ -53,21 +87,46 @@ const doneCount = computed(
   () => entries.value.filter((e) => taskMap.value.get(e.taskId)?.status === 'done').length,
 )
 
+const activeEntries = computed(() =>
+  entries.value.filter((e) => taskMap.value.get(e.taskId)?.status !== 'done'),
+)
+
+const doneEntries = computed(() =>
+  entries.value.filter((e) => taskMap.value.get(e.taskId)?.status === 'done'),
+)
+
+const summaryMsg = computed(() => {
+  const left = entries.value.length - doneCount.value
+  if (entries.value.length === 0) return t('today.summary.start')
+  if (left === 0) return t('today.summary.all_done')
+  if (left <= 2) return t('today.summary.almost')
+  return t('today.summary.start')
+})
+
+function openSheet() {
+  newTitle.value = ''
+  newCategory.value = null
+  showSheet.value = true
+}
+
+function closeSheet() {
+  showSheet.value = false
+}
+
 async function handleAdd() {
   const title = newTitle.value.trim()
   if (!title) return
   isAdding.value = true
   try {
-    const task = await createTaskAsync({ title })
+    const task = await createTaskAsync({
+      title,
+      ...(newCategory.value ? { category: newCategory.value } : {}),
+    })
     await addEntryAsync(task.id)
-    newTitle.value = ''
+    closeSheet()
   } finally {
     isAdding.value = false
   }
-}
-
-function handleKeydown(e: KeyboardEvent) {
-  if (e.key === 'Enter') handleAdd()
 }
 
 function handleToggleDone(taskId: string, currentStatus: string) {
@@ -92,51 +151,43 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
 
 <template>
   <div class="surface-app pb-nav min-h-full">
-    <!-- Header -->
-    <header class="surface-card border-line sticky top-0 z-10 border-b shadow-sm">
-      <div class="flex items-center justify-between px-5 py-4">
-        <h1 class="font-display text-ink text-xl leading-tight font-extrabold">
-          {{ t('today.title') }}
-        </h1>
-        <AppProgressRing
-          :done="doneCount"
-          :total="entries.length || 1"
-          :aria-label="t('today.progressAria', { done: doneCount, total: entries.length })"
-        />
-      </div>
-    </header>
-
     <!-- MIT limit toast -->
     <Transition name="fade">
-      <div v-if="showMitLimitToast" class="fixed top-20 right-4 left-4 z-50 mx-auto max-w-sm">
+      <div v-if="showMitLimitToast" class="fixed top-6 right-4 left-4 z-50 mx-auto max-w-sm">
         <AppToast variant="gentle">
-          <template #icon>
-            <AppIcon name="bell" :size="15" />
-          </template>
           {{ t('today.mitLimitToast') }}
         </AppToast>
       </div>
     </Transition>
 
-    <main class="mx-auto max-w-xl px-4 pt-6">
-      <!-- Add form -->
-      <div class="surface-card mb-5 flex gap-2 rounded-2xl p-4 shadow-sm">
-        <AppInput
-          v-model="newTitle"
-          :placeholder="t('today.addPlaceholder')"
-          class="flex-1"
-          @keydown="handleKeydown"
+    <main class="mx-auto max-w-xl px-4 pt-14 pb-4">
+      <!-- Greeting -->
+      <div class="mb-5">
+        <h1 class="font-display text-ink text-2xl leading-tight font-extrabold">
+          {{ greetingFull }}
+        </h1>
+        <p class="font-body text-ink-soft mt-0.5 text-sm">{{ t('greeting.subtitle') }}</p>
+      </div>
+
+      <!-- Summary card -->
+      <div class="surface-card mb-6 flex items-center gap-4 rounded-2xl p-4 shadow-md">
+        <AppProgressRing
+          :done="doneCount"
+          :total="entries.length || 1"
+          :aria-label="t('today.progressAria', { done: doneCount, total: entries.length })"
         />
-        <AppButton
-          variant="primary"
-          :disabled="isAdding || !newTitle.trim()"
-          class="!px-3 sm:!px-5"
-          @click="handleAdd"
-        >
-          <AppIcon v-if="isAdding" name="sparkles" :size="16" color="#fff" />
-          <AppIcon v-else name="plus" :size="16" color="#fff" :stroke-width="2.4" />
-          <span class="hidden sm:inline">{{ t('today.addButton') }}</span>
-        </AppButton>
+        <div class="min-w-0 flex-1">
+          <p class="font-body text-ink text-sm leading-snug font-semibold">{{ summaryMsg }}</p>
+          <div
+            v-if="streak > 0"
+            class="bg-apricot/15 mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1"
+          >
+            <AppIcon name="flame" :size="13" class="text-apricot-deep" />
+            <span class="text-apricot-deep text-xs font-bold">
+              {{ t('today.streak', { days: streak }) }}
+            </span>
+          </div>
+        </div>
       </div>
 
       <!-- Loading -->
@@ -152,20 +203,122 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
         {{ t('today.emptyState') }}
       </div>
 
-      <!-- Entry list -->
-      <div v-else class="flex flex-col">
-        <TodayTaskCard
-          v-for="entry in entries"
-          :key="entry.id"
-          :entry="entry"
-          :task="taskMap.get(entry.taskId)"
-          :child-done="childProgress.get(entry.taskId)?.done"
-          :child-total="childProgress.get(entry.taskId)?.total"
-          @toggle-done="handleToggleDone"
-          @toggle-mit="handleToggleMIT"
-        />
-      </div>
+      <template v-else>
+        <!-- Active section -->
+        <template v-if="activeEntries.length > 0">
+          <p class="font-body text-ink-soft mb-2 text-xs font-bold tracking-widest uppercase">
+            {{ t('today.sections.active') }}
+          </p>
+          <div class="mb-5 flex flex-col">
+            <TodayTaskCard
+              v-for="entry in activeEntries"
+              :key="entry.id"
+              :entry="entry"
+              :task="taskMap.get(entry.taskId)"
+              :child-done="childProgress.get(entry.taskId)?.done"
+              :child-total="childProgress.get(entry.taskId)?.total"
+              @toggle-done="handleToggleDone"
+              @toggle-mit="handleToggleMIT"
+            />
+          </div>
+        </template>
+
+        <!-- Done section -->
+        <template v-if="doneEntries.length > 0">
+          <p class="font-body text-ink-soft mb-2 text-xs font-bold tracking-widest uppercase">
+            {{ t('today.sections.done') }}
+          </p>
+          <div class="flex flex-col">
+            <TodayTaskCard
+              v-for="entry in doneEntries"
+              :key="entry.id"
+              :entry="entry"
+              :task="taskMap.get(entry.taskId)"
+              :child-done="childProgress.get(entry.taskId)?.done"
+              :child-total="childProgress.get(entry.taskId)?.total"
+              @toggle-done="handleToggleDone"
+              @toggle-mit="handleToggleMIT"
+            />
+          </div>
+        </template>
+      </template>
     </main>
+
+    <!-- FAB -->
+    <Teleport to="body">
+      <button
+        type="button"
+        class="bg-sage fixed z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full shadow-lg transition-transform active:scale-95"
+        style="bottom: calc(5rem + env(safe-area-inset-bottom) + 0.75rem); right: 1.25rem"
+        :aria-label="t('today.add.title')"
+        @click="openSheet"
+      >
+        <AppIcon name="plus" :size="24" color="#fff" :stroke-width="2.5" />
+      </button>
+    </Teleport>
+
+    <!-- Add sheet -->
+    <Teleport to="body">
+      <Transition name="sheet" :duration="{ enter: 300, leave: 250 }">
+        <div v-if="showSheet" class="fixed inset-0 z-50 flex flex-col justify-end">
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="closeSheet" />
+          <div
+            class="surface-card relative rounded-t-3xl px-5 pt-5 shadow-xl"
+            style="padding-bottom: calc(2rem + env(safe-area-inset-bottom))"
+          >
+            <div class="mb-4 flex items-start justify-between">
+              <div>
+                <h2 class="font-display text-ink text-lg font-extrabold">
+                  {{ t('today.add.title') }}
+                </h2>
+                <p class="text-ink-soft mt-0.5 text-xs">{{ t('today.add.subtitle') }}</p>
+              </div>
+              <button
+                type="button"
+                class="text-ink-soft hover:text-ink cursor-pointer"
+                @click="closeSheet"
+              >
+                <AppIcon name="x" :size="22" />
+              </button>
+            </div>
+
+            <AppInput
+              v-model="newTitle"
+              :placeholder="t('today.add.placeholder')"
+              class="mb-4"
+              @keydown.enter="handleAdd"
+            />
+
+            <p class="text-ink-soft mb-2 text-xs font-semibold">
+              {{ t('today.add.categoryLabel') }}
+            </p>
+            <div class="mb-5 flex flex-wrap gap-2">
+              <button
+                v-for="cat in CATEGORIES"
+                :key="cat"
+                type="button"
+                class="border-line flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-colors"
+                :class="newCategory === cat ? 'border-transparent text-white' : 'text-ink-soft'"
+                :style="newCategory === cat ? { background: CAT_COLORS[cat] } : {}"
+                @click="newCategory = newCategory === cat ? null : cat"
+              >
+                <span class="h-2 w-2 rounded-full" :style="{ background: CAT_COLORS[cat] }" />
+                {{ t(`category.${cat}`) }}
+              </button>
+            </div>
+
+            <AppButton
+              variant="primary"
+              :disabled="isAdding || !newTitle.trim()"
+              class="w-full"
+              @click="handleAdd"
+            >
+              {{ t('today.add.button') }}
+            </AppButton>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -177,5 +330,22 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.sheet-enter-active,
+.sheet-leave-active {
+  transition: opacity 0.25s ease;
+}
+.sheet-enter-active .surface-card,
+.sheet-leave-active .surface-card {
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.sheet-enter-from,
+.sheet-leave-to {
+  opacity: 0;
+}
+.sheet-enter-from .surface-card,
+.sheet-leave-to .surface-card {
+  transform: translateY(100%);
 }
 </style>
