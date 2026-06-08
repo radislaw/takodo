@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import TasksPage from './TasksPage.vue'
 
 const mockCreateTask = vi.fn()
+const mockAddEntry = vi.fn()
 const tasksData = ref<
   {
     id: string
@@ -26,6 +27,7 @@ vi.mock('vue-router', () => ({
 vi.mock('@/shared/api', () => ({
   useTasks: () => ({ data: tasksData, isPending }),
   useCreateTask: () => ({ mutateAsync: mockCreateTask }),
+  useAddDailyEntry: () => ({ mutateAsync: mockAddEntry }),
   useCompleteTask: () => ({ mutate: vi.fn() }),
   useReopenTask: () => ({ mutate: vi.fn() }),
   useDeleteTask: () => ({ mutate: vi.fn() }),
@@ -160,8 +162,9 @@ describe('TasksPage', () => {
     expect(wrapper.text()).toContain('Сегодня')
   })
 
-  it('calls createTask on add button click', async () => {
+  it('calls createTask and addEntry on add button click', async () => {
     mockCreateTask.mockResolvedValueOnce({ id: 't-new', title: 'Test task' })
+    mockAddEntry.mockResolvedValueOnce({})
     wrapper = mount(TasksPage)
     await wrapper.find('input').setValue('Test task')
     await wrapper.vm.$nextTick()
@@ -169,5 +172,6 @@ describe('TasksPage', () => {
     await addBtn!.trigger('click')
     await wrapper.vm.$nextTick()
     expect(mockCreateTask).toHaveBeenCalledWith({ title: 'Test task' })
+    expect(mockAddEntry).toHaveBeenCalledWith('t-new')
   })
 })

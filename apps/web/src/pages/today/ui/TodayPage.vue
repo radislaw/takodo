@@ -88,7 +88,9 @@ const doneCount = computed(
 )
 
 const activeEntries = computed(() =>
-  entries.value.filter((e) => taskMap.value.get(e.taskId)?.status !== 'done'),
+  entries.value
+    .filter((e) => taskMap.value.get(e.taskId)?.status !== 'done')
+    .sort((a, b) => Number(b.isMIT) - Number(a.isMIT)),
 )
 
 const doneEntries = computed(() =>
