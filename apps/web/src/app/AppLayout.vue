@@ -18,12 +18,14 @@ const theme = computed(() => profile.value?.theme ?? 'amoled')
 const navItems = computed<{ id: string; icon: IconName; label: string }[]>(() => [
   { id: 'today', icon: 'home', label: t('nav.today') },
   { id: 'tasks', icon: 'layers', label: t('nav.tasks') },
+  { id: 'frequent', icon: 'repeat', label: t('nav.frequent') },
   { id: 'rewards', icon: 'award', label: t('nav.rewards') },
   { id: 'profile', icon: 'settings', label: t('nav.profile') },
 ])
 
 const activeTab = computed(() => {
   if (route.path.startsWith('/tasks')) return 'tasks'
+  if (route.path.startsWith('/frequent')) return 'frequent'
   if (route.path.startsWith('/rewards')) return 'rewards'
   if (route.path.startsWith('/profile')) return 'profile'
   return 'today'
