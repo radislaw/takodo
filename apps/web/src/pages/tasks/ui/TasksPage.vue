@@ -2,12 +2,13 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppButton, AppInput, AppIcon } from '@/shared/ui'
-import { useTasks, useCreateTask } from '@/shared/api'
+import { useTasks, useCreateTask, useAddDailyEntry } from '@/shared/api'
 import TaskCard from './TaskCard.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const { data: taskList, isPending } = useTasks()
 const { mutateAsync: createTask } = useCreateTask()
+const { mutateAsync: addEntryAsync } = useAddDailyEntry()
 
 const newTitle = ref('')
 const isAdding = ref(false)
@@ -56,7 +57,8 @@ async function handleAdd() {
   if (!title) return
   isAdding.value = true
   try {
-    await createTask({ title })
+    const task = await createTask({ title })
+    await addEntryAsync(task.id)
     newTitle.value = ''
   } finally {
     isAdding.value = false

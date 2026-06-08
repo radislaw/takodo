@@ -50,6 +50,10 @@ const categoryColor = computed(() =>
   props.task?.category ? (CAT_COLORS[props.task.category] ?? 'var(--ink-faint)') : null,
 )
 
+const hasBottomRow = computed(
+  () => !isDone.value && !!(props.task?.category || (props.childTotal && props.childTotal > 0)),
+)
+
 function handleToggleDone() {
   emit('toggleDone', props.entry.taskId, props.task?.status ?? 'open')
 }
@@ -60,10 +64,11 @@ function handleToggleMit() {
 </script>
 
 <template>
-  <div class="surface-card mb-2.5 rounded-2xl px-3 py-3 shadow-sm">
-    <div class="flex items-start gap-3">
+  <div class="surface-card mb-2.5 cursor-pointer rounded-2xl px-3 py-3 shadow-sm">
+    <div class="flex gap-3" :class="hasBottomRow ? 'items-start' : 'items-center'">
       <AppCheckbox
-        class="mt-0.5 flex-shrink-0"
+        class="flex-shrink-0"
+        :class="{ 'mt-0.5': hasBottomRow }"
         :model-value="isDone"
         :aria-label="task?.title ?? '...'"
         @update:model-value="handleToggleDone"
@@ -110,7 +115,8 @@ function handleToggleMit() {
 
       <!-- MIT button -->
       <button
-        class="text-ink-soft hover:text-sage mt-0.5 flex-shrink-0 cursor-pointer transition-colors"
+        class="text-ink-soft hover:text-sage flex-shrink-0 cursor-pointer transition-colors"
+        :class="{ 'mt-0.5': hasBottomRow }"
         :aria-label="t('today.mitLabel')"
         @click="handleToggleMit"
       >
