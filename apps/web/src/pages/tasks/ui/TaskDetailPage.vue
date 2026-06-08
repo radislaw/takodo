@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppCheckbox, AppIcon, AppInput, AppProgressRing, AppActionSheet } from '@/shared/ui'
@@ -61,6 +61,7 @@ const editingEstimate = ref(false)
 const estimateValue = ref('')
 const addingSubtask = ref(false)
 const subtaskTitle = ref('')
+const subtaskInputRef = ref<{ focus: () => void } | null>(null)
 const confirmDeleteOpen = ref(false)
 
 function handleToggle() {
@@ -103,6 +104,12 @@ async function handleAddSubtask() {
   await createTask({ title, parentId: id.value })
   subtaskTitle.value = ''
   addingSubtask.value = false
+}
+
+async function startAddingSubtask() {
+  addingSubtask.value = true
+  await nextTick()
+  subtaskInputRef.value?.focus()
 }
 
 function handleSubtaskKeydown(e: KeyboardEvent) {
@@ -286,6 +293,7 @@ function handleDeleteConfirmed() {
           <div class="mb-2">
             <div v-if="addingSubtask" class="flex gap-2">
               <AppInput
+                ref="subtaskInputRef"
                 v-model="subtaskTitle"
                 :placeholder="t('tasks.detail.addSubtaskPlaceholder')"
                 class="flex-1"
@@ -296,7 +304,7 @@ function handleDeleteConfirmed() {
               v-else
               type="button"
               class="text-ink-faint hover:text-sage cursor-pointer text-xs transition-colors"
-              @click="addingSubtask = true"
+              @click="startAddingSubtask"
             >
               {{ t('tasks.detail.addSubtask') }}
             </button>

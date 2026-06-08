@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useId } from 'vue'
+import { useId, ref } from 'vue'
 
 const model = defineModel<string>({ default: '' })
 
@@ -27,6 +27,9 @@ withDefaults(
 const id = useId()
 const hintId = `${id}-hint`
 const errorId = `${id}-error`
+
+const inputEl = ref<HTMLInputElement | HTMLTextAreaElement | null>(null)
+defineExpose({ focus: () => inputEl.value?.focus() })
 </script>
 
 <template>
@@ -38,6 +41,7 @@ const errorId = `${id}-error`
     <textarea
       v-if="multiline"
       :id="id"
+      ref="inputEl"
       v-model="model"
       :rows="rows"
       :placeholder="placeholder"
@@ -53,6 +57,7 @@ const errorId = `${id}-error`
     <input
       v-else
       :id="id"
+      ref="inputEl"
       v-model="model"
       :placeholder="placeholder"
       :disabled="disabled"
