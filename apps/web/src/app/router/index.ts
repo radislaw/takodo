@@ -23,6 +23,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/frequent').then((m) => m.FrequentPage),
   },
   {
+    path: '/rewards',
+    component: () => import('@/pages/rewards').then((m) => m.RewardsPage),
+  },
+  {
+    path: '/profile',
+    component: () => import('@/pages/profile').then((m) => m.ProfilePage),
+  },
+  {
     path: '/design/tokens',
     meta: { chrome: false },
     component: () => import('@/pages/design-tokens').then((m) => m.DesignTokensPage),

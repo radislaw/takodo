@@ -1,7 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
+import { ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import AppLayout from './AppLayout.vue'
+
+vi.mock('@/shared/api', () => ({
+  useProfile: () => ({ data: ref({ name: '', theme: 'amoled' }) }),
+}))
 
 function makeRouter(path: string) {
   const router = createRouter({
@@ -9,7 +14,8 @@ function makeRouter(path: string) {
     routes: [
       { path: '/today', component: { template: '<div/>' } },
       { path: '/tasks', component: { template: '<div/>' } },
-      { path: '/frequent', component: { template: '<div/>' } },
+      { path: '/rewards', component: { template: '<div/>' } },
+      { path: '/profile', component: { template: '<div/>' } },
       { path: '/design/ui', component: { template: '<div/>' }, meta: { chrome: false } },
     ],
   })
@@ -41,10 +47,16 @@ describe('AppLayout', () => {
     expect(nav.props('modelValue')).toBe('tasks')
   })
 
-  it('active tab is "frequent" on /frequent', async () => {
-    const wrapper = await mountLayout('/frequent')
+  it('active tab is "rewards" on /rewards', async () => {
+    const wrapper = await mountLayout('/rewards')
     const nav = wrapper.findComponent({ name: 'AppBottomNav' })
-    expect(nav.props('modelValue')).toBe('frequent')
+    expect(nav.props('modelValue')).toBe('rewards')
+  })
+
+  it('active tab is "profile" on /profile', async () => {
+    const wrapper = await mountLayout('/profile')
+    const nav = wrapper.findComponent({ name: 'AppBottomNav' })
+    expect(nav.props('modelValue')).toBe('profile')
   })
 
   it('tab click calls router.push with correct path', async () => {
