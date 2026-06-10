@@ -25,6 +25,7 @@ export const IC = {
   cloud: 'M17.5 19a4.5 4.5 0 1 0 0-9 .2.2 0 0 1-.2-.16A6 6 0 1 0 6.5 19z',
   repeat: 'M17 2l4 4-4 4 M3 11V9a4 4 0 0 1 4-4h14 M7 22l-4-4 4-4 M21 13v2a4 4 0 0 1-4 4H3',
   arrowR: 'M5 12h14 M12 5l7 7-7 7',
+  play: 'M6 3l14 9-14 9V3z',
 } as const
 
 export type IconName = keyof typeof IC

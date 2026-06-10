@@ -11,6 +11,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/today').then((m) => m.TodayPage),
   },
   {
+    path: '/do',
+    meta: { chrome: false },
+    component: () => import('@/pages/do').then((m) => m.DoPage),
+  },
+  {
     path: '/tasks',
     component: () => import('@/pages/tasks').then((m) => m.TasksPage),
   },
