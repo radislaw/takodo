@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppButton, AppIcon } from '@/shared/ui'
 import { useRecordFocus } from '@/shared/api'
-import { usePomodoro } from '../lib/usePomodoro'
+import { usePomodoro } from '@/shared/lib/usePomodoro'
 import { formatFocusDuration } from '@/shared/lib/formatFocus'
 import { playChime } from '@/shared/lib/chime'
 

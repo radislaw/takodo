@@ -2,9 +2,8 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppIcon, AppButton } from '@/shared/ui'
+import { AppIcon, AppButton, PomodoroTimer } from '@/shared/ui'
 import { useDailyToday, useTasks, useCompleteTask } from '@/shared/api'
-import PomodoroTimer from './PomodoroTimer.vue'
 
 const route = useRoute()
 const router = useRouter()
