@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, type ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppCheckbox, AppIcon, AppInput, AppProgressRing, AppActionSheet } from '@/shared/ui'
+import { formatFocusDuration } from '@/shared/lib/formatFocus'
 import {
   useTaskTree,
   useTasks,
@@ -119,6 +120,18 @@ function handleSubtaskKeydown(e: KeyboardEvent) {
     subtaskTitle.value = ''
   }
 }
+
+const focusStatsText: ComputedRef<string> = computed(() => {
+  if (!tree.value) return ''
+  const parts: string[] = []
+  parts.push(
+    t('tasks.detail.focusStats', { time: formatFocusDuration(tree.value.focusSeconds, t) }),
+  )
+  if (tree.value.pomodoros > 0) {
+    parts.push(t('do.pomodoro.statsPomodoros', tree.value.pomodoros))
+  }
+  return parts.join(' · ')
+})
 
 function handleDeleteConfirmed() {
   deleteTask(id.value)
@@ -255,6 +268,15 @@ function handleDeleteConfirmed() {
             >
               <AppIcon name="x" :size="16" />
             </button>
+          </div>
+
+          <!-- Focus stats -->
+          <div
+            v-if="tree.focusSeconds > 0 || tree.pomodoros > 0"
+            class="border-line-card mt-3 flex items-center gap-1.5 border-t pt-3"
+          >
+            <AppIcon name="timer" :size="14" class="text-ink-faint flex-shrink-0" />
+            <span class="text-ink-faint text-xs font-semibold">{{ focusStatsText }}</span>
           </div>
 
           <!-- Note -->

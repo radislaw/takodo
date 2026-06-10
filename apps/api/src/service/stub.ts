@@ -14,6 +14,7 @@ export const stubService = {
   Tasks_complete: notImplemented,
   Tasks_reopen: notImplemented,
   Tasks_resolveResistance: notImplemented,
+  Tasks_recordFocus: notImplemented,
   Daily_create: notImplemented,
   Daily_getByDate: notImplemented,
   Daily_addEntry: notImplemented,

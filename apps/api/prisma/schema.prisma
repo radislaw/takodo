@@ -29,6 +29,8 @@ model Task {
   category           String?
   completedAt        DateTime?
   normalizedTitle    String
+  focusSeconds       Int          @default(0)
+  pomodoros          Int          @default(0)
   createdAt          DateTime     @default(now())
   user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   parent             Task?        @relation("TaskChildren", fields: [parentId], references: [id], onDelete: SetNull)

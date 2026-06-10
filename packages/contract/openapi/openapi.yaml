@@ -353,6 +353,37 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
+  /tasks/{id}/focus:
+    post:
+      operationId: Tasks_recordFocus
+      description: Record focused time (and optionally a completed Pomodoro) on the task.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FocusRecord'
   /tasks/{id}/reopen:
     post:
       operationId: Tasks_reopen
@@ -545,6 +576,20 @@ components:
         order:
           type: integer
           format: int32
+    FocusRecord:
+      type: object
+      required:
+        - seconds
+      properties:
+        seconds:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 7200
+          description: Focused seconds to add (1–7200).
+        pomodoro:
+          type: boolean
+          description: True when a full 25-min Pomodoro was completed → increments counter.
     FrequentTask:
       type: object
       required:
@@ -613,6 +658,8 @@ components:
         - status
         - completedAt
         - normalizedTitle
+        - focusSeconds
+        - pomodoros
         - createdAt
       properties:
         id:
@@ -645,6 +692,14 @@ components:
         normalizedTitle:
           type: string
           description: lower+trim of the title — used to match "frequently undone" tasks.
+        focusSeconds:
+          type: integer
+          format: int32
+          description: Accumulated focused seconds (from Pomodoro sessions). Server-set.
+        pomodoros:
+          type: integer
+          format: int32
+          description: Completed 25-minute Pomodoros. Server-set.
         createdAt:
           type: string
           format: date-time
@@ -685,6 +740,8 @@ components:
         - status
         - completedAt
         - normalizedTitle
+        - focusSeconds
+        - pomodoros
         - createdAt
         - children
       properties:
@@ -718,6 +775,14 @@ components:
         normalizedTitle:
           type: string
           description: lower+trim of the title — used to match "frequently undone" tasks.
+        focusSeconds:
+          type: integer
+          format: int32
+          description: Accumulated focused seconds (from Pomodoro sessions). Server-set.
+        pomodoros:
+          type: integer
+          format: int32
+          description: Completed 25-minute Pomodoros. Server-set.
         createdAt:
           type: string
           format: date-time

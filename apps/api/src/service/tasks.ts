@@ -236,5 +236,23 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       const task = await prisma.task.update({ where: { id }, data: { resistanceResolved: true } })
       return toResponse(task)
     },
+
+    async Tasks_recordFocus(req: FastifyRequest, reply: FastifyReply) {
+      const userId = await getUserId()
+      const { id } = req.params as { id: string }
+      const body = req.body as { seconds: number; pomodoro?: boolean }
+      const existing = await prisma.task.findUnique({ where: { id } })
+      if (!existing || existing.userId !== userId) {
+        return reply.status(404).send({ code: 'not_found', message: 'Task not found' })
+      }
+      const task = await prisma.task.update({
+        where: { id },
+        data: {
+          focusSeconds: { increment: body.seconds },
+          ...(body.pomodoro ? { pomodoros: { increment: 1 } } : {}),
+        },
+      })
+      return toResponse(task)
+    },
   }
 }

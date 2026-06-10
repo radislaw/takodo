@@ -41,6 +41,8 @@ function makeTask(overrides: Partial<Task> = {}): Task {
     category: null,
     completedAt: null,
     normalizedTitle: 'buy milk',
+    focusSeconds: 0,
+    pomodoros: 0,
     createdAt: new Date('2024-01-01T00:00:00Z'),
     ...overrides,
   }

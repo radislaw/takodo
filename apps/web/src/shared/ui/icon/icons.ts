@@ -26,6 +26,9 @@ export const IC = {
   repeat: 'M17 2l4 4-4 4 M3 11V9a4 4 0 0 1 4-4h14 M7 22l-4-4 4-4 M21 13v2a4 4 0 0 1-4 4H3',
   arrowR: 'M5 12h14 M12 5l7 7-7 7',
   play: 'M6 3l14 9-14 9V3z',
+  pause: 'M6 4h4v16H6z M14 4h4v16h-4z',
+  rotateCcw: 'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5',
+  timer: 'M10 2h4 M12 14l3-3 M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
 } as const
 
 export type IconName = keyof typeof IC
