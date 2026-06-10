@@ -20,6 +20,8 @@ function makeTask(overrides: Partial<Task> = {}): Task {
     category: null,
     completedAt: null,
     normalizedTitle: 'buy milk',
+    focusSeconds: 0,
+    pomodoros: 0,
     createdAt: new Date('2024-01-01T00:00:00Z'),
     ...overrides,
   }
@@ -234,6 +236,114 @@ describe('Tasks routes', () => {
       const res = await app.inject({ method: 'POST', url: '/tasks/task-1/resolve-resistance' })
       expect(res.statusCode).toBe(200)
       expect((res.json() as Record<string, unknown>).resistanceResolved).toBe(true)
+    })
+  })
+
+  describe('POST /tasks/:id/focus', () => {
+    it('increments focusSeconds and returns updated task', async () => {
+      prisma.task.findUnique.mockResolvedValue(makeTask())
+      prisma.task.update.mockResolvedValue(makeTask({ focusSeconds: 300 }))
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks/task-1/focus',
+        payload: { seconds: 300 },
+      })
+      expect(res.statusCode).toBe(200)
+      expect((res.json() as Record<string, unknown>).focusSeconds).toBe(300)
+      expect(prisma.task.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ focusSeconds: { increment: 300 } }),
+        }),
+      )
+    })
+
+    it('increments pomodoros when pomodoro=true', async () => {
+      prisma.task.findUnique.mockResolvedValue(makeTask())
+      prisma.task.update.mockResolvedValue(makeTask({ focusSeconds: 1500, pomodoros: 1 }))
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks/task-1/focus',
+        payload: { seconds: 1500, pomodoro: true },
+      })
+      expect(res.statusCode).toBe(200)
+      expect(prisma.task.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            focusSeconds: { increment: 1500 },
+            pomodoros: { increment: 1 },
+          }),
+        }),
+      )
+    })
+
+    it('does not increment pomodoros when pomodoro is absent', async () => {
+      prisma.task.findUnique.mockResolvedValue(makeTask())
+      prisma.task.update.mockResolvedValue(makeTask({ focusSeconds: 60 }))
+      await app.inject({
+        method: 'POST',
+        url: '/tasks/task-1/focus',
+        payload: { seconds: 60 },
+      })
+      const call = prisma.task.update.mock.calls[0]?.[0]
+      expect(call?.data).not.toHaveProperty('pomodoros')
+    })
+
+    it('returns 404 when task not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(null)
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks/missing/focus',
+        payload: { seconds: 60 },
+      })
+      expect(res.statusCode).toBe(404)
+    })
+
+    it('returns 404 when task belongs to different user', async () => {
+      prisma.task.findUnique.mockResolvedValue(makeTask({ userId: 'other' }))
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks/task-1/focus',
+        payload: { seconds: 60 },
+      })
+      expect(res.statusCode).toBe(404)
+    })
+
+    it('returns 400 when seconds is 0', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks/task-1/focus',
+        payload: { seconds: 0 },
+      })
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('returns 400 when seconds exceeds 7200', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks/task-1/focus',
+        payload: { seconds: 7201 },
+      })
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('returns 400 when seconds is missing', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks/task-1/focus',
+        payload: {},
+      })
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('does not expose userId in response', async () => {
+      prisma.task.findUnique.mockResolvedValue(makeTask())
+      prisma.task.update.mockResolvedValue(makeTask({ focusSeconds: 60 }))
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks/task-1/focus',
+        payload: { seconds: 60 },
+      })
+      expect(res.json() as Record<string, unknown>).not.toHaveProperty('userId')
     })
   })
 })

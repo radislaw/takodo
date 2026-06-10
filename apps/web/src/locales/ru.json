@@ -217,7 +217,8 @@
       "addSubtask": "+ подзадача",
       "addSubtaskPlaceholder": "Новый шаг...",
       "notePlaceholder": "Заметка...",
-      "notFound": "Задача не найдена"
+      "notFound": "Задача не найдена",
+      "focusStats": "Фокус: {time}"
     }
   },
   "frequent": {
@@ -271,7 +272,21 @@
     "allDone": "Всё на сегодня сделано. Отдохни.",
     "backToToday": "К списку",
     "close": "Закрыть",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "pomodoro": {
+      "start": "Старт",
+      "pause": "Пауза",
+      "reset": "Сбросить",
+      "timerAria": "Таймер фокуса, осталось {time}",
+      "finished": "Помидор готов!",
+      "count": "{n} помидоров | {n} помидор | {n} помидора | {n} помидоров",
+      "focusBadgeAria": "Время фокуса: {time}"
+    }
+  },
+  "time": {
+    "min": "{n} мин",
+    "hour": "{n} ч",
+    "hourMin": "{h} ч {m} мин"
   },
   "a11y": {
     "mainNav": "Основная навигация"

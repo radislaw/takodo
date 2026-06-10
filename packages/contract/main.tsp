@@ -77,6 +77,12 @@ model Task {
   /** lower+trim of the title — used to match "frequently undone" tasks. */
   normalizedTitle: string;
 
+  /** Accumulated focused seconds (from Pomodoro sessions). Server-set. */
+  focusSeconds: int32;
+
+  /** Completed 25-minute Pomodoros. Server-set. */
+  pomodoros: int32;
+
   createdAt: utcDateTime;
 }
 
@@ -110,6 +116,16 @@ model TaskUpdate {
   category?: TaskCategory;
 }
 
+model FocusRecord {
+  /** Focused seconds to add (1–7200). */
+  @minValue(1)
+  @maxValue(7200)
+  seconds: int32;
+
+  /** True when a full 25-min Pomodoro was completed → increments counter. */
+  pomodoro?: boolean;
+}
+
 @route("/tasks")
 @tag("Tasks")
 interface Tasks {
@@ -130,6 +146,9 @@ interface Tasks {
 
   /** "No resistance, I can do it" → resistanceResolved = true. */
   @route("/{id}/resolve-resistance") @post resolveResistance(@path id: string): Task | ApiError;
+
+  /** Record focused time (and optionally a completed Pomodoro) on the task. */
+  @route("/{id}/focus") @post recordFocus(@path id: string, @body body: FocusRecord): Task | ApiError;
 }
 
 // ─── Daily list ─────────────────────────────────────────────────

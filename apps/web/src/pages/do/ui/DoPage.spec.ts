@@ -23,6 +23,7 @@ vi.mock('@/shared/api', () => ({
   useDailyToday: () => ({ data: dailyData, isPending: ref(false) }),
   useTasks: () => ({ data: tasksData }),
   useCompleteTask: () => ({ mutateAsync: mockCompleteTask }),
+  useRecordFocus: () => ({ mutate: vi.fn() }),
 }))
 
 vi.mock('vue-router', () => ({

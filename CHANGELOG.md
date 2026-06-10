@@ -5,6 +5,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.11.0] — 2026-06-11 · Pomodoro timer with focus tracking
+
+### Added
+
+- **`PomodoroTimer.vue`** (`shared/ui/pomodoro-timer/`) — 25-minute conic-gradient ring timer; start / pause / reset controls; apricot fill + water-ripple pulse animation on completion (respects `prefers-reduced-motion`); Web Audio chime (`shared/lib/chime.ts`) + `navigator.vibrate` on finish; theme-aware via `--sage` / `--apricot` tokens
+- **`usePomodoro`** composable (`shared/lib/usePomodoro.ts`) — timestamp-delta ticking (survives tab throttle); `onFlush` / `onComplete` callbacks; flushes on pause, reset, completion, and unmount; tracks flushed seconds to avoid double-sending
+- **`shared/lib/chime.ts`** — lazy `AudioContext` two-note sine chime (880 → 1318 Hz); no-op guard when API absent
+- **`shared/lib/formatFocus.ts`** — `formatFocusDuration(seconds, t)` → "25 мин" / "1 ч 5 мин"
+- **`tomato` icon** in shared icon registry — stroke-style: circle body, stem, two leaves
+- **`POST /tasks/:id/focus`** endpoint — atomically increments `focusSeconds`; sets `pomodoro: true` → increments `pomodoros`; validates `seconds` range `1–7200`
+- **`focusSeconds` + `pomodoros` fields** on `Task` model (contract + Prisma schema, `@default(0)`)
+- **`useRecordFocus`** composable (`shared/api/tasks.ts`) — silent background mutation; `onSettled` invalidates `['tasks']` prefix, propagating to all surfaces
+- **Focus stats in 3 surfaces:**
+  - `DoPage` — `PomodoroTimer` rendered below task title; `:key="currentTask.id"` forces remount + flush on task change
+  - `TodayTaskCard` — small focus badge (timer icon + duration) when `focusSeconds > 0`
+  - `TaskDetailPage` — focus stats row (timer icon + duration + tomato icons) when task has any focus data
+- **Tomato icons instead of text counter** — up to 5 `🍅`-style icons in apricot token color; `+N` overflow label; `aria-label` with plural form for screen readers
+
 ## [0.10.0] — 2026-06-07 · AMOLED default theme, task date groups, today task cards
 
 ### Added

@@ -17,6 +17,7 @@ export {
   useUpdateTask,
   useDeleteTask,
   useResolveResistance,
+  useRecordFocus,
 } from './tasks'
 export { useFrequent } from './frequent'
 export { useProfile, useUpdateProfile } from './profile'

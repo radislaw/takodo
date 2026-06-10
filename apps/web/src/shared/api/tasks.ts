@@ -164,3 +164,28 @@ export function useResolveResistance() {
     },
   })
 }
+
+export function useRecordFocus() {
+  const queryCache = useQueryCache()
+  return useMutation({
+    mutation: async ({
+      id,
+      seconds,
+      pomodoro,
+    }: {
+      id: string
+      seconds: number
+      pomodoro?: boolean
+    }) => {
+      const { data, error } = await apiClient.POST('/tasks/{id}/focus', {
+        params: { path: { id } },
+        body: { seconds, pomodoro },
+      })
+      if (error) throw new Error('Failed to record focus')
+      return data!
+    },
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
+    },
+  })
+}

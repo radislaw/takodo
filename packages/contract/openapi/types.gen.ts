@@ -167,6 +167,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tasks/{id}/focus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Record focused time (and optionally a completed Pomodoro) on the task. */
+        post: operations["Tasks_recordFocus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tasks/{id}/reopen": {
         parameters: {
             query?: never;
@@ -279,6 +296,15 @@ export interface components {
             /** Format: int32 */
             order?: number;
         };
+        FocusRecord: {
+            /**
+             * Format: int32
+             * @description Focused seconds to add (1–7200).
+             */
+            seconds: number;
+            /** @description True when a full 25-min Pomodoro was completed → increments counter. */
+            pomodoro?: boolean;
+        };
         FrequentTask: {
             normalizedTitle: string;
             title: string;
@@ -326,6 +352,16 @@ export interface components {
             completedAt: string | null;
             /** @description lower+trim of the title — used to match "frequently undone" tasks. */
             normalizedTitle: string;
+            /**
+             * Format: int32
+             * @description Accumulated focused seconds (from Pomodoro sessions). Server-set.
+             */
+            focusSeconds: number;
+            /**
+             * Format: int32
+             * @description Completed 25-minute Pomodoros. Server-set.
+             */
+            pomodoros: number;
             /** Format: date-time */
             createdAt: string;
         };
@@ -360,6 +396,16 @@ export interface components {
             completedAt: string | null;
             /** @description lower+trim of the title — used to match "frequently undone" tasks. */
             normalizedTitle: string;
+            /**
+             * Format: int32
+             * @description Accumulated focused seconds (from Pomodoro sessions). Server-set.
+             */
+            focusSeconds: number;
+            /**
+             * Format: int32
+             * @description Completed 25-minute Pomodoros. Server-set.
+             */
+            pomodoros: number;
             /** Format: date-time */
             createdAt: string;
             children: components["schemas"]["TaskNode"][];
@@ -787,6 +833,41 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Tasks_recordFocus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FocusRecord"];
+            };
+        };
         responses: {
             /** @description The request has succeeded. */
             200: {

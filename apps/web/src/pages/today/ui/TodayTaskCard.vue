@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppCheckbox, AppIcon, AppBadge } from '@/shared/ui'
+import { formatFocusDuration } from '@/shared/lib/formatFocus'
 
 interface Entry {
   id: string
@@ -15,6 +16,7 @@ interface Task {
   title: string
   status: string
   category?: string | null
+  focusSeconds?: number
 }
 
 const props = defineProps<{
@@ -51,8 +53,16 @@ const categoryColor = computed(() =>
   props.task?.category ? (CAT_COLORS[props.task.category] ?? 'var(--ink-faint)') : null,
 )
 
+const hasFocusTime = computed(() => !isDone.value && (props.task?.focusSeconds ?? 0) > 0)
+
+const focusBadge = computed(() =>
+  hasFocusTime.value ? formatFocusDuration(props.task!.focusSeconds!, t) : '',
+)
+
 const hasBottomRow = computed(
-  () => !isDone.value && !!(props.task?.category || (props.childTotal && props.childTotal > 0)),
+  () =>
+    !isDone.value &&
+    !!(props.task?.category || (props.childTotal && props.childTotal > 0) || hasFocusTime.value),
 )
 
 function handleToggleDone() {
@@ -110,6 +120,15 @@ function handleToggleMit() {
             <span class="text-ink-soft flex-shrink-0 text-xs font-semibold">
               {{ childDone ?? 0 }}/{{ childTotal }}
             </span>
+          </div>
+
+          <div
+            v-if="hasFocusTime"
+            class="flex items-center gap-1"
+            :aria-label="t('do.pomodoro.focusBadgeAria', { time: focusBadge })"
+          >
+            <AppIcon name="timer" :size="12" class="text-ink-faint flex-shrink-0" />
+            <span class="text-ink-faint text-xs font-semibold">{{ focusBadge }}</span>
           </div>
         </div>
       </div>

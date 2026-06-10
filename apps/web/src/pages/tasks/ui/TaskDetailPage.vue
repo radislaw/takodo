@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, type ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppCheckbox, AppIcon, AppInput, AppProgressRing, AppActionSheet } from '@/shared/ui'
+import { formatFocusDuration } from '@/shared/lib/formatFocus'
 import {
   useTaskTree,
   useTasks,
@@ -119,6 +120,21 @@ function handleSubtaskKeydown(e: KeyboardEvent) {
     subtaskTitle.value = ''
   }
 }
+
+const MAX_TOMATOES = 5
+
+const focusStatsText: ComputedRef<string> = computed(() => {
+  if (!tree.value) return ''
+  return t('tasks.detail.focusStats', { time: formatFocusDuration(tree.value.focusSeconds, t) })
+})
+
+const visibleTomatoes: ComputedRef<number> = computed(() =>
+  Math.min(tree.value?.pomodoros ?? 0, MAX_TOMATOES),
+)
+const tomatoOverflowText: ComputedRef<string> = computed(() => {
+  const overflow = Math.max((tree.value?.pomodoros ?? 0) - MAX_TOMATOES, 0)
+  return overflow > 0 ? `+${overflow}` : ''
+})
 
 function handleDeleteConfirmed() {
   deleteTask(id.value)
@@ -255,6 +271,30 @@ function handleDeleteConfirmed() {
             >
               <AppIcon name="x" :size="16" />
             </button>
+          </div>
+
+          <!-- Focus stats -->
+          <div
+            v-if="tree.focusSeconds > 0 || tree.pomodoros > 0"
+            class="border-line-card mt-3 flex items-center gap-1.5 border-t pt-3"
+          >
+            <AppIcon name="timer" :size="14" class="text-ink-faint flex-shrink-0" />
+            <span class="text-ink-faint text-xs font-semibold">{{ focusStatsText }}</span>
+            <span
+              v-if="tree.pomodoros > 0"
+              role="img"
+              :aria-label="t('do.pomodoro.count', tree.pomodoros)"
+              class="text-apricot-deep ml-1 flex items-center gap-0.5 text-xs font-semibold"
+            >
+              <AppIcon
+                v-for="i in visibleTomatoes"
+                :key="i"
+                name="tomato"
+                :size="13"
+                aria-hidden="true"
+              />
+              <span v-if="tomatoOverflowText" aria-hidden="true">{{ tomatoOverflowText }}</span>
+            </span>
           </div>
 
           <!-- Note -->

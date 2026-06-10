@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppIcon, AppButton } from '@/shared/ui'
+import { AppIcon, AppButton, PomodoroTimer } from '@/shared/ui'
 import { useDailyToday, useTasks, useCompleteTask } from '@/shared/api'
 
 const route = useRoute()
@@ -28,7 +28,14 @@ const CAT_COLORS: Record<string, string> = {
 const taskMap = computed(() => {
   const map = new Map<
     string,
-    { id: string; title: string; status: string; category?: string | null }
+    {
+      id: string
+      title: string
+      status: string
+      category?: string | null
+      focusSeconds: number
+      pomodoros: number
+    }
   >()
   for (const task of taskList.value ?? []) map.set(task.id, task)
   return map
@@ -130,6 +137,15 @@ function goBack() {
             :style="{ background: catColor }"
           />{{ currentTask?.title }}
         </h1>
+
+        <PomodoroTimer
+          v-if="currentTask"
+          :key="currentTask.id"
+          :task-id="currentTask.id"
+          :focus-seconds="currentTask.focusSeconds ?? 0"
+          :pomodoros="currentTask.pomodoros ?? 0"
+          class="mt-8"
+        />
       </div>
 
       <div
