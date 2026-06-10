@@ -85,6 +85,22 @@ Dev DB bring-up: `docker compose up -d` → `pnpm --filter @tootoo/api db:push` 
 
 API changes **only** through TypeSpec (`.tsp`) → `pnpm contract:build` → `pnpm contract:gen`. Generated files (`openapi.yaml`, `types.gen.ts`) must not be edited by hand. No manual Zod schemas — validation comes from the contract (Fastify ajv on api, `openapi-fetch` on web).
 
+## Security rules
+
+Derived from the 2026-06 security audit — keep these invariants when touching the listed areas:
+
+- **String inputs are bounded in the contract.** Every client-writable string gets `@maxLength` in `main.tsp` (`title` 500, `note` 5000, `name` 100). New string fields must declare a limit — ajv enforces it for free; never rely on handler-side checks.
+- **Multi-write operations use `prisma.$transaction`.** `Tasks_complete`, `Tasks_reopen`, `Daily_addEntry` are transactional (status bubble-up, MIT-limit check). Any new handler doing read-then-write or multiple writes must be too. Test mocks: `prisma.$transaction.mockImplementation(async (fn) => fn(prisma))`.
+- **Ownership checks on every id from the client.** Any `id`/`parentId`/`taskId` in params or body → verify the row exists **and** `userId` matches before use; otherwise 404 (single-user today, but auth is coming — don't create cross-tenant holes).
+- **Tree traversal needs a cycle guard.** `bubbleUp`/`reopenTask` carry a `visited` Set; any new recursion/loop over `parentId` links must do the same (corrupt data must not hang the process).
+- **Server binds localhost by default.** `HOST ?? '127.0.0.1'` in `server.ts` — never change the default back to `0.0.0.0`; opt in via env only.
+- **Unbounded-growth queries get a window.** `Frequent_list` scans the last 30 days of daily lists, not all history. New aggregate queries over per-day data must be windowed.
+- **No `v-html` with non-static content.** Vue interpolation only; the sole exceptions are static i18n strings on dev-only pages.
+- **No secrets in code.** Env vars only; `.env` is gitignored. No raw SQL (Prisma query API only).
+- **Explicit `onDelete` on every relation.** Task self-relation is `SetNull` (children become roots) — set the action consciously on new relations, never leave the default implicit.
+
+Known accepted debt (MVP): no auth, no rate limiting — revisit before any non-localhost deployment.
+
 ## TDD (mandatory)
 
 Cycle: test first → red → minimal implementation → green → refactor. Vitest for unit/integration, Playwright for E2E (`e2e/smoke.spec.ts`). Vitest excludes `e2e/` — do not move specs there.
