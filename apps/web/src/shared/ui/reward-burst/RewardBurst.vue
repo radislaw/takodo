@@ -3,7 +3,7 @@ import { ref, computed, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fireConfetti, fireFireworks } from '@/shared/lib/confetti'
 
-const props = defineProps<{ show: boolean }>()
+const props = defineProps<{ show: boolean; epic?: boolean }>()
 const emit = defineEmits<{ close: [] }>()
 
 const { tm, rt } = useI18n({ useScope: 'global' })
@@ -18,7 +18,8 @@ function getList(key: string): string[] {
   return Object.values(raw as object).map((v) => rt(v as Parameters<typeof rt>[0]))
 }
 
-const praiseText = computed(() => getList('reward.praise')[praiseIndex.value] ?? '')
+const praiseKey = computed(() => (props.epic ? 'reward.epicPraise' : 'reward.praise'))
+const praiseText = computed(() => getList(praiseKey.value)[praiseIndex.value] ?? '')
 const emojiText = computed(() => getList('reward.emoji')[emojiIndex.value] ?? '🎉')
 
 function isReducedMotion(): boolean {
@@ -40,7 +41,7 @@ watch(
       return
     }
 
-    const praises = getList('reward.praise')
+    const praises = getList(praiseKey.value)
     const emojis = getList('reward.emoji')
     praiseIndex.value = Math.floor(Math.random() * praises.length)
     emojiIndex.value = Math.floor(Math.random() * emojis.length)
@@ -48,12 +49,16 @@ watch(
     if (!isReducedMotion()) {
       fireConfetti()
       fireFireworks()
+      if (props.epic) fireFireworks()
     }
 
     clearTimer()
-    closeTimer = setTimeout(() => {
-      emit('close')
-    }, 1800)
+    closeTimer = setTimeout(
+      () => {
+        emit('close')
+      },
+      props.epic ? 2600 : 1800,
+    )
   },
   { immediate: true },
 )

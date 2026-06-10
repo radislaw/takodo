@@ -243,6 +243,8 @@ model DayActivity {
   date: plainDate;
   /** User completed at least one task that day. */
   active: boolean;
+  /** Inactive day covered by a streak shield (streak preserved). */
+  shielded?: boolean;
 }
 
 /** Achievement badge. Title/description live in web i18n, keyed by id. */
@@ -257,6 +259,10 @@ model Badge {
 model RewardsSummary {
   streak: int32;
   longestStreak: int32;
+  /** Streak shields available (earned every 5 active streak days, max 2). */
+  shields: int32;
+  /** A shield was consumed within the last 7 days. */
+  shieldUsedRecently: boolean;
   /** Last 7 days, Monday-first. */
   week: DayActivity[];
   badges: Badge[];

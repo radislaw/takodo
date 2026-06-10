@@ -31,4 +31,31 @@ describe('useReward', () => {
     hide()
     expect(isVisible.value).toBe(false)
   })
+
+  it('isEpic defaults to false on plain celebrate()', () => {
+    const { celebrate, isEpic } = useReward()
+    celebrate()
+    expect(isEpic.value).toBe(false)
+  })
+
+  it('celebrate({ epic: true }) sets isEpic', () => {
+    const { celebrate, isEpic } = useReward()
+    celebrate({ epic: true })
+    expect(isEpic.value).toBe(true)
+  })
+
+  it('hide() resets isEpic', () => {
+    const { celebrate, hide, isEpic } = useReward()
+    celebrate({ epic: true })
+    hide()
+    expect(isEpic.value).toBe(false)
+  })
+
+  it('plain celebrate() after epic resets isEpic', () => {
+    const { celebrate, hide, isEpic } = useReward()
+    celebrate({ epic: true })
+    hide()
+    celebrate()
+    expect(isEpic.value).toBe(false)
+  })
 })

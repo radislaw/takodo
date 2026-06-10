@@ -567,6 +567,9 @@ components:
         active:
           type: boolean
           description: User completed at least one task that day.
+        shielded:
+          type: boolean
+          description: Inactive day covered by a streak shield (streak preserved).
       description: One day cell in the weekly streak strip.
     EntryUpdate:
       type: object
@@ -630,6 +633,8 @@ components:
       required:
         - streak
         - longestStreak
+        - shields
+        - shieldUsedRecently
         - week
         - badges
       properties:
@@ -639,6 +644,13 @@ components:
         longestStreak:
           type: integer
           format: int32
+        shields:
+          type: integer
+          format: int32
+          description: Streak shields available (earned every 5 active streak days, max 2).
+        shieldUsedRecently:
+          type: boolean
+          description: A shield was consumed within the last 7 days.
         week:
           type: array
           items:

@@ -13,7 +13,7 @@ import { useProfile } from '@/shared/api'
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
-const { isVisible, hide } = useReward()
+const { isVisible, isEpic, hide } = useReward()
 const { key: errorKey, hideError } = useErrorToast()
 const { key: successKey, hideSuccess } = useSuccessToast()
 const { pending: undoPending } = useUndoDelete()
@@ -56,7 +56,7 @@ function handleTabChange(id: string) {
       :items="navItems"
       @update:model-value="handleTabChange"
     />
-    <RewardBurst :show="isVisible" @close="hide" />
+    <RewardBurst :show="isVisible" :epic="isEpic" @close="hide" />
 
     <Teleport to="body">
       <Transition name="error-toast">
