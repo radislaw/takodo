@@ -376,4 +376,15 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
 .sheet-leave-to .surface-card {
   transform: translateY(100%);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active,
+  .sheet-enter-active,
+  .sheet-leave-active,
+  .sheet-enter-active .surface-card,
+  .sheet-leave-active .surface-card {
+    transition: none;
+  }
+}
 </style>

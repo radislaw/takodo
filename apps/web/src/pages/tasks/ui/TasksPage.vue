@@ -12,8 +12,27 @@ const { mutateAsync: addEntryAsync } = useAddDailyEntry()
 
 const newTitle = ref('')
 const isAdding = ref(false)
+const expandedIds = ref(new Set<string>())
+
+function toggleExpand(id: string) {
+  const next = new Set(expandedIds.value)
+  if (next.has(id)) next.delete(id)
+  else next.add(id)
+  expandedIds.value = next
+}
 
 const rootTasks = computed(() => (taskList.value ?? []).filter((task) => !task.parentId))
+
+const childrenByParent = computed(() => {
+  const map = new Map<string, typeof rootTasks.value>()
+  for (const task of taskList.value ?? []) {
+    if (!task.parentId) continue
+    const arr = map.get(task.parentId) ?? []
+    arr.push(task)
+    map.set(task.parentId, arr)
+  }
+  return map
+})
 
 const childProgress = computed(() => {
   const map = new Map<string, { done: number; total: number }>()
@@ -119,13 +138,24 @@ function handleKeydown(e: KeyboardEvent) {
             {{ group.label }}
           </h2>
           <div class="flex flex-col">
-            <TaskCard
-              v-for="task in group.tasks"
-              :key="task.id"
-              :task="task"
-              :child-done="childProgress.get(task.id)?.done"
-              :child-total="childProgress.get(task.id)?.total"
-            />
+            <template v-for="task in group.tasks" :key="task.id">
+              <TaskCard
+                :task="task"
+                :child-done="childProgress.get(task.id)?.done"
+                :child-total="childProgress.get(task.id)?.total"
+                :expanded="expandedIds.has(task.id)"
+                @toggle-expand="toggleExpand(task.id)"
+              />
+              <template v-if="expandedIds.has(task.id)">
+                <div
+                  v-for="child in childrenByParent.get(task.id) ?? []"
+                  :key="child.id"
+                  class="ml-6"
+                >
+                  <TaskCard :task="child" />
+                </div>
+              </template>
+            </template>
           </div>
         </section>
       </div>

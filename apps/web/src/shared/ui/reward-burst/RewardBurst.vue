@@ -66,10 +66,11 @@ onUnmounted(clearTimer)
     <Transition name="reward-fade">
       <div
         v-if="show"
-        class="pointer-events-none fixed inset-0 z-50 flex items-center justify-center"
+        class="fixed inset-0 z-50 flex cursor-pointer items-center justify-center"
         role="status"
         aria-live="polite"
         :aria-label="$t('reward.aria')"
+        @click="emit('close')"
       >
         <div class="reward-card">
           <span class="reward-emoji" aria-hidden="true">{{ emojiText }}</span>

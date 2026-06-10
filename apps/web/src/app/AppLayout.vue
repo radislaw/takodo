@@ -6,6 +6,7 @@ import { AppBottomNav, RewardBurst, AppToast } from '@/shared/ui'
 import type { IconName } from '@/shared/ui/icon/icons'
 import { useReward } from '@/shared/lib/useReward'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
+import { useUndoDelete } from '@/shared/lib/useUndoDelete'
 import { useProfile } from '@/shared/api'
 
 const route = useRoute()
@@ -13,6 +14,7 @@ const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
 const { isVisible, hide } = useReward()
 const { key: errorKey, hideError } = useErrorToast()
+const { pending: undoPending } = useUndoDelete()
 const { data: profile } = useProfile()
 
 const theme = computed(() => profile.value?.theme ?? 'amoled')
@@ -62,6 +64,26 @@ function handleTabChange(id: string) {
         >
           <AppToast variant="gentle" class="cursor-pointer" @click="hideError">
             {{ t(errorKey) }}
+          </AppToast>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <Teleport to="body">
+      <Transition name="error-toast">
+        <div
+          v-if="undoPending"
+          class="fixed top-6 right-4 left-4 z-[61] mx-auto flex max-w-sm justify-center"
+        >
+          <AppToast variant="gentle" class="flex items-center gap-3">
+            <span>{{ t('undo.taskDeleted') }}</span>
+            <button
+              type="button"
+              class="text-sage font-body ml-1 cursor-pointer text-sm font-bold"
+              @click="undoPending!.cancel()"
+            >
+              {{ t('undo.cancel') }}
+            </button>
           </AppToast>
         </div>
       </Transition>

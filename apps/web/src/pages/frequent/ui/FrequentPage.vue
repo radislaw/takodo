@@ -24,6 +24,7 @@ async function handleReAdd(title: string) {
         <h1 class="font-display text-ink text-xl leading-tight font-extrabold">
           {{ t('frequent.title') }}
         </h1>
+        <p class="text-ink-soft mt-0.5 text-xs">{{ t('frequent.hint') }}</p>
       </div>
     </header>
 
