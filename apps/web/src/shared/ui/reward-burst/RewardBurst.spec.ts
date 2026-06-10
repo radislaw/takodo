@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import RewardBurst from './RewardBurst.vue'
+const EPIC_PRAISE = [
+  '21 день! Привычка сложилась!',
+  'Три недели подряд — это уже ты!',
+  '21 день! Мозг запомнил дорогу!',
+]
 
 vi.mock('@/shared/lib/confetti', () => ({
   fireConfetti: vi.fn(),
@@ -86,5 +91,27 @@ describe('RewardBurst', () => {
     wrapper = mount(RewardBurst, { props: { show: true }, attachTo: document.body })
     expect(mockFireConfetti).not.toHaveBeenCalled()
     expect(mockFireFireworks).not.toHaveBeenCalled()
+  })
+
+  it('epic shows praise from the epic pool', async () => {
+    wrapper = mount(RewardBurst, { props: { show: true, epic: true }, attachTo: document.body })
+    await wrapper.vm.$nextTick()
+    const text = findStatus()?.textContent ?? ''
+    expect(EPIC_PRAISE.some((p) => text.includes(p))).toBe(true)
+  })
+
+  it('epic fires double fireworks', () => {
+    wrapper = mount(RewardBurst, { props: { show: true, epic: true }, attachTo: document.body })
+    expect(mockFireFireworks).toHaveBeenCalledTimes(2)
+  })
+
+  it('epic stays longer before close (~2600ms)', async () => {
+    wrapper = mount(RewardBurst, { props: { show: true, epic: true }, attachTo: document.body })
+    vi.advanceTimersByTime(1800)
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('close')).toBeFalsy()
+    vi.advanceTimersByTime(800)
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('close')).toBeTruthy()
   })
 })

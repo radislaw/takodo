@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppProgressRing, AppToast, AppIcon, AppButton, AppInput } from '@/shared/ui'
+import { AppProgressRing, AppToast, AppIcon, AppButton, AppInput, StreakFlame } from '@/shared/ui'
 import {
   useDailyToday,
   useAddDailyEntry,
@@ -16,6 +16,7 @@ import {
 } from '@/shared/api'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useSuccessToast } from '@/shared/lib/useSuccessToast'
+import { useReward } from '@/shared/lib/useReward'
 import TodayTaskCard from './TodayTaskCard.vue'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -59,8 +60,21 @@ const greetingKey = computed(() => {
   return 'greeting.evening'
 })
 
+const { celebrate } = useReward()
+
 const userName = computed(() => profile.value?.name ?? '')
 const streak = computed(() => rewards.value?.streak ?? 0)
+const shields = computed(() => rewards.value?.shields ?? 0)
+const shieldUsedRecently = computed(() => rewards.value?.shieldUsedRecently ?? false)
+
+watch(
+  () => rewards.value?.streak,
+  (next, prev) => {
+    if (next === 21 && (prev ?? 0) < 21) {
+      celebrate({ epic: true })
+    }
+  },
+)
 
 const greetingFull = computed(() => {
   const base = t(greetingKey.value)
@@ -207,15 +221,12 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
         <div class="min-w-0 flex-1">
           <p class="font-body text-ink text-sm leading-snug font-semibold">{{ summaryMsg }}</p>
           <div v-if="streak > 0 || entries.length > 0" class="mt-2 flex flex-wrap gap-1.5">
-            <div
+            <StreakFlame
               v-if="streak > 0"
-              class="bg-apricot/15 inline-flex items-center gap-1 rounded-full px-2.5 py-1"
-            >
-              <AppIcon name="flame" :size="13" class="text-apricot-deep" />
-              <span class="text-apricot-deep text-xs font-bold">
-                {{ t('today.streak', { days: streak }) }}
-              </span>
-            </div>
+              :streak="streak"
+              :shields="shields"
+              :shield-used-recently="shieldUsedRecently"
+            />
             <div
               v-if="entries.length > 0"
               class="bg-sage/10 inline-flex items-center gap-1 rounded-full px-2.5 py-1"

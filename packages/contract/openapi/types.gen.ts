@@ -290,6 +290,8 @@ export interface components {
             date: string;
             /** @description User completed at least one task that day. */
             active: boolean;
+            /** @description Inactive day covered by a streak shield (streak preserved). */
+            shielded?: boolean;
         };
         EntryUpdate: {
             isMIT?: boolean;
@@ -328,6 +330,13 @@ export interface components {
             streak: number;
             /** Format: int32 */
             longestStreak: number;
+            /**
+             * Format: int32
+             * @description Streak shields available (earned every 5 active streak days, max 2).
+             */
+            shields: number;
+            /** @description A shield was consumed within the last 7 days. */
+            shieldUsedRecently: boolean;
             /** @description Last 7 days, Monday-first. */
             week: components["schemas"]["DayActivity"][];
             badges: components["schemas"]["Badge"][];

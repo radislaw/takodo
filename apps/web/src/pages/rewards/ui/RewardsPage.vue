@@ -4,15 +4,16 @@ import { useI18n } from 'vue-i18n'
 import { AppIcon } from '@/shared/ui'
 import { useRewards } from '@/shared/api'
 
-const { t } = useI18n({ useScope: 'global' })
-const { data: rewards, isPending } = useRewards()
-
 const BADGE_ICONS: Record<string, string> = {
   first_step: 'sparkles',
   streak_5: 'flame',
   streak_7: 'award',
+  streak_21: 'trophy',
   gentle_mode: 'moon',
 }
+
+const { t } = useI18n({ useScope: 'global' })
+const { data: rewards, isPending } = useRewards()
 
 const weekdayLabel = computed(() => {
   if (!rewards.value) return []
@@ -64,14 +65,51 @@ const weekdayLabel = computed(() => {
             >
               <div
                 class="flex h-8 w-8 items-center justify-center rounded-full"
-                :class="day.active ? 'bg-apricot' : 'bg-apricot/25'"
+                :class="
+                  day.active ? 'bg-apricot' : day.shielded ? 'bg-apricot/40' : 'bg-apricot/20'
+                "
               >
                 <AppIcon v-if="day.active" name="check" :size="16" color="#fff" :stroke-width="3" />
+                <AppIcon
+                  v-else-if="day.shielded"
+                  name="shield"
+                  :size="14"
+                  class="text-apricot-deep opacity-70"
+                />
               </div>
               <span class="text-apricot-deep text-[11px] font-bold opacity-75">
                 {{ weekdayLabel[i] }}
               </span>
             </div>
+          </div>
+
+          <!-- Shields row -->
+          <div
+            v-if="rewards.shields > 0 || rewards.shieldUsedRecently"
+            class="mt-4 flex items-center gap-2"
+          >
+            <div class="flex gap-1">
+              <AppIcon
+                v-for="i in rewards.shields"
+                :key="i"
+                name="shield"
+                :size="16"
+                class="text-apricot-deep"
+              />
+              <AppIcon
+                v-for="i in 2 - rewards.shields"
+                :key="'empty-' + i"
+                name="shield"
+                :size="16"
+                class="text-apricot/30"
+              />
+            </div>
+            <span class="text-apricot-deep text-xs font-semibold opacity-80">
+              {{ t('rewards.shieldsLabel') }}
+            </span>
+            <span v-if="rewards.shieldUsedRecently" class="text-apricot-deep text-xs opacity-60">
+              {{ t('rewards.shieldUsedSep') }} {{ t('rewards.shieldUsed') }}
+            </span>
           </div>
         </div>
 

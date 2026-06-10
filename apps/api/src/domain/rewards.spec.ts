@@ -90,3 +90,106 @@ describe('computeRewards', () => {
     expect(r.streak).toBe(1)
   })
 })
+
+describe('streak shields', () => {
+  /** Active streak run of `len` days ending `endAgo` days ago. */
+  function run(len: number, endAgo: number): Date[] {
+    return Array.from({ length: len }, (_, i) => daysAgo(endAgo + i))
+  }
+
+  it('no shields below 5 streak days', () => {
+    const r = computeRewards(run(4, 0), NOW)
+    expect(r.shields).toBe(0)
+  })
+
+  it('earns a shield on the 5th streak day', () => {
+    const r = computeRewards(run(5, 0), NOW)
+    expect(r.shields).toBe(1)
+  })
+
+  it('earns second shield on the 10th streak day, capped at 2', () => {
+    expect(computeRewards(run(10, 0), NOW).shields).toBe(2)
+    expect(computeRewards(run(20, 0), NOW).shields).toBe(2)
+  })
+
+  it('1-day gap consumes a shield and preserves streak', () => {
+    // 5 active days, then gap yesterday... wait: days 6..2 active, day 1 gap, day 0 active
+    const dates = [...run(5, 2), daysAgo(0)]
+    const r = computeRewards(dates, NOW)
+    expect(r.streak).toBe(6)
+    expect(r.shields).toBe(0)
+    expect(r.shieldUsedRecently).toBe(true)
+  })
+
+  it('2-day gap with 2 shields preserves streak', () => {
+    // 10 active days → 2 shields, then 2-day gap, then today active
+    const dates = [...run(10, 3), daysAgo(0)]
+    const r = computeRewards(dates, NOW)
+    expect(r.streak).toBe(11)
+    expect(r.shields).toBe(0)
+  })
+
+  it('3-day gap breaks streak even with 2 shields', () => {
+    const dates = [...run(10, 4), daysAgo(0)]
+    const r = computeRewards(dates, NOW)
+    expect(r.streak).toBe(1)
+    expect(r.shields).toBe(0)
+  })
+
+  it('gap with no shields resets streak', () => {
+    const dates = [...run(3, 2), daysAgo(0)]
+    const r = computeRewards(dates, NOW)
+    expect(r.streak).toBe(1)
+    expect(r.shieldUsedRecently).toBe(false)
+  })
+
+  it('today inactive is grace, not a shield consumption', () => {
+    const r = computeRewards(run(5, 1), NOW)
+    expect(r.streak).toBe(5)
+    expect(r.shields).toBe(1)
+    expect(r.shieldUsedRecently).toBe(false)
+  })
+
+  it('streak continues earning shields after a shielded gap', () => {
+    // 5 active (1 shield), gap (consume, not counted), 5 more active → 10th active day re-earns
+    const dates = [...run(5, 6), ...run(5, 0)]
+    const r = computeRewards(dates, NOW)
+    expect(r.streak).toBe(10)
+    expect(r.shields).toBe(1)
+  })
+
+  it('week marks shielded days', () => {
+    // NOW = Wed 2024-06-05; Tue gap covered by shield earned in prior 5-day run
+    const dates = [...run(5, 2), daysAgo(0)]
+    const r = computeRewards(dates, NOW)
+    const tue = r.week.find((d) => d.date === '2024-06-04')
+    expect(tue?.active).toBe(false)
+    expect(tue?.shielded).toBe(true)
+  })
+
+  it('shieldUsedRecently false when shield used more than 7 days ago', () => {
+    // shield consumed 10 days ago, streak continues since
+    const dates = [...run(5, 11), ...run(10, 0)]
+    const r = computeRewards(dates, NOW)
+    expect(r.streak).toBe(15)
+    expect(r.shieldUsedRecently).toBe(false)
+  })
+
+  it('longestStreak counts shielded runs as continuous', () => {
+    const dates = [...run(5, 2), daysAgo(0)] // 6-day shielded run
+    const r = computeRewards(dates, NOW)
+    expect(r.longestStreak).toBe(6)
+  })
+
+  it('streak_21 badge earned at longestStreak >= 21', () => {
+    const r = computeRewards(run(21, 0), NOW)
+    expect(r.badges.find((b) => b.id === 'streak_21')?.earned).toBe(true)
+  })
+
+  it('streak_21 badge counts down remaining', () => {
+    const r = computeRewards(run(10, 0), NOW)
+    const badge = r.badges.find((b) => b.id === 'streak_21')
+    expect(badge?.earned).toBe(false)
+    expect(badge?.remaining).toBe(11)
+  })
+})

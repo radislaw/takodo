@@ -37,7 +37,16 @@ vi.mock('@/shared/api', () => ({
   useReopenTask: () => ({ mutate: mockReopenTask }),
   useUpdateDailyEntry: () => ({ mutateAsync: mockUpdateEntry }),
   useProfile: () => ({ data: ref({ name: '', theme: 'amoled' }) }),
-  useRewards: () => ({ data: ref({ streak: 0, longestStreak: 0, week: [], badges: [] }) }),
+  useRewards: () => ({
+    data: ref({
+      streak: 0,
+      longestStreak: 0,
+      shields: 0,
+      shieldUsedRecently: false,
+      week: [],
+      badges: [],
+    }),
+  }),
 }))
 
 function mountPage() {
