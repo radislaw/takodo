@@ -57,7 +57,10 @@ model Task {
   /** Parent in the tree; null = root. */
   parentId: string | null;
 
+  @maxLength(500)
   title: string;
+
+  @maxLength(5000)
   note?: string;
 
   /** User pressed "I can do this" → task became an executable leaf. */
@@ -84,7 +87,10 @@ model TaskNode {
 }
 
 model TaskCreate {
+  @maxLength(500)
   title: string;
+
+  @maxLength(5000)
   note?: string;
 
   /** Parent when splitting; absent = root task of the day. */
@@ -94,8 +100,12 @@ model TaskCreate {
 }
 
 model TaskUpdate {
+  @maxLength(500)
   title?: string;
+
+  @maxLength(5000)
   note?: string;
+
   estimateMinutes?: int32;
   category?: TaskCategory;
 }
@@ -187,12 +197,16 @@ interface Daily {
 
 model Profile {
   /** Display name used in the greeting. */
+  @maxLength(100)
   name: string;
+
   theme: Theme;
 }
 
 model ProfileUpdate {
+  @maxLength(100)
   name?: string;
+
   theme?: Theme;
 }
 

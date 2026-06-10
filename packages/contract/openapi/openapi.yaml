@@ -568,6 +568,7 @@ components:
       properties:
         name:
           type: string
+          maxLength: 100
           description: Display name used in the greeting.
         theme:
           $ref: '#/components/schemas/Theme'
@@ -576,6 +577,7 @@ components:
       properties:
         name:
           type: string
+          maxLength: 100
         theme:
           $ref: '#/components/schemas/Theme'
     RewardsSummary:
@@ -621,8 +623,10 @@ components:
           description: Parent in the tree; null = root.
         title:
           type: string
+          maxLength: 500
         note:
           type: string
+          maxLength: 5000
         resistanceResolved:
           type: boolean
           description: User pressed "I can do this" → task became an executable leaf.
@@ -659,8 +663,10 @@ components:
       properties:
         title:
           type: string
+          maxLength: 500
         note:
           type: string
+          maxLength: 5000
         parentId:
           type: string
           description: Parent when splitting; absent = root task of the day.
@@ -690,8 +696,10 @@ components:
           description: Parent in the tree; null = root.
         title:
           type: string
+          maxLength: 500
         note:
           type: string
+          maxLength: 5000
         resistanceResolved:
           type: boolean
           description: User pressed "I can do this" → task became an executable leaf.
@@ -728,8 +736,10 @@ components:
       properties:
         title:
           type: string
+          maxLength: 500
         note:
           type: string
+          maxLength: 5000
         estimateMinutes:
           type: integer
           format: int32

@@ -12,9 +12,13 @@ export function buildFrequentHandlers(prisma: PrismaClient, getUserId: GetUserId
       const query = req.query as { minDays?: string }
       const minDays = query.minDays !== undefined ? parseInt(query.minDays, 10) : 1
 
+      const windowStart = new Date()
+      windowStart.setUTCDate(windowStart.getUTCDate() - 30)
+      windowStart.setUTCHours(0, 0, 0, 0)
+
       const tasks = await prisma.task.findMany({ where: { userId } })
       const dailyLists = await prisma.dailyList.findMany({
-        where: { userId },
+        where: { userId, date: { gte: windowStart } },
         include: { entries: true },
       })
 
