@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppProgressRing, AppToast, AppIcon, AppButton, AppInput } from '@/shared/ui'
 import {
@@ -18,6 +19,7 @@ import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 import TodayTaskCard from './TodayTaskCard.vue'
 
+const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
 const { showError } = useErrorToast()
 const { showSuccess } = useSuccessToast()
@@ -228,6 +230,17 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
           </div>
         </div>
       </div>
+
+      <!-- Do-mode entry -->
+      <AppButton
+        v-if="activeEntries.length > 0"
+        variant="primary"
+        class="mb-6 w-full"
+        @click="router.push('/do')"
+      >
+        <AppIcon name="play" :size="18" />
+        {{ t('do.title') }}
+      </AppButton>
 
       <!-- Loading -->
       <div v-if="isPending" class="text-ink-soft font-body py-12 text-center text-sm">
