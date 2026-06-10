@@ -9,9 +9,11 @@ import {
   useDeleteTask,
   useResolveResistance,
   useUpdateTask,
+  useAddDailyEntry,
 } from '@/shared/api'
 import { useReward } from '@/shared/lib/useReward'
 import { useUndoDelete } from '@/shared/lib/useUndoDelete'
+import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 
 interface Task {
   id: string
@@ -44,6 +46,8 @@ const { mutate: updateTask } = useUpdateTask()
 
 const { celebrate } = useReward()
 const { scheduleDelete } = useUndoDelete()
+const { mutateAsync: addToTodayAsync } = useAddDailyEntry()
+const { showSuccess } = useSuccessToast()
 
 const actionsOpen = ref(false)
 const confirmOpen = ref(false)
@@ -85,6 +89,16 @@ function openConfirmDelete() {
 function handleDelete() {
   confirmOpen.value = false
   scheduleDelete(() => deleteTask(props.task.id))
+}
+
+async function handleAddToToday() {
+  actionsOpen.value = false
+  try {
+    await addToTodayAsync(props.task.id)
+    showSuccess('success.addedToToday')
+  } catch {
+    // error toast shown by mutation
+  }
 }
 </script>
 
@@ -187,6 +201,15 @@ function handleDelete() {
       >
         <AppIcon name="flame" :size="16" class="text-apricot" />
         {{ t('tasks.actions.resolve') }}
+      </button>
+
+      <button
+        type="button"
+        class="font-body text-sage flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors"
+        @click="handleAddToToday"
+      >
+        <AppIcon name="plus" :size="16" class="text-sage" />
+        {{ t('tasks.actions.addToToday') }}
       </button>
 
       <div class="border-line-card my-1 border-t" />

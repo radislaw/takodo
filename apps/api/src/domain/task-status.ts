@@ -1,5 +1,23 @@
 import type { DomainTask } from './types.js'
 
+/** Walk ancestors from taskId upward, reopening each done parent. Does NOT touch siblings. */
+export function reopenAncestors(tasks: DomainTask[], taskId: string): DomainTask[] {
+  const map = new Map(tasks.map((t) => [t.id, { ...t }]))
+  const target = map.get(taskId)
+  if (!target) return [...map.values()]
+
+  let parentId = target.parentId
+  while (parentId !== null) {
+    const parent = map.get(parentId)
+    if (!parent || parent.status !== 'done') break
+    parent.status = 'open'
+    parent.completedAt = null
+    parentId = parent.parentId
+  }
+
+  return [...map.values()]
+}
+
 export function bubbleUp(tasks: DomainTask[], taskId: string): DomainTask[] {
   const map = new Map(tasks.map((t) => [t.id, { ...t }]))
 

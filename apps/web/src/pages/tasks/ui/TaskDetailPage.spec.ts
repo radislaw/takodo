@@ -53,6 +53,11 @@ vi.mock('@/shared/api', () => ({
   useResolveResistance: () => ({ mutate: vi.fn() }),
   useUpdateTask: () => ({ mutate: vi.fn() }),
   useCreateTask: () => ({ mutateAsync: vi.fn() }),
+  useAddDailyEntry: () => ({ mutateAsync: vi.fn() }),
+}))
+
+vi.mock('@/shared/lib/useSuccessToast', () => ({
+  useSuccessToast: () => ({ showSuccess: vi.fn(), hideSuccess: vi.fn(), key: { value: null } }),
 }))
 
 const fakeTree = {

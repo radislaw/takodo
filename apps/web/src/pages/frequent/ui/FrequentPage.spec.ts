@@ -5,6 +5,7 @@ import FrequentPage from './FrequentPage.vue'
 
 const mockCreateTask = vi.fn()
 const mockAddEntry = vi.fn()
+const mockShowSuccess = vi.fn()
 const frequentData = ref<{ normalizedTitle: string; title: string; undoneDays: number }[]>([])
 const isPending = ref(false)
 const mockInvalidate = vi.fn()
@@ -22,6 +23,14 @@ vi.mock('@/shared/api', () => ({
   useCreateTask: () => ({ mutateAsync: mockCreateTask }),
   useAddDailyEntry: () => ({ mutateAsync: mockAddEntry }),
   todayDate: '2026-06-06',
+}))
+
+vi.mock('@/shared/lib/useSuccessToast', () => ({
+  useSuccessToast: () => ({
+    showSuccess: mockShowSuccess,
+    hideSuccess: vi.fn(),
+    key: { value: null },
+  }),
 }))
 
 beforeEach(() => {
@@ -73,5 +82,18 @@ describe('FrequentPage', () => {
     await new Promise((r) => setTimeout(r, 10))
 
     expect(mockInvalidate).toHaveBeenCalledWith({ key: ['frequent'] })
+  })
+
+  it('shows success toast after re-add', async () => {
+    frequentData.value = [{ normalizedTitle: 'buy milk', title: 'Buy milk', undoneDays: 3 }]
+    mockCreateTask.mockResolvedValueOnce({ id: 't-new', title: 'Buy milk' })
+    mockAddEntry.mockResolvedValueOnce({ id: 'e-new' })
+
+    const wrapper = mount(FrequentPage)
+    await wrapper.find('button').trigger('click')
+    await wrapper.vm.$nextTick()
+    await new Promise((r) => setTimeout(r, 10))
+
+    expect(mockShowSuccess).toHaveBeenCalledWith('success.addedToToday')
   })
 })

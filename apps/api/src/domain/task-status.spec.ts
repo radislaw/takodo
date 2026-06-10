@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { bubbleUp, reopenTask } from './task-status.js'
+import { bubbleUp, reopenTask, reopenAncestors } from './task-status.js'
 import type { DomainTask } from './types.js'
 
 const base: Omit<
@@ -86,6 +86,59 @@ describe('reopenTask', () => {
   it('returns new array (immutable)', () => {
     const tasks = [task('a', null, 'done')]
     const result = reopenTask(tasks, 'a')
+    expect(result).not.toBe(tasks)
+  })
+})
+
+describe('reopenAncestors', () => {
+  it('no-op when task has no parent', () => {
+    const tasks = [task('a', null, 'done')]
+    const result = reopenAncestors(tasks, 'a')
+    expect(result.find((t) => t.id === 'a')!.status).toBe('done')
+  })
+
+  it('reopens done parent when subtask added', () => {
+    const tasks = [task('parent', null, 'done'), task('child-new', 'parent', 'open')]
+    const result = reopenAncestors(tasks, 'child-new')
+    expect(result.find((t) => t.id === 'parent')!.status).toBe('open')
+    expect(result.find((t) => t.id === 'parent')!.completedAt).toBeNull()
+  })
+
+  it('reopens multiple ancestors up the chain', () => {
+    const tasks = [
+      task('gp', null, 'done'),
+      task('parent', 'gp', 'done'),
+      task('child-new', 'parent', 'open'),
+    ]
+    const result = reopenAncestors(tasks, 'child-new')
+    expect(result.find((t) => t.id === 'parent')!.status).toBe('open')
+    expect(result.find((t) => t.id === 'gp')!.status).toBe('open')
+  })
+
+  it('does NOT reopen siblings', () => {
+    const tasks = [
+      task('parent', null, 'done'),
+      task('sibling', 'parent', 'done'),
+      task('child-new', 'parent', 'open'),
+    ]
+    const result = reopenAncestors(tasks, 'child-new')
+    expect(result.find((t) => t.id === 'sibling')!.status).toBe('done')
+  })
+
+  it('stops at open ancestor', () => {
+    const tasks = [
+      task('gp', null, 'open'),
+      task('parent', 'gp', 'done'),
+      task('child-new', 'parent', 'open'),
+    ]
+    const result = reopenAncestors(tasks, 'child-new')
+    expect(result.find((t) => t.id === 'parent')!.status).toBe('open')
+    expect(result.find((t) => t.id === 'gp')!.status).toBe('open')
+  })
+
+  it('returns new array (immutable)', () => {
+    const tasks = [task('a', null, 'open')]
+    const result = reopenAncestors(tasks, 'a')
     expect(result).not.toBe(tasks)
   })
 })

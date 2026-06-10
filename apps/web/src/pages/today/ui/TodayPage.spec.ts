@@ -9,6 +9,7 @@ const mockAddEntry = vi.fn()
 const mockCompleteTask = vi.fn()
 const mockReopenTask = vi.fn()
 const mockUpdateEntry = vi.fn()
+const mockMoveToTomorrow = vi.fn()
 
 const dailyData = ref<
   | {
@@ -27,6 +28,7 @@ vi.mock('@/shared/api', () => ({
   useTasks: () => ({ data: tasksData }),
   useCreateTask: () => ({ mutateAsync: mockCreateTask }),
   useAddDailyEntry: () => ({ mutateAsync: mockAddEntry }),
+  useMoveToTomorrow: () => ({ mutateAsync: mockMoveToTomorrow }),
   useCompleteTask: () => ({ mutate: mockCompleteTask }),
   useReopenTask: () => ({ mutate: mockReopenTask }),
   useUpdateDailyEntry: () => ({ mutateAsync: mockUpdateEntry }),
@@ -252,5 +254,26 @@ describe('TodayPage', () => {
     await new Promise((r) => setTimeout(r, 10))
 
     expect(wrapper.text()).toContain('Главных дел уже 3')
+  })
+
+  it('calls moveToTomorrow with entryId and taskId', async () => {
+    tasksData.value = [{ id: 't1', parentId: null, title: 'Task 1', status: 'open' }]
+    dailyData.value = {
+      id: 'list-1',
+      date: '2026-06-05',
+      createdAt: '2026-06-05T00:00:00Z',
+      entries: [{ id: 'e1', taskId: 't1', isMIT: false, order: 0 }],
+    }
+    mockMoveToTomorrow.mockResolvedValueOnce({})
+
+    const wrapper = mountPage()
+    await wrapper.vm.$nextTick()
+
+    const arrowBtn = wrapper.find('[aria-label="На завтра"]')
+    await arrowBtn.trigger('click')
+    await wrapper.vm.$nextTick()
+    await new Promise((r) => setTimeout(r, 10))
+
+    expect(mockMoveToTomorrow).toHaveBeenCalledWith({ entryId: 'e1', taskId: 't1' })
   })
 })

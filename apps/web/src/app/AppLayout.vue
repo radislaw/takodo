@@ -6,6 +6,7 @@ import { AppBottomNav, RewardBurst, AppToast } from '@/shared/ui'
 import type { IconName } from '@/shared/ui/icon/icons'
 import { useReward } from '@/shared/lib/useReward'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
+import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 import { useUndoDelete } from '@/shared/lib/useUndoDelete'
 import { useProfile } from '@/shared/api'
 
@@ -14,6 +15,7 @@ const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
 const { isVisible, hide } = useReward()
 const { key: errorKey, hideError } = useErrorToast()
+const { key: successKey, hideSuccess } = useSuccessToast()
 const { pending: undoPending } = useUndoDelete()
 const { data: profile } = useProfile()
 
@@ -64,6 +66,19 @@ function handleTabChange(id: string) {
         >
           <AppToast variant="gentle" class="cursor-pointer" @click="hideError">
             {{ t(errorKey) }}
+          </AppToast>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <Teleport to="body">
+      <Transition name="error-toast">
+        <div
+          v-if="successKey"
+          class="fixed top-6 right-4 left-4 z-[60] mx-auto flex max-w-sm justify-center"
+        >
+          <AppToast variant="sage" class="cursor-pointer" @click="hideSuccess">
+            {{ t(successKey) }}
           </AppToast>
         </div>
       </Transition>

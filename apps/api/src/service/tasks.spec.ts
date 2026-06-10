@@ -88,6 +88,44 @@ describe('Tasks routes', () => {
       })
       expect(res.json() as Record<string, unknown>).not.toHaveProperty('userId')
     })
+
+    it('reopens done parent when subtask created', async () => {
+      const parent = makeTask({ id: 'parent-1', status: 'done', completedAt: new Date() })
+      const newChild = makeTask({ id: 'child-1', parentId: 'parent-1' })
+      prisma.task.findUnique.mockResolvedValue(parent)
+      prisma.task.create.mockResolvedValue(newChild)
+      prisma.task.findMany.mockResolvedValue([parent, newChild])
+      prisma.task.updateMany.mockResolvedValue({ count: 1 })
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks',
+        payload: { title: 'Sub task', parentId: 'parent-1' },
+      })
+      expect(res.statusCode).toBe(200)
+      expect(prisma.task.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: { in: ['parent-1'] } },
+          data: { status: 'open', completedAt: null },
+        }),
+      )
+    })
+
+    it('does not call updateMany when parent is already open', async () => {
+      const parent = makeTask({ id: 'parent-1', status: 'open' })
+      const newChild = makeTask({ id: 'child-1', parentId: 'parent-1' })
+      prisma.task.findUnique.mockResolvedValue(parent)
+      prisma.task.create.mockResolvedValue(newChild)
+      prisma.task.findMany.mockResolvedValue([parent, newChild])
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/tasks',
+        payload: { title: 'Sub task', parentId: 'parent-1' },
+      })
+      expect(res.statusCode).toBe(200)
+      expect(prisma.task.updateMany).not.toHaveBeenCalled()
+    })
   })
 
   describe('GET /tasks/:id', () => {

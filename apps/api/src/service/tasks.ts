@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient, Task } from '@prisma/client'
 import { normalizeTitle } from '../domain/normalize.js'
 import { assembleTree } from '../domain/tree.js'
-import { bubbleUp, reopenTask } from '../domain/task-status.js'
+import { bubbleUp, reopenTask, reopenAncestors } from '../domain/task-status.js'
 import type { DomainTask } from '../domain/types.js'
 
 type GetUserId = () => Promise<string>
@@ -75,6 +75,28 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
           normalizedTitle: normalizeTitle(body.title),
         },
       })
+
+      if (body.parentId) {
+        const allTasks = await prisma.task.findMany({ where: { userId } })
+        const parent = allTasks.find((t) => t.id === body.parentId)
+        if (parent && parent.status === 'done') {
+          const domainTasks = allTasks.map(toDomain)
+          const afterReopen = reopenAncestors(domainTasks, task.id)
+          const reopenedIds = afterReopen
+            .filter((after) => {
+              const before = domainTasks.find((t) => t.id === after.id)
+              return before && before.status === 'done' && after.status === 'open'
+            })
+            .map((t) => t.id)
+          if (reopenedIds.length > 0) {
+            await prisma.task.updateMany({
+              where: { id: { in: reopenedIds } },
+              data: { status: 'open', completedAt: null },
+            })
+          }
+        }
+      }
+
       return toResponse(task)
     },
 

@@ -5,6 +5,7 @@ import { AppProgressRing, AppToast, AppIcon, AppButton, AppInput } from '@/share
 import {
   useDailyToday,
   useAddDailyEntry,
+  useMoveToTomorrow,
   useUpdateDailyEntry,
   useTasks,
   useCreateTask,
@@ -14,10 +15,12 @@ import {
   useRewards,
 } from '@/shared/api'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
+import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 import TodayTaskCard from './TodayTaskCard.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const { showError } = useErrorToast()
+const { showSuccess } = useSuccessToast()
 
 const { data: daily, isPending } = useDailyToday()
 const { data: taskList } = useTasks()
@@ -29,6 +32,7 @@ const { mutateAsync: addEntryAsync } = useAddDailyEntry()
 const { mutate: completeTask } = useCompleteTask()
 const { mutate: reopenTask } = useReopenTask()
 const { mutateAsync: updateEntryAsync } = useUpdateDailyEntry()
+const { mutateAsync: moveToTomorrowAsync } = useMoveToTomorrow()
 
 const showSheet = ref(false)
 const newTitle = ref('')
@@ -149,6 +153,15 @@ function handleToggleDone(taskId: string, currentStatus: string) {
   else completeTask(taskId)
 }
 
+async function handleMoveTomorrow(entryId: string, taskId: string) {
+  try {
+    await moveToTomorrowAsync({ entryId, taskId })
+    showSuccess('today.movedTomorrow')
+  } catch {
+    // error toast shown by mutation
+  }
+}
+
 async function handleToggleMIT(entryId: string, currentMIT: boolean) {
   try {
     await updateEntryAsync({ entryId, isMIT: !currentMIT })
@@ -245,6 +258,7 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
               :child-total="childProgress.get(entry.taskId)?.total"
               @toggle-done="handleToggleDone"
               @toggle-mit="handleToggleMIT"
+              @move-tomorrow="handleMoveTomorrow"
             />
           </div>
         </template>

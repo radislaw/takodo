@@ -10,6 +10,8 @@ const mockDelete = vi.fn()
 const mockResolve = vi.fn()
 const mockUpdate = vi.fn()
 const mockCelebrate = vi.fn()
+const mockAddToToday = vi.fn()
+const mockShowSuccess = vi.fn()
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush }),
@@ -21,6 +23,15 @@ vi.mock('@/shared/api', () => ({
   useDeleteTask: () => ({ mutate: mockDelete }),
   useResolveResistance: () => ({ mutate: mockResolve }),
   useUpdateTask: () => ({ mutate: mockUpdate }),
+  useAddDailyEntry: () => ({ mutateAsync: mockAddToToday }),
+}))
+
+vi.mock('@/shared/lib/useSuccessToast', () => ({
+  useSuccessToast: () => ({
+    showSuccess: mockShowSuccess,
+    hideSuccess: vi.fn(),
+    key: { value: null },
+  }),
 }))
 
 vi.mock('@/shared/lib/useReward', () => ({
@@ -167,5 +178,23 @@ describe('TaskCard', () => {
     await badge.trigger('click')
     expect(mockResolve).toHaveBeenCalledWith('t1')
     expect(mockCelebrate).toHaveBeenCalled()
+  })
+
+  it('+ в сегодня in action sheet calls addDailyEntry and shows success toast', async () => {
+    mockAddToToday.mockResolvedValueOnce({})
+    wrapper = mount(TaskCard, { props: { task: openTask }, attachTo: document.body })
+    await wrapper.find('[aria-label="Действия"]').trigger('click')
+    await wrapper.vm.$nextTick()
+
+    const addBtn = Array.from(document.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('+ в сегодня'),
+    )
+    expect(addBtn).toBeTruthy()
+    addBtn!.click()
+    await wrapper.vm.$nextTick()
+    await new Promise((r) => setTimeout(r, 10))
+
+    expect(mockAddToToday).toHaveBeenCalledWith('t1')
+    expect(mockShowSuccess).toHaveBeenCalledWith('success.addedToToday')
   })
 })
