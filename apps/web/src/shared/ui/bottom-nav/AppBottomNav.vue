@@ -24,7 +24,7 @@ defineProps<{
         :aria-current="model === item.id ? 'page' : undefined"
         :class="[
           'font-body flex min-h-[44px] cursor-pointer flex-col items-center justify-center gap-0.5 border-none bg-transparent px-4 py-2 text-[11px] font-bold',
-          model === item.id ? 'text-sage-deep' : 'text-ink-faint',
+          model === item.id ? 'text-sage-deep' : 'text-[color:var(--nav-inactive)]',
         ]"
         @click="model = item.id"
       >

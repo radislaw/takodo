@@ -37,6 +37,8 @@
 
   /* Nav background — frosted, auto-adapts to each theme via --card */
   --nav-bg: color-mix(in srgb, var(--card) 80%, transparent);
+  /* Nav inactive label — AA-compliant (≥4.5:1 on --nav-bg), distinct from active --sage-deep */
+  --nav-inactive: #6c7870;
 
   /* Soft semantic — kept low-saturation to stay calm */
   --done: #84a98c; /* completed / positive            */
@@ -173,6 +175,8 @@
   --line-card: #2d3832;
   --line-strong: #415048;
 
+  --nav-inactive: #9caaa0;
+
   /* Elevation — deeper, since warm-tint shadows vanish on dark */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.32), 0 1px 2px rgba(0, 0, 0, 0.24);
@@ -232,6 +236,8 @@
   --line-card: #ede9f3;
   --line-strong: #d5cee3;
 
+  --nav-inactive: #77728a;
+
   /* Elevation — tinted with the plum ink so shadows read soft & cool */
   --shadow-sm: 0 1px 2px rgba(53, 48, 72, 0.05), 0 1px 1px rgba(53, 48, 72, 0.03);
   --shadow-md: 0 2px 6px rgba(53, 48, 72, 0.05), 0 4px 12px rgba(53, 48, 72, 0.04);
@@ -290,6 +296,8 @@
   --line-card: #2a2540;
   --line-strong: #3d3660;
 
+  --nav-inactive: #9e98b8;
+
   /* Elevation — deep plum-tinted shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.36);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.38), 0 1px 2px rgba(0, 0, 0, 0.28);
@@ -337,6 +345,7 @@
 
   /* Nav — solid, color-mix is invalid with gradient --card */
   --nav-bg: #161334;
+  --nav-inactive: #7e7fc8;
 
   /* Soft semantic */
   --done: #00e0b8;
@@ -423,6 +432,8 @@
   --line-card: #8f8f8f;
   --line-strong: #000000;
 
+  --nav-inactive: #2b2b2b;
+
   /* Elevation — solid black outlines so cards are clearly bounded */
   --shadow-sm: 0 0 0 1.5px #000000;
   --shadow-md: 0 0 0 2px #000000;
@@ -487,6 +498,8 @@
   --line-card: #dce8f2;
   --line-strong: #bacad8;
 
+  --nav-inactive: #5b7686;
+
   /* Elevation — airy, barely there */
   --shadow-sm: 0 1px 2px rgba(51, 68, 85, 0.05), 0 1px 1px rgba(51, 68, 85, 0.03);
   --shadow-md: 0 2px 6px rgba(51, 68, 85, 0.06), 0 4px 12px rgba(51, 68, 85, 0.04);
@@ -550,6 +563,8 @@
   --line-card: #d4e8f0;
   --line-strong: #a8c8d8;
 
+  --nav-inactive: #4e7888;
+
   /* Elevation — cool ocean-tinted */
   --shadow-sm: 0 1px 2px rgba(24, 52, 68, 0.05), 0 1px 1px rgba(24, 52, 68, 0.03);
   --shadow-md: 0 2px 6px rgba(24, 52, 68, 0.07), 0 4px 12px rgba(24, 52, 68, 0.05);
@@ -612,6 +627,8 @@
   --line: #dee2d4;
   --line-card: #e6e9dd;
   --line-strong: #c7cdba;
+
+  --nav-inactive: #6b7663;
 
   /* Elevation — soft green-tinted */
   --shadow-sm: 0 1px 2px rgba(46, 58, 43, 0.05), 0 1px 1px rgba(46, 58, 43, 0.03);
@@ -678,6 +695,8 @@
   --line-card: #eceae7;
   --line-strong: #cccac5;
 
+  --nav-inactive: #75716e;
+
   /* Elevation — barely there */
   --shadow-sm: 0 1px 2px rgba(50, 49, 46, 0.04), 0 1px 1px rgba(50, 49, 46, 0.03);
   --shadow-md: 0 2px 6px rgba(50, 49, 46, 0.05), 0 4px 12px rgba(50, 49, 46, 0.04);
@@ -741,6 +760,8 @@
   --line: #2a2018;
   --line-card: #241c10;
   --line-strong: #3a2e1c;
+
+  --nav-inactive: #9c8c6c;
 
   /* Elevation — deep warm shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
@@ -809,6 +830,7 @@
 
   /* Nav — solid black, no frosted glass (OLED pixel savings) */
   --nav-bg: #000000;
+  --nav-inactive: #999999;
 
   /* Elevation — card borders (shadow on black = invisible) */
   --shadow-sm: 0 0 0 1px #1a1a1a;
