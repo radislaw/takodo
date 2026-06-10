@@ -31,6 +31,7 @@ describe('Tasks routes', () => {
   beforeEach(async () => {
     mockReset(prisma)
     getUserId.mockResolvedValue('user-1')
+    prisma.$transaction.mockImplementation(async (fn) => fn(prisma))
     app = buildApp({ prisma, getUserId })
     await app.ready()
   })

@@ -64,31 +64,34 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       const { taskId } = req.body as { taskId: string }
       const dateVal = parseDate(date)
 
-      const list = await prisma.dailyList.findUnique({
-        where: { userId_date: { userId, date: dateVal } },
-        include: { entries: true },
-      })
-      if (!list) {
-        return reply.status(404).send({ code: 'not_found', message: 'Daily list not found' })
-      }
-
-      const mitCount = list.entries.filter((e) => e.isMIT).length
-      const maxOrder = list.entries.reduce((m, e) => Math.max(m, e.order), -1)
-
       const task = await prisma.task.findUnique({ where: { id: taskId } })
       if (!task || task.userId !== userId) {
         return reply.status(404).send({ code: 'not_found', message: 'Task not found' })
       }
 
-      const entry = await prisma.dailyEntry.create({
-        data: {
-          dailyListId: list.id,
-          taskId,
-          isMIT: mitCount < 3,
-          order: maxOrder + 1,
-        },
+      const entry = await prisma.$transaction(async (tx) => {
+        const list = await tx.dailyList.findUnique({
+          where: { userId_date: { userId, date: dateVal } },
+          include: { entries: true },
+        })
+        if (!list) {
+          return reply.status(404).send({ code: 'not_found', message: 'Daily list not found' })
+        }
+
+        const mitCount = list.entries.filter((e) => e.isMIT).length
+        const maxOrder = list.entries.reduce((m, e) => Math.max(m, e.order), -1)
+
+        return tx.dailyEntry.create({
+          data: {
+            dailyListId: list.id,
+            taskId,
+            isMIT: mitCount < 3,
+            order: maxOrder + 1,
+          },
+        })
       })
 
+      if (!('id' in entry)) return entry
       return { id: entry.id, taskId: entry.taskId, isMIT: entry.isMIT, order: entry.order }
     },
 

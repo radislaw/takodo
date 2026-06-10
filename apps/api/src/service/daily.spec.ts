@@ -52,6 +52,7 @@ describe('Daily routes', () => {
   beforeEach(async () => {
     mockReset(prisma)
     getUserId.mockResolvedValue('user-1')
+    prisma.$transaction.mockImplementation(async (fn) => fn(prisma))
     app = buildApp({ prisma, getUserId })
     await app.ready()
   })
@@ -121,10 +122,10 @@ describe('Daily routes', () => {
   describe('POST /daily/:date/entries', () => {
     it('adds entry to existing list', async () => {
       const list = { ...makeList(), entries: [] }
+      prisma.task.findUnique.mockResolvedValue(makeTask())
       prisma.dailyList.findUnique.mockResolvedValue(
         list as Parameters<typeof prisma.dailyList.findUnique.mockResolvedValue>[0],
       )
-      prisma.task.findUnique.mockResolvedValue(makeTask())
       prisma.dailyEntry.create.mockResolvedValue(makeEntry())
       const res = await app.inject({
         method: 'POST',
@@ -134,7 +135,18 @@ describe('Daily routes', () => {
       expect(res.statusCode).toBe(200)
     })
 
+    it('returns 404 when task not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(null)
+      const res = await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/entries',
+        payload: { taskId: 'missing' },
+      })
+      expect(res.statusCode).toBe(404)
+    })
+
     it('returns 404 when list not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(makeTask())
       prisma.dailyList.findUnique.mockResolvedValue(null)
       const res = await app.inject({
         method: 'POST',

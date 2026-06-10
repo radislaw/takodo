@@ -6,8 +6,11 @@ export function bubbleUp(tasks: DomainTask[], taskId: string): DomainTask[] {
   const target = map.get(taskId)
   if (!target || target.parentId === null) return [...map.values()]
 
+  const visited = new Set<string>()
   let currentId: string | null = target.parentId
   while (currentId !== null) {
+    if (visited.has(currentId)) break
+    visited.add(currentId)
     const parent = map.get(currentId)
     if (!parent) break
 
@@ -27,7 +30,10 @@ export function bubbleUp(tasks: DomainTask[], taskId: string): DomainTask[] {
 export function reopenTask(tasks: DomainTask[], taskId: string): DomainTask[] {
   const map = new Map(tasks.map((t) => [t.id, { ...t }]))
 
+  const seen = new Set<string>()
   const markOpen = (id: string) => {
+    if (seen.has(id)) return
+    seen.add(id)
     const t = map.get(id)
     if (!t) return
     t.status = 'open'

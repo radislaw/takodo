@@ -2,7 +2,7 @@ import { buildApp } from './app.js'
 import { prisma } from './db/client.js'
 
 const PORT = Number(process.env.PORT ?? 3001)
-const HOST = process.env.HOST ?? '0.0.0.0'
+const HOST = process.env.HOST ?? '127.0.0.1'
 const SEED_EMAIL = process.env.SEED_USER_EMAIL ?? 'dev@tootoo.local'
 
 let cachedUserId: string | null = null

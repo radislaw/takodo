@@ -47,7 +47,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       return tasks.map(toResponse)
     },
 
-    async Tasks_create(req: FastifyRequest, _reply: FastifyReply) {
+    async Tasks_create(req: FastifyRequest, reply: FastifyReply) {
       const userId = await getUserId()
       const body = req.body as {
         title: string
@@ -56,6 +56,14 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
         estimateMinutes?: number
         category?: string
       }
+
+      if (body.parentId) {
+        const parent = await prisma.task.findUnique({ where: { id: body.parentId } })
+        if (!parent || parent.userId !== userId) {
+          return reply.status(404).send({ code: 'not_found', message: 'Parent task not found' })
+        }
+      }
+
       const task = await prisma.task.create({
         data: {
           userId,
@@ -139,8 +147,6 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       }
 
       const now = new Date()
-      await prisma.task.update({ where: { id }, data: { status: 'done', completedAt: now } })
-
       const updatedTarget = { ...toDomain(target), status: 'done' as const, completedAt: now }
       const domainTasks = allTasks.map((t) => (t.id === id ? updatedTarget : toDomain(t)))
       const afterBubble = bubbleUp(domainTasks, id)
@@ -152,14 +158,17 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
         })
         .map((t) => t.id)
 
-      if (changedIds.length > 0) {
-        await prisma.task.updateMany({
-          where: { id: { in: changedIds } },
-          data: { status: 'done', completedAt: now },
-        })
-      }
+      const result = await prisma.$transaction(async (tx) => {
+        await tx.task.update({ where: { id }, data: { status: 'done', completedAt: now } })
+        if (changedIds.length > 0) {
+          await tx.task.updateMany({
+            where: { id: { in: changedIds } },
+            data: { status: 'done', completedAt: now },
+          })
+        }
+        return tx.task.findUnique({ where: { id } })
+      })
 
-      const result = await prisma.task.findUnique({ where: { id } })
       return toResponse(result!)
     },
 
@@ -182,14 +191,16 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
         })
         .map((t) => t.id)
 
-      if (reopenedIds.length > 0) {
-        await prisma.task.updateMany({
-          where: { id: { in: reopenedIds } },
-          data: { status: 'open', completedAt: null },
-        })
-      }
+      const result = await prisma.$transaction(async (tx) => {
+        if (reopenedIds.length > 0) {
+          await tx.task.updateMany({
+            where: { id: { in: reopenedIds } },
+            data: { status: 'open', completedAt: null },
+          })
+        }
+        return tx.task.findUnique({ where: { id } })
+      })
 
-      const result = await prisma.task.findUnique({ where: { id } })
       return toResponse(result!)
     },
 
