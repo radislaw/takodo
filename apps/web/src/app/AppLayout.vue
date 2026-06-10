@@ -2,15 +2,17 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppBottomNav, RewardBurst } from '@/shared/ui'
+import { AppBottomNav, RewardBurst, AppToast } from '@/shared/ui'
 import type { IconName } from '@/shared/ui/icon/icons'
 import { useReward } from '@/shared/lib/useReward'
+import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useProfile } from '@/shared/api'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
 const { isVisible, hide } = useReward()
+const { key: errorKey, hideError } = useErrorToast()
 const { data: profile } = useProfile()
 
 const theme = computed(() => profile.value?.theme ?? 'amoled')
@@ -51,5 +53,32 @@ function handleTabChange(id: string) {
       @update:model-value="handleTabChange"
     />
     <RewardBurst :show="isVisible" @close="hide" />
+
+    <Teleport to="body">
+      <Transition name="error-toast">
+        <div
+          v-if="errorKey"
+          class="fixed top-6 right-4 left-4 z-[60] mx-auto flex max-w-sm justify-center"
+        >
+          <AppToast variant="gentle" class="cursor-pointer" @click="hideError">
+            {{ t(errorKey) }}
+          </AppToast>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
+
+<style scoped>
+.error-toast-enter-active,
+.error-toast-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.error-toast-enter-from,
+.error-toast-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+</style>

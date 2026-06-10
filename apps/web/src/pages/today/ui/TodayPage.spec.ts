@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
 import TodayPage from './TodayPage.vue'
+import { useErrorToast } from '@/shared/lib/useErrorToast'
 
 const mockCreateTask = vi.fn()
 const mockAddEntry = vi.fn()
@@ -46,6 +47,10 @@ beforeEach(() => {
     entries: [],
   }
   tasksData.value = []
+})
+
+afterEach(() => {
+  useErrorToast().hideError()
 })
 
 describe('TodayPage', () => {
@@ -101,6 +106,113 @@ describe('TodayPage', () => {
 
     expect(mockCreateTask).toHaveBeenCalledWith({ title: 'Test task' })
     expect(mockAddEntry).toHaveBeenCalledWith('t-new')
+  })
+
+  it('sheet stays open after successful add', async () => {
+    mockCreateTask.mockResolvedValueOnce({ id: 't-new', title: 'Test task' })
+    mockAddEntry.mockResolvedValueOnce({ id: 'e-new', taskId: 't-new', isMIT: false, order: 0 })
+
+    const wrapper = mountPage()
+
+    const fab = document.body.querySelector('button[aria-label]') as HTMLButtonElement | null
+    fab?.click()
+    await wrapper.vm.$nextTick()
+
+    const input = document.body.querySelector('input') as HTMLInputElement | null
+    if (input) {
+      input.value = 'Test task'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+    await wrapper.vm.$nextTick()
+
+    const btns = Array.from(document.body.querySelectorAll('button'))
+    const addBtn = btns.find((b) => b.textContent?.includes('Добавить в список'))
+    addBtn?.click()
+    await wrapper.vm.$nextTick()
+    await new Promise((r) => setTimeout(r, 10))
+
+    // Sheet should still be open (showSheet = true)
+    const sheet = document.body.querySelector('.rounded-t-3xl')
+    expect(sheet).not.toBeNull()
+  })
+
+  it('clears input text after successful add', async () => {
+    mockCreateTask.mockResolvedValueOnce({ id: 't-new', title: 'Test task' })
+    mockAddEntry.mockResolvedValueOnce({ id: 'e-new', taskId: 't-new', isMIT: false, order: 0 })
+
+    const wrapper = mountPage()
+
+    const fab = document.body.querySelector('button[aria-label]') as HTMLButtonElement | null
+    fab?.click()
+    await wrapper.vm.$nextTick()
+
+    const input = document.body.querySelector('input') as HTMLInputElement | null
+    if (input) {
+      input.value = 'Test task'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+    await wrapper.vm.$nextTick()
+
+    const btns = Array.from(document.body.querySelectorAll('button'))
+    const addBtn = btns.find((b) => b.textContent?.includes('Добавить в список'))
+    addBtn?.click()
+    await wrapper.vm.$nextTick()
+    await new Promise((r) => setTimeout(r, 10))
+
+    const inputAfter = document.body.querySelector('input') as HTMLInputElement | null
+    expect(inputAfter?.value ?? '').toBe('')
+  })
+
+  it('shows error toast when add fails', async () => {
+    mockCreateTask.mockRejectedValueOnce(new Error('Network error'))
+
+    const wrapper = mountPage()
+
+    const fab = document.body.querySelector('button[aria-label]') as HTMLButtonElement | null
+    fab?.click()
+    await wrapper.vm.$nextTick()
+
+    const input = document.body.querySelector('input') as HTMLInputElement | null
+    if (input) {
+      input.value = 'Test task'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+    await wrapper.vm.$nextTick()
+
+    const btns = Array.from(document.body.querySelectorAll('button'))
+    const addBtn = btns.find((b) => b.textContent?.includes('Добавить в список'))
+    addBtn?.click()
+    await wrapper.vm.$nextTick()
+    await new Promise((r) => setTimeout(r, 10))
+
+    const { key } = useErrorToast()
+    expect(key.value).toBe('errors.addFailed')
+  })
+
+  it('shows MIT counter when entries exist', async () => {
+    tasksData.value = [{ id: 't1', parentId: null, title: 'Task', status: 'open' }]
+    dailyData.value = {
+      id: 'list-1',
+      date: '2026-06-05',
+      createdAt: '2026-06-05T00:00:00Z',
+      entries: [{ id: 'e1', taskId: 't1', isMIT: true, order: 0 }],
+    }
+    const wrapper = mountPage()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toContain('1/3')
+  })
+
+  it('MIT counter shows 0/3 when no MIT set', async () => {
+    tasksData.value = [{ id: 't1', parentId: null, title: 'Task', status: 'open' }]
+    dailyData.value = {
+      id: 'list-1',
+      date: '2026-06-05',
+      createdAt: '2026-06-05T00:00:00Z',
+      entries: [{ id: 'e1', taskId: 't1', isMIT: false, order: 0 }],
+    }
+    const wrapper = mountPage()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toContain('0/3')
   })
 
   it('calls completeTask when checkbox checked for open task', async () => {

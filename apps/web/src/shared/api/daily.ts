@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
 import { apiClient } from '@/api/client'
+import { useErrorToast } from '@/shared/lib/useErrorToast'
 
 export function todayDate(timeZone?: string): string {
   const tz = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -33,6 +34,7 @@ export function useDailyToday() {
 
 export function useAddDailyEntry() {
   const queryCache = useQueryCache()
+  const { showError } = useErrorToast()
   const date = todayDate()
   return useMutation({
     mutation: async (taskId: string) => {
@@ -43,6 +45,9 @@ export function useAddDailyEntry() {
       if (error) throw new Error(error.message)
       return data!
     },
+    onError: () => {
+      showError('errors.saveFailed')
+    },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
     },
@@ -51,6 +56,7 @@ export function useAddDailyEntry() {
 
 export function useUpdateDailyEntry() {
   const queryCache = useQueryCache()
+  const { showError } = useErrorToast()
   const date = todayDate()
   return useMutation({
     mutation: async ({
@@ -73,6 +79,11 @@ export function useUpdateDailyEntry() {
       if (error) throw new Error(error.message)
       return data!
     },
+    onError: (err: unknown) => {
+      if ((err as { code?: string }).code !== 'mit_limit') {
+        showError('errors.saveFailed')
+      }
+    },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
     },
@@ -81,6 +92,7 @@ export function useUpdateDailyEntry() {
 
 export function useRemoveDailyEntry() {
   const queryCache = useQueryCache()
+  const { showError } = useErrorToast()
   const date = todayDate()
   return useMutation({
     mutation: async (entryId: string) => {
@@ -88,6 +100,9 @@ export function useRemoveDailyEntry() {
         params: { path: { date, entryId } },
       })
       if (error) throw new Error(error.message)
+    },
+    onError: () => {
+      showError('errors.saveFailed')
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
