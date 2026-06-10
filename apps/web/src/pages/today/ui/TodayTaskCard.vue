@@ -102,7 +102,7 @@ function handleToggleMit() {
           <div v-if="childTotal && childTotal > 0" class="flex min-w-0 flex-1 items-center gap-2">
             <div class="bg-line h-1.5 min-w-0 flex-1 overflow-hidden rounded-full">
               <div
-                class="bg-sage h-full rounded-full transition-all duration-300"
+                class="bg-sage h-full rounded-full transition-all duration-300 motion-reduce:transition-none"
                 :style="{ width: `${progressPct}%` }"
               />
             </div>

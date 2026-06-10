@@ -83,7 +83,7 @@ describe('TasksPage', () => {
     expect(wrapper.text()).toContain('Buy milk')
   })
 
-  it('does not show child tasks in flat list', () => {
+  it('does not show child tasks when parent is collapsed (default)', () => {
     tasksData.value = [
       {
         id: 't1',
@@ -108,6 +108,36 @@ describe('TasksPage', () => {
     const cards = wrapper.findAllComponents({ name: 'TaskCard' })
     expect(cards).toHaveLength(1)
     expect(cards.at(0)!.props('task').id).toBe('t1')
+  })
+
+  it('shows child tasks when parent is expanded', async () => {
+    tasksData.value = [
+      {
+        id: 't1',
+        parentId: null,
+        title: 'Parent',
+        status: 'open',
+        resistanceResolved: false,
+        normalizedTitle: 'parent',
+        createdAt: TODAY,
+      },
+      {
+        id: 't2',
+        parentId: 't1',
+        title: 'Child',
+        status: 'open',
+        resistanceResolved: false,
+        normalizedTitle: 'child',
+        createdAt: TODAY,
+      },
+    ]
+    wrapper = mount(TasksPage)
+    const parentCard = wrapper.findComponent({ name: 'TaskCard' })
+    await parentCard.vm.$emit('toggleExpand')
+    await wrapper.vm.$nextTick()
+    const cards = wrapper.findAllComponents({ name: 'TaskCard' })
+    expect(cards).toHaveLength(2)
+    expect(cards.at(1)!.props('task').id).toBe('t2')
   })
 
   it('shows correct child progress on root task', () => {

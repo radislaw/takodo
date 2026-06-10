@@ -10,6 +10,8 @@ import {
   useResolveResistance,
   useUpdateTask,
 } from '@/shared/api'
+import { useReward } from '@/shared/lib/useReward'
+import { useUndoDelete } from '@/shared/lib/useUndoDelete'
 
 interface Task {
   id: string
@@ -25,6 +27,11 @@ const props = defineProps<{
   task: Task
   childDone?: number
   childTotal?: number
+  expanded?: boolean
+}>()
+
+const emit = defineEmits<{
+  toggleExpand: []
 }>()
 
 const { t } = useI18n({ useScope: 'global' })
@@ -35,6 +42,9 @@ const { mutate: deleteTask } = useDeleteTask()
 const { mutate: resolveResistance } = useResolveResistance()
 const { mutate: updateTask } = useUpdateTask()
 
+const { celebrate } = useReward()
+const { scheduleDelete } = useUndoDelete()
+
 const actionsOpen = ref(false)
 const confirmOpen = ref(false)
 const editingEstimate = ref(false)
@@ -43,6 +53,11 @@ const estimateValue = ref('')
 function handleToggle() {
   if (props.task.status === 'done') reopenTask(props.task.id)
   else completeTask(props.task.id)
+}
+
+function handleResolveBadge() {
+  resolveResistance(props.task.id)
+  celebrate()
 }
 
 function openActions() {
@@ -68,8 +83,8 @@ function openConfirmDelete() {
 }
 
 function handleDelete() {
-  deleteTask(props.task.id)
   confirmOpen.value = false
+  scheduleDelete(() => deleteTask(props.task.id))
 }
 </script>
 
@@ -90,12 +105,32 @@ function handleDelete() {
       {{ task.title }}
     </button>
 
-    <span
+    <button
       v-if="childTotal && childTotal > 0"
-      class="text-ink-soft flex-shrink-0 text-xs font-semibold"
+      type="button"
+      class="text-ink-soft hover:text-ink flex-shrink-0 cursor-pointer text-xs font-semibold transition-colors"
+      :aria-expanded="expanded"
+      :aria-label="t('tasks.toggleExpand')"
+      @click="emit('toggleExpand')"
     >
       {{ t('tasks.progress', { done: childDone ?? 0, total: childTotal }) }}
-    </span>
+      <AppIcon
+        name="chevronR"
+        :size="12"
+        class="ml-0.5 inline-block transition-transform"
+        :class="{ 'rotate-90': expanded }"
+      />
+    </button>
+
+    <button
+      v-if="!task.resistanceResolved && task.status !== 'done'"
+      type="button"
+      class="text-apricot hover:text-apricot-deep flex-shrink-0 cursor-pointer transition-colors"
+      :aria-label="t('tasks.resistanceBadgeLabel')"
+      @click="handleResolveBadge"
+    >
+      <AppIcon name="flame" :size="18" />
+    </button>
 
     <button
       type="button"

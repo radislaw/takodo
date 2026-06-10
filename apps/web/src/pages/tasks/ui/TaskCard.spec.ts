@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TaskCard from './TaskCard.vue'
+import { useUndoDelete } from '@/shared/lib/useUndoDelete'
 
 const mockPush = vi.fn()
 const mockComplete = vi.fn()
@@ -8,6 +9,7 @@ const mockReopen = vi.fn()
 const mockDelete = vi.fn()
 const mockResolve = vi.fn()
 const mockUpdate = vi.fn()
+const mockCelebrate = vi.fn()
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush }),
@@ -19,6 +21,10 @@ vi.mock('@/shared/api', () => ({
   useDeleteTask: () => ({ mutate: mockDelete }),
   useResolveResistance: () => ({ mutate: mockResolve }),
   useUpdateTask: () => ({ mutate: mockUpdate }),
+}))
+
+vi.mock('@/shared/lib/useReward', () => ({
+  useReward: () => ({ celebrate: mockCelebrate, hide: vi.fn(), isVisible: { value: false } }),
 }))
 
 const openTask = {
@@ -37,6 +43,7 @@ let wrapper: ReturnType<typeof mount> | null = null
 beforeEach(() => {
   vi.clearAllMocks()
   document.body.style.overflow = ''
+  useUndoDelete().dismiss()
 })
 
 afterEach(() => {
@@ -96,23 +103,69 @@ describe('TaskCard', () => {
     expect(document.querySelector('[role="dialog"]')).not.toBeNull()
   })
 
-  it('calls deleteTask after confirm flow', async () => {
+  it('schedules delete (does not call deleteTask immediately)', async () => {
+    vi.useFakeTimers()
     wrapper = mount(TaskCard, { props: { task: openTask }, attachTo: document.body })
-    // open actions
     await wrapper.find('[aria-label="Действия"]').trigger('click')
     await wrapper.vm.$nextTick()
-    // click delete in action sheet
     const deleteBtn = Array.from(document.querySelectorAll('button')).find((b) =>
       b.textContent?.includes('Удалить'),
     )
     deleteBtn?.click()
     await wrapper.vm.$nextTick()
-    // confirm
     const confirmBtn = Array.from(document.querySelectorAll('button')).find(
       (b) => b.textContent?.trim() === 'Удалить',
     )
     confirmBtn?.click()
     await wrapper.vm.$nextTick()
+    // not yet — pending 5s
+    expect(mockDelete).not.toHaveBeenCalled()
+    // after 5s → fires
+    vi.advanceTimersByTime(5000)
     expect(mockDelete).toHaveBeenCalledWith('t1')
+    vi.useRealTimers()
+  })
+
+  it('undo cancels scheduled delete', async () => {
+    vi.useFakeTimers()
+    wrapper = mount(TaskCard, { props: { task: openTask }, attachTo: document.body })
+    await wrapper.find('[aria-label="Действия"]').trigger('click')
+    await wrapper.vm.$nextTick()
+    const deleteBtn = Array.from(document.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Удалить'),
+    )
+    deleteBtn?.click()
+    await wrapper.vm.$nextTick()
+    const confirmBtn = Array.from(document.querySelectorAll('button')).find(
+      (b) => b.textContent?.trim() === 'Удалить',
+    )
+    confirmBtn?.click()
+    await wrapper.vm.$nextTick()
+    // cancel via undo
+    useUndoDelete().pending.value!.cancel()
+    vi.advanceTimersByTime(5000)
+    expect(mockDelete).not.toHaveBeenCalled()
+    vi.useRealTimers()
+  })
+
+  it('shows resistance badge when resistanceResolved is false', () => {
+    wrapper = mount(TaskCard, { props: { task: openTask }, attachTo: document.body })
+    const badge = wrapper.find('[aria-label="Есть сопротивление — нажми, чтобы преодолеть"]')
+    expect(badge.exists()).toBe(true)
+  })
+
+  it('hides resistance badge when resistanceResolved is true', () => {
+    const resolvedTask = { ...openTask, resistanceResolved: true }
+    wrapper = mount(TaskCard, { props: { task: resolvedTask }, attachTo: document.body })
+    const badge = wrapper.find('[aria-label="Есть сопротивление — нажми, чтобы преодолеть"]')
+    expect(badge.exists()).toBe(false)
+  })
+
+  it('clicking resistance badge calls resolveResistance and celebrate', async () => {
+    wrapper = mount(TaskCard, { props: { task: openTask }, attachTo: document.body })
+    const badge = wrapper.find('[aria-label="Есть сопротивление — нажми, чтобы преодолеть"]')
+    await badge.trigger('click')
+    expect(mockResolve).toHaveBeenCalledWith('t1')
+    expect(mockCelebrate).toHaveBeenCalled()
   })
 })

@@ -82,7 +82,9 @@ function selectTheme(id: string) {
             v-for="th in THEMES"
             :key="th.id"
             type="button"
-            class="flex w-14 cursor-pointer flex-col items-center gap-1.5 border-none bg-transparent p-0"
+            class="flex w-14 cursor-pointer flex-col items-center gap-1.5 rounded-lg border-none bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)] focus-visible:ring-offset-2"
+            :aria-label="t('profile.themes.' + th.id)"
+            :aria-pressed="profile?.theme === th.id"
             @click="selectTheme(th.id)"
           >
             <div
@@ -126,7 +128,9 @@ function selectTheme(id: string) {
             v-for="th in A11Y_THEMES"
             :key="th.id"
             type="button"
-            class="flex w-14 cursor-pointer flex-col items-center gap-1.5 border-none bg-transparent p-0"
+            class="flex w-14 cursor-pointer flex-col items-center gap-1.5 rounded-lg border-none bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)] focus-visible:ring-offset-2"
+            :aria-label="t('profile.themes.' + th.id)"
+            :aria-pressed="profile?.theme === th.id"
             @click="selectTheme(th.id)"
           >
             <div
