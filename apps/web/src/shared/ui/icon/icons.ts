@@ -24,6 +24,7 @@ export const IC = {
   eye: 'M2.06 12.34a1 1 0 0 1 0-.68 10.5 10.5 0 0 1 19.88 0 1 1 0 0 1 0 .68 10.5 10.5 0 0 1-19.88 0z',
   cloud: 'M17.5 19a4.5 4.5 0 1 0 0-9 .2.2 0 0 1-.2-.16A6 6 0 1 0 6.5 19z',
   repeat: 'M17 2l4 4-4 4 M3 11V9a4 4 0 0 1 4-4h14 M7 22l-4-4 4-4 M21 13v2a4 4 0 0 1-4 4H3',
+  arrowR: 'M5 12h14 M12 5l7 7-7 7',
 } as const
 
 export type IconName = keyof typeof IC

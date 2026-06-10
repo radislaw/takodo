@@ -35,9 +35,24 @@ describe('TodayTaskCard', () => {
 
   it('emits toggleMit on zap button click', async () => {
     const wrapper = mountCard()
-    const mitBtn = wrapper.find('button[aria-label]')
+    // first aria-label button is "На завтра", second is "Главное"
+    const buttons = wrapper.findAll('button[aria-label]')
+    const mitBtn = buttons[buttons.length - 1]
     await mitBtn.trigger('click')
     expect(wrapper.emitted('toggleMit')?.[0]).toEqual(['e1', false])
+  })
+
+  it('emits moveTomorrow on arrow button click for active task', async () => {
+    const wrapper = mountCard()
+    const arrowBtn = wrapper.find('[aria-label="На завтра"]')
+    expect(arrowBtn.exists()).toBe(true)
+    await arrowBtn.trigger('click')
+    expect(wrapper.emitted('moveTomorrow')?.[0]).toEqual(['e1', 't1'])
+  })
+
+  it('hides moveTomorrow button for done task', () => {
+    const wrapper = mountCard({ task: { ...TASK, status: 'done' } })
+    expect(wrapper.find('[aria-label="На завтра"]').exists()).toBe(false)
   })
 
   it('shows MIT badge when isMIT is true', () => {

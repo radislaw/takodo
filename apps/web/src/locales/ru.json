@@ -149,6 +149,9 @@
     "saveFailed": "Не получилось сохранить — попробуй ещё раз",
     "addFailed": "Не удалось добавить — текст сохранён"
   },
+  "success": {
+    "addedToToday": "Добавлено в список на сегодня"
+  },
   "undo": {
     "taskDeleted": "Задача удалена",
     "cancel": "Отменить"
@@ -199,6 +202,7 @@
       "estimate": "Оценка",
       "estimateOk": "ОК",
       "resolve": "Я могу это",
+      "addToToday": "+ в сегодня",
       "delete": "Удалить"
     },
     "confirmDelete": {
@@ -254,7 +258,9 @@
       "placeholder": "Например: налить себе воды",
       "categoryLabel": "Категория",
       "button": "Добавить в список"
-    }
+    },
+    "moveTomorrow": "На завтра",
+    "movedTomorrow": "Перенесено на завтра"
   },
   "a11y": {
     "mainNav": "Основная навигация"

@@ -7,6 +7,13 @@ export function todayDate(timeZone?: string): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
 }
 
+export function tomorrowDate(timeZone?: string): string {
+  const tz = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d)
+}
+
 export async function fetchDailyByDate(date: string) {
   const { data, response } = await apiClient.GET('/daily/{date}', {
     params: { path: { date } },
@@ -86,6 +93,45 @@ export function useUpdateDailyEntry() {
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
+    },
+  })
+}
+
+export function useMoveToTomorrow() {
+  const queryCache = useQueryCache()
+  const { showError } = useErrorToast()
+  const today = todayDate()
+  const tomorrow = tomorrowDate()
+  return useMutation({
+    mutation: async ({ entryId, taskId }: { entryId: string; taskId: string }) => {
+      // ensure tomorrow's daily list exists
+      const { response } = await apiClient.GET('/daily/{date}', {
+        params: { path: { date: tomorrow } },
+      })
+      if (response.status === 404) {
+        const { data: created } = await apiClient.POST('/daily', { body: { date: tomorrow } })
+        if (!created) throw new Error('Failed to create tomorrow daily list')
+      }
+
+      // add to tomorrow first so we never lose the task
+      const { data, error } = await apiClient.POST('/daily/{date}/entries', {
+        params: { path: { date: tomorrow } },
+        body: { taskId },
+      })
+      if (error) throw new Error(error.message)
+
+      // remove from today
+      await apiClient.DELETE('/daily/{date}/entries/{entryId}', {
+        params: { path: { date: today, entryId } },
+      })
+
+      return data!
+    },
+    onError: () => {
+      showError('errors.saveFailed')
+    },
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ['daily', today], exact: true })
     },
   })
 }

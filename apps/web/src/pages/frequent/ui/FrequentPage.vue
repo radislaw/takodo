@@ -3,17 +3,20 @@ import { useI18n } from 'vue-i18n'
 import { useQueryCache } from '@pinia/colada'
 import { AppIcon, AppButton } from '@/shared/ui'
 import { useFrequent, useCreateTask, useAddDailyEntry } from '@/shared/api'
+import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 
 const { t } = useI18n({ useScope: 'global' })
 const queryCache = useQueryCache()
 const { data: frequent, isPending } = useFrequent()
 const { mutateAsync: createTask } = useCreateTask()
 const { mutateAsync: addEntry } = useAddDailyEntry()
+const { showSuccess } = useSuccessToast()
 
 async function handleReAdd(title: string) {
   const task = await createTask({ title })
   await addEntry(task.id)
   queryCache.invalidateQueries({ key: ['frequent'] })
+  showSuccess('success.addedToToday')
 }
 </script>
 

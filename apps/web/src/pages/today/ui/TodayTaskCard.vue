@@ -27,6 +27,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   toggleDone: [taskId: string, currentStatus: string]
   toggleMit: [entryId: string, currentMIT: boolean]
+  moveTomorrow: [entryId: string, taskId: string]
 }>()
 
 const { t } = useI18n({ useScope: 'global' })
@@ -112,6 +113,18 @@ function handleToggleMit() {
           </div>
         </div>
       </div>
+
+      <!-- Move to tomorrow (active tasks only) -->
+      <button
+        v-if="!isDone"
+        type="button"
+        class="text-ink-soft hover:text-ink flex-shrink-0 cursor-pointer transition-colors"
+        :class="{ 'mt-0.5': hasBottomRow }"
+        :aria-label="t('today.moveTomorrow')"
+        @click="emit('moveTomorrow', entry.id, entry.taskId)"
+      >
+        <AppIcon name="arrowR" :size="16" />
+      </button>
 
       <!-- MIT button -->
       <button

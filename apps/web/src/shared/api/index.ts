@@ -1,9 +1,11 @@
 export {
   useDailyToday,
   useAddDailyEntry,
+  useMoveToTomorrow,
   useUpdateDailyEntry,
   useRemoveDailyEntry,
   todayDate,
+  tomorrowDate,
   fetchDailyByDate,
 } from './daily'
 export {
