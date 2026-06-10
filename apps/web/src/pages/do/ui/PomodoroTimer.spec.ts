@@ -120,6 +120,22 @@ describe('PomodoroTimer', () => {
     expect(wrapper.text()).not.toContain('мин')
   })
 
+  it('renders one tomato icon per pomodoro', () => {
+    const wrapper = mountTimer({ focusSeconds: 1500, pomodoros: 3 })
+    expect(wrapper.findAll('[name="tomato"]')).toHaveLength(3)
+  })
+
+  it('caps tomato icons at 5 and shows overflow count', () => {
+    const wrapper = mountTimer({ focusSeconds: 1500, pomodoros: 8 })
+    expect(wrapper.findAll('[name="tomato"]')).toHaveLength(5)
+    expect(wrapper.text()).toContain('+3')
+  })
+
+  it('renders no tomato icons when pomodoros=0', () => {
+    const wrapper = mountTimer({ focusSeconds: 1500, pomodoros: 0 })
+    expect(wrapper.findAll('[name="tomato"]')).toHaveLength(0)
+  })
+
   it('shows ripple on completion when motion allowed', async () => {
     const wrapper = mountTimer()
     await wrapper.find('[aria-label="Старт"]').trigger('click')

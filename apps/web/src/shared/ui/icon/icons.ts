@@ -29,6 +29,8 @@ export const IC = {
   pause: 'M6 4h4v16H6z M14 4h4v16h-4z',
   rotateCcw: 'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5',
   timer: 'M10 2h4 M12 14l3-3 M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
+  tomato:
+    'M12 22a7 7 0 1 0 0-14 7 7 0 0 0 0 14z M12 8V5 M12 8c-1.2-1.6-3.2-2.2-5-1.6 M12 8c1.2-1.6 3.2-2.2 5-1.6',
 } as const
 
 export type IconName = keyof typeof IC

@@ -51,18 +51,15 @@ const ringGradient = computed(() => {
   return `conic-gradient(${fill} ${pct}%, ${track} ${pct}% 100%)`
 })
 
-const hasStats = computed(() => props.focusSeconds > 0 || props.pomodoros > 0)
+const MAX_TOMATOES = 5
 
-const statsText = computed(() => {
-  const parts: string[] = []
-  if (props.pomodoros > 0) {
-    parts.push(t('do.pomodoro.statsPomodoros', props.pomodoros))
-  }
-  if (props.focusSeconds > 0) {
-    parts.push(formatFocusDuration(props.focusSeconds, t))
-  }
-  return parts.join(' · ')
-})
+const hasStats = computed(() => props.focusSeconds > 0 || props.pomodoros > 0)
+const visibleTomatoes = computed(() => Math.min(props.pomodoros, MAX_TOMATOES))
+const tomatoOverflow = computed(() => Math.max(props.pomodoros - MAX_TOMATOES, 0))
+const overflowText = computed(() => `+${tomatoOverflow.value}`)
+const focusTimeText = computed(() =>
+  props.focusSeconds > 0 ? formatFocusDuration(props.focusSeconds, t) : '',
+)
 
 function toggleStartPause() {
   if (status.value === 'running') {
@@ -142,8 +139,25 @@ defineExpose({ flushAndReset: handleReset })
       v-if="hasStats"
       class="font-body text-ink-soft flex items-center gap-1.5 text-xs font-semibold"
     >
-      <AppIcon name="timer" :size="13" class="flex-shrink-0" />
-      {{ statsText }}
+      <span
+        v-if="pomodoros > 0"
+        role="img"
+        :aria-label="t('do.pomodoro.count', pomodoros)"
+        class="text-apricot-deep flex items-center gap-0.5"
+      >
+        <AppIcon
+          v-for="i in visibleTomatoes"
+          :key="i"
+          name="tomato"
+          :size="14"
+          aria-hidden="true"
+        />
+        <span v-if="tomatoOverflow > 0" aria-hidden="true">{{ overflowText }}</span>
+      </span>
+      <template v-if="focusTimeText">
+        <AppIcon name="timer" :size="13" class="flex-shrink-0" />
+        {{ focusTimeText }}
+      </template>
     </p>
   </div>
 </template>
