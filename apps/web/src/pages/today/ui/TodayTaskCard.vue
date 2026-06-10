@@ -114,6 +114,18 @@ function handleToggleMit() {
         </div>
       </div>
 
+      <!-- Start Do-mode with this task (active tasks only) -->
+      <button
+        v-if="!isDone"
+        type="button"
+        class="text-ink-soft hover:text-sage flex-shrink-0 cursor-pointer transition-colors"
+        :class="{ 'mt-0.5': hasBottomRow }"
+        :aria-label="t('do.startWith')"
+        @click="router.push(`/do?task=${entry.taskId}`)"
+      >
+        <AppIcon name="play" :size="16" />
+      </button>
+
       <!-- Move to tomorrow (active tasks only) -->
       <button
         v-if="!isDone"
