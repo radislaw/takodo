@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
 import { apiClient } from '@/api/client'
+import { useErrorToast } from '@/shared/lib/useErrorToast'
 type Theme =
   | 'light'
   | 'lavender'
@@ -27,11 +28,15 @@ export function useProfile() {
 
 export function useUpdateProfile() {
   const queryCache = useQueryCache()
+  const { showError } = useErrorToast()
   return useMutation({
     mutation: async (body: { name?: string; theme?: Theme }) => {
       const { data } = await apiClient.PATCH('/me', { body })
       if (!data) throw new Error('Failed to update profile')
       return data
+    },
+    onError: () => {
+      showError('errors.saveFailed')
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['profile'], exact: true })

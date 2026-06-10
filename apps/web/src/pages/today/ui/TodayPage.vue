@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppProgressRing, AppToast, AppIcon, AppButton, AppInput } from '@/shared/ui'
 import {
@@ -13,9 +13,11 @@ import {
   useProfile,
   useRewards,
 } from '@/shared/api'
+import { useErrorToast } from '@/shared/lib/useErrorToast'
 import TodayTaskCard from './TodayTaskCard.vue'
 
 const { t } = useI18n({ useScope: 'global' })
+const { showError } = useErrorToast()
 
 const { data: daily, isPending } = useDailyToday()
 const { data: taskList } = useTasks()
@@ -34,6 +36,7 @@ const newCategory = ref<'home' | 'health' | 'work' | 'self' | null>(null)
 const isAdding = ref(false)
 const showMitLimitToast = ref(false)
 let mitToastTimer: ReturnType<typeof setTimeout> | null = null
+const inputRef = ref<InstanceType<typeof AppInput> | null>(null)
 
 const CATEGORIES = ['home', 'health', 'work', 'self'] as const
 
@@ -87,6 +90,8 @@ const doneCount = computed(
   () => entries.value.filter((e) => taskMap.value.get(e.taskId)?.status === 'done').length,
 )
 
+const mitCount = computed(() => entries.value.filter((e) => e.isMIT).length)
+
 const activeEntries = computed(() =>
   entries.value
     .filter((e) => taskMap.value.get(e.taskId)?.status !== 'done')
@@ -115,6 +120,10 @@ function closeSheet() {
   showSheet.value = false
 }
 
+function focusInput() {
+  inputRef.value?.focus()
+}
+
 async function handleAdd() {
   const title = newTitle.value.trim()
   if (!title) return
@@ -125,7 +134,11 @@ async function handleAdd() {
       ...(newCategory.value ? { category: newCategory.value } : {}),
     })
     await addEntryAsync(task.id)
-    closeSheet()
+    newTitle.value = ''
+    newCategory.value = null
+    nextTick(() => inputRef.value?.focus())
+  } catch {
+    showError('errors.addFailed')
   } finally {
     isAdding.value = false
   }
@@ -180,14 +193,25 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
         />
         <div class="min-w-0 flex-1">
           <p class="font-body text-ink text-sm leading-snug font-semibold">{{ summaryMsg }}</p>
-          <div
-            v-if="streak > 0"
-            class="bg-apricot/15 mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1"
-          >
-            <AppIcon name="flame" :size="13" class="text-apricot-deep" />
-            <span class="text-apricot-deep text-xs font-bold">
-              {{ t('today.streak', { days: streak }) }}
-            </span>
+          <div v-if="streak > 0 || entries.length > 0" class="mt-2 flex flex-wrap gap-1.5">
+            <div
+              v-if="streak > 0"
+              class="bg-apricot/15 inline-flex items-center gap-1 rounded-full px-2.5 py-1"
+            >
+              <AppIcon name="flame" :size="13" class="text-apricot-deep" />
+              <span class="text-apricot-deep text-xs font-bold">
+                {{ t('today.streak', { days: streak }) }}
+              </span>
+            </div>
+            <div
+              v-if="entries.length > 0"
+              class="bg-sage/10 inline-flex items-center gap-1 rounded-full px-2.5 py-1"
+            >
+              <AppIcon name="zap" :size="13" class="text-sage-deep" />
+              <span class="text-sage-deep text-xs font-bold">{{
+                t('today.mitCounter', { count: mitCount })
+              }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -261,7 +285,7 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
 
     <!-- Add sheet -->
     <Teleport to="body">
-      <Transition name="sheet" :duration="{ enter: 300, leave: 250 }">
+      <Transition name="sheet" :duration="{ enter: 300, leave: 250 }" @after-enter="focusInput">
         <div v-if="showSheet" class="fixed inset-0 z-50 flex flex-col justify-end">
           <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="closeSheet" />
           <div
@@ -285,10 +309,12 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
             </div>
 
             <AppInput
+              ref="inputRef"
               v-model="newTitle"
               :placeholder="t('today.add.placeholder')"
               class="mb-4"
               @keydown.enter="handleAdd"
+              @keydown.esc="closeSheet"
             />
 
             <p class="text-ink-soft mb-2 text-xs font-semibold">
