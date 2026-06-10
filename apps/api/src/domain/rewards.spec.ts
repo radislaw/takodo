@@ -192,4 +192,31 @@ describe('streak shields', () => {
     expect(badge?.earned).toBe(false)
     expect(badge?.remaining).toBe(11)
   })
+
+  describe('gentle_mode badge', () => {
+    it('not earned at 0 gentleMoves', () => {
+      const r = computeRewards([], NOW, 0)
+      const badge = r.badges.find((b) => b.id === 'gentle_mode')
+      expect(badge?.earned).toBe(false)
+    })
+
+    it('not earned at 2 gentleMoves, remaining = 1', () => {
+      const r = computeRewards([], NOW, 2)
+      const badge = r.badges.find((b) => b.id === 'gentle_mode')
+      expect(badge?.earned).toBe(false)
+      expect(badge?.remaining).toBe(1)
+    })
+
+    it('earned at 3 gentleMoves', () => {
+      const r = computeRewards([], NOW, 3)
+      const badge = r.badges.find((b) => b.id === 'gentle_mode')
+      expect(badge?.earned).toBe(true)
+    })
+
+    it('earned at 10 gentleMoves', () => {
+      const r = computeRewards([], NOW, 10)
+      const badge = r.badges.find((b) => b.id === 'gentle_mode')
+      expect(badge?.earned).toBe(true)
+    })
+  })
 })

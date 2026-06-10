@@ -101,30 +101,13 @@ export function useMoveToTomorrow() {
   const queryCache = useQueryCache()
   const { showError } = useErrorToast()
   const today = todayDate()
-  const tomorrow = tomorrowDate()
   return useMutation({
-    mutation: async ({ entryId, taskId }: { entryId: string; taskId: string }) => {
-      // ensure tomorrow's daily list exists
-      const { response } = await apiClient.GET('/daily/{date}', {
-        params: { path: { date: tomorrow } },
-      })
-      if (response.status === 404) {
-        const { data: created } = await apiClient.POST('/daily', { body: { date: tomorrow } })
-        if (!created) throw new Error('Failed to create tomorrow daily list')
-      }
-
-      // add to tomorrow first so we never lose the task
-      const { data, error } = await apiClient.POST('/daily/{date}/entries', {
-        params: { path: { date: tomorrow } },
-        body: { taskId },
-      })
+    mutation: async ({ entryId }: { entryId: string; taskId: string }) => {
+      const { data, error } = await apiClient.POST(
+        '/daily/{date}/entries/{entryId}/move-to-tomorrow',
+        { params: { path: { date: today, entryId } } },
+      )
       if (error) throw new Error(error.message)
-
-      // remove from today
-      await apiClient.DELETE('/daily/{date}/entries/{entryId}', {
-        params: { path: { date: today, entryId } },
-      })
-
       return data!
     },
     onError: () => {

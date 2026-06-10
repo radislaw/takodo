@@ -13,6 +13,7 @@ function makeUser(overrides: Partial<User> = {}): User {
     email: 'test@example.com',
     name: 'Аня',
     theme: 'light',
+    gentleMoves: 0,
     createdAt: new Date('2024-01-01T00:00:00Z'),
     ...overrides,
   }

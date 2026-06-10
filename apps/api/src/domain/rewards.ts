@@ -80,7 +80,11 @@ function replayStreak(activeDays: Set<string>, nowDate: Date): StreakReplay {
   return result
 }
 
-export function computeRewards(completedAts: Date[], nowDate: Date): RewardsSummaryResult {
+export function computeRewards(
+  completedAts: Date[],
+  nowDate: Date,
+  gentleMoves = 0,
+): RewardsSummaryResult {
   const activeDays = new Set(completedAts.map(toDateStr))
   const { streak, longest, shields, shieldedDays } = replayStreak(activeDays, nowDate)
 
@@ -113,8 +117,11 @@ export function computeRewards(completedAts: Date[], nowDate: Date): RewardsSumm
     streakBadge('streak_5', 5),
     streakBadge('streak_7', 7),
     streakBadge('streak_21', 21),
-    // TODO: track reschedule events when "gentle mode" mechanic is implemented
-    { id: 'gentle_mode', earned: false },
+    {
+      id: 'gentle_mode',
+      earned: gentleMoves >= 3,
+      ...(gentleMoves < 3 ? { remaining: 3 - gentleMoves } : {}),
+    },
   ]
 
   return { streak, longestStreak: longest, shields, shieldUsedRecently, week, badges }

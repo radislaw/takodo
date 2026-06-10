@@ -69,6 +69,23 @@ export interface paths {
         patch: operations["Daily_updateEntry"];
         trace?: never;
     };
+    "/daily/{date}/entries/{entryId}/move-to-tomorrow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Move an entry from this day to tomorrow atomically. Increments the user's gentleMoves counter. */
+        post: operations["Daily_moveToTomorrow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frequent": {
         parameters: {
             query?: never;
@@ -577,6 +594,38 @@ export interface operations {
                 "application/json": components["schemas"]["EntryUpdate"];
             };
         };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DailyEntry"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Daily_moveToTomorrow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description The request has succeeded. */
             200: {

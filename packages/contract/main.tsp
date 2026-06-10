@@ -210,6 +210,12 @@ interface Daily {
     @path date: plainDate,
     @path entryId: string,
   ): void | ApiError;
+
+  /** Move an entry from this day to tomorrow atomically. Increments the user's gentleMoves counter. */
+  @route("/{date}/entries/{entryId}/move-to-tomorrow") @post moveToTomorrow(
+    @path date: plainDate,
+    @path entryId: string,
+  ): DailyEntry | ApiError;
 }
 
 // ─── Profile / Me ───────────────────────────────────────────────
