@@ -5,6 +5,7 @@ import DoPage from './DoPage.vue'
 
 const mockCompleteTask = vi.fn()
 const mockPush = vi.fn()
+const routeQuery = ref<Record<string, string>>({})
 
 const dailyData = ref<
   | {
@@ -26,6 +27,7 @@ vi.mock('@/shared/api', () => ({
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: mockPush }),
+  useRoute: () => ({ query: routeQuery.value }),
 }))
 
 function mountPage() {
@@ -59,6 +61,7 @@ beforeEach(() => {
   mockCompleteTask.mockResolvedValue({})
   dailyData.value = undefined
   tasksData.value = []
+  routeQuery.value = {}
 })
 
 describe('DoPage', () => {
@@ -182,6 +185,48 @@ describe('DoPage', () => {
     const wrapper = mountPage()
     await findButton(wrapper, 'К списку')!.trigger('click')
     expect(mockPush).toHaveBeenCalledWith('/today')
+  })
+
+  it('starts with the task from the query param even when another is MIT', () => {
+    routeQuery.value = { task: 't2' }
+    setData(
+      [
+        { id: 't1', title: 'Wash dishes', status: 'open' },
+        { id: 't2', title: 'Call mom', status: 'open' },
+      ],
+      [{ taskId: 't1', isMIT: true }, { taskId: 't2' }],
+    )
+    const wrapper = mountPage()
+    expect(wrapper.text()).toContain('Call mom')
+    expect(wrapper.text()).not.toContain('Wash dishes')
+  })
+
+  it('moves the query-param task to the end on skip', async () => {
+    routeQuery.value = { task: 't2' }
+    setData(
+      [
+        { id: 't1', title: 'Wash dishes', status: 'open' },
+        { id: 't2', title: 'Call mom', status: 'open' },
+      ],
+      [{ taskId: 't1' }, { taskId: 't2' }],
+    )
+    const wrapper = mountPage()
+    await findButton(wrapper, 'Не сейчас')!.trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toContain('Wash dishes')
+  })
+
+  it('falls back to normal queue when query-param task is done', () => {
+    routeQuery.value = { task: 't2' }
+    setData(
+      [
+        { id: 't1', title: 'Wash dishes', status: 'open' },
+        { id: 't2', title: 'Call mom', status: 'done' },
+      ],
+      [{ taskId: 't1' }, { taskId: 't2' }],
+    )
+    const wrapper = mountPage()
+    expect(wrapper.text()).toContain('Wash dishes')
   })
 
   it('close button navigates to today', async () => {

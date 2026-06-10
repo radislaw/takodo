@@ -2,8 +2,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TodayTaskCard from './TodayTaskCard.vue'
 
+const mockPush = vi.fn()
+
 vi.mock('vue-router', () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: mockPush }),
 }))
 
 const ENTRY = { id: 'e1', taskId: 't1', isMIT: false }
@@ -59,6 +61,19 @@ describe('TodayTaskCard', () => {
     const wrapper = mountCard({ entry: { ...ENTRY, isMIT: true } })
     expect(wrapper.findComponent({ name: 'AppBadge' }).exists()).toBe(true)
     expect(wrapper.text()).toContain('Главное')
+  })
+
+  it('navigates to do-mode with task id on play button click', async () => {
+    const wrapper = mountCard()
+    const playBtn = wrapper.find('[aria-label="Начать с этого дела"]')
+    expect(playBtn.exists()).toBe(true)
+    await playBtn.trigger('click')
+    expect(mockPush).toHaveBeenCalledWith('/do?task=t1')
+  })
+
+  it('hides play button for done task', () => {
+    const wrapper = mountCard({ task: { ...TASK, status: 'done' } })
+    expect(wrapper.find('[aria-label="Начать с этого дела"]').exists()).toBe(false)
   })
 
   it('shows subtask counter when childTotal > 0', () => {

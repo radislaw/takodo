@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppIcon, AppButton } from '@/shared/ui'
 import { useDailyToday, useTasks, useCompleteTask } from '@/shared/api'
 
+const route = useRoute()
 const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
+
+const startId = typeof route.query.task === 'string' ? route.query.task : undefined
 
 const { data: daily, isPending } = useDailyToday()
 const { data: taskList } = useTasks()
@@ -39,7 +42,13 @@ const queue = computed(() => {
         taskMap.value.get(e.taskId)?.status !== 'done' && !completingIds.value.includes(e.taskId),
     )
     .sort((a, b) => Number(b.isMIT) - Number(a.isMIT) || a.order - b.order)
-  const fresh = active.filter((e) => !skippedIds.value.includes(e.taskId))
+  const notSkipped = active.filter((e) => !skippedIds.value.includes(e.taskId))
+  const fresh = startId
+    ? [
+        ...notSkipped.filter((e) => e.taskId === startId),
+        ...notSkipped.filter((e) => e.taskId !== startId),
+      ]
+    : notSkipped
   const skipped = skippedIds.value
     .map((id) => active.find((e) => e.taskId === id))
     .filter((e): e is NonNullable<typeof e> => e !== undefined)
