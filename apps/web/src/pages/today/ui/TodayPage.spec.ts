@@ -4,7 +4,6 @@ import { ref } from 'vue'
 import TodayPage from './TodayPage.vue'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
 
-const mockPush = vi.fn()
 const mockCreateTask = vi.fn()
 const mockAddEntry = vi.fn()
 const mockCompleteTask = vi.fn()
@@ -25,7 +24,7 @@ const dailyData = ref<
 const tasksData = ref<{ id: string; parentId: string | null; title: string; status: string }[]>([])
 
 vi.mock('vue-router', () => ({
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: vi.fn() }),
 }))
 
 vi.mock('@/shared/api', () => ({
@@ -261,25 +260,8 @@ describe('TodayPage', () => {
     expect(wrapper.text()).toContain('Главных дел уже 3')
   })
 
-  it('shows Do-mode button when active entries exist and navigates to /do', async () => {
+  it('does not render Do-mode entry button (entry point is on task cards)', async () => {
     tasksData.value = [{ id: 't1', parentId: null, title: 'Task', status: 'open' }]
-    dailyData.value = {
-      id: 'list-1',
-      date: '2026-06-05',
-      createdAt: '2026-06-05T00:00:00Z',
-      entries: [{ id: 'e1', taskId: 't1', isMIT: false, order: 0 }],
-    }
-    const wrapper = mountPage()
-    await wrapper.vm.$nextTick()
-
-    const doBtn = wrapper.findAll('button').find((b) => b.text().includes('Что сейчас?'))
-    expect(doBtn).toBeDefined()
-    await doBtn!.trigger('click')
-    expect(mockPush).toHaveBeenCalledWith('/do')
-  })
-
-  it('hides Do-mode button when all tasks done', async () => {
-    tasksData.value = [{ id: 't1', parentId: null, title: 'Task', status: 'done' }]
     dailyData.value = {
       id: 'list-1',
       date: '2026-06-05',
