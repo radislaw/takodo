@@ -37,7 +37,7 @@ describe('TodayTaskCard', () => {
     const wrapper = mountCard()
     // first aria-label button is "На завтра", second is "Главное"
     const buttons = wrapper.findAll('button[aria-label]')
-    const mitBtn = buttons[buttons.length - 1]
+    const mitBtn = buttons[buttons.length - 1]!
     await mitBtn.trigger('click')
     expect(wrapper.emitted('toggleMit')?.[0]).toEqual(['e1', false])
   })
