@@ -147,5 +147,52 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       await prisma.dailyEntry.delete({ where: { id: entryId } })
       return reply.status(204).send()
     },
+
+    async Daily_moveToTomorrow(req: FastifyRequest, reply: FastifyReply) {
+      const userId = await getUserId()
+      const { date, entryId } = req.params as { date: string; entryId: string }
+      const today = parseDate(date)
+      const tomorrow = new Date(today)
+      tomorrow.setUTCDate(tomorrow.getUTCDate() + 1)
+
+      const todayList = await prisma.dailyList.findUnique({
+        where: { userId_date: { userId, date: today } },
+        include: { entries: { where: { id: entryId } } },
+      })
+      if (!todayList || todayList.entries.length === 0) {
+        return reply.status(404).send({ code: 'not_found', message: 'Entry not found' })
+      }
+      const entry = todayList.entries[0]!
+
+      const newEntry = await prisma.$transaction(async (tx) => {
+        const tomorrowList = await tx.dailyList.upsert({
+          where: { userId_date: { userId, date: tomorrow } },
+          create: { userId, date: tomorrow },
+          update: {},
+        })
+        const lastEntry = await tx.dailyEntry.findFirst({
+          where: { dailyListId: tomorrowList.id },
+          orderBy: { order: 'desc' },
+        })
+        const created = await tx.dailyEntry.create({
+          data: {
+            dailyListId: tomorrowList.id,
+            taskId: entry.taskId,
+            isMIT: false,
+            order: (lastEntry?.order ?? -1) + 1,
+          },
+        })
+        await tx.dailyEntry.delete({ where: { id: entryId } })
+        await tx.user.update({ where: { id: userId }, data: { gentleMoves: { increment: 1 } } })
+        return created
+      })
+
+      return {
+        id: newEntry.id,
+        taskId: newEntry.taskId,
+        isMIT: newEntry.isMIT,
+        order: newEntry.order,
+      }
+    },
   }
 }

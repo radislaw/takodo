@@ -179,4 +179,101 @@ describe('Daily routes', () => {
       expect(res.statusCode).toBe(404)
     })
   })
+
+  describe('POST /daily/:date/entries/:entryId/move-to-tomorrow', () => {
+    it('returns 404 when entry not found', async () => {
+      prisma.dailyList.findUnique.mockResolvedValue({ ...makeList(), entries: [] } as Parameters<
+        typeof prisma.dailyList.findUnique.mockResolvedValue
+      >[0])
+      const res = await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/entries/entry-1/move-to-tomorrow',
+      })
+      expect(res.statusCode).toBe(404)
+    })
+
+    it('moves entry atomically and returns new entry', async () => {
+      prisma.dailyList.findUnique.mockResolvedValue({
+        ...makeList(),
+        entries: [makeEntry()],
+      } as Parameters<typeof prisma.dailyList.findUnique.mockResolvedValue>[0])
+      const tomorrowList = makeList({ id: 'list-2', date: new Date('2024-01-16T00:00:00.000Z') })
+      prisma.dailyList.upsert.mockResolvedValue(tomorrowList)
+      prisma.dailyEntry.findFirst.mockResolvedValue(null)
+      const newEntry = makeEntry({ id: 'entry-2', dailyListId: 'list-2', order: 0 })
+      prisma.dailyEntry.create.mockResolvedValue(newEntry)
+      prisma.dailyEntry.delete.mockResolvedValue(makeEntry())
+      prisma.user.update.mockResolvedValue({
+        id: 'user-1',
+        email: 'u@u.com',
+        name: '',
+        theme: 'light',
+        createdAt: new Date(),
+        gentleMoves: 1,
+      })
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/entries/entry-1/move-to-tomorrow',
+      })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as { id: string; taskId: string; isMIT: boolean; order: number }
+      expect(body.id).toBe('entry-2')
+      expect(body.isMIT).toBe(false)
+    })
+
+    it('uses $transaction', async () => {
+      prisma.dailyList.findUnique.mockResolvedValue({
+        ...makeList(),
+        entries: [makeEntry()],
+      } as Parameters<typeof prisma.dailyList.findUnique.mockResolvedValue>[0])
+      prisma.dailyList.upsert.mockResolvedValue(makeList({ id: 'list-2' }))
+      prisma.dailyEntry.findFirst.mockResolvedValue(null)
+      prisma.dailyEntry.create.mockResolvedValue(makeEntry({ id: 'entry-2' }))
+      prisma.dailyEntry.delete.mockResolvedValue(makeEntry())
+      prisma.user.update.mockResolvedValue({
+        id: 'user-1',
+        email: 'u@u.com',
+        name: '',
+        theme: 'light',
+        createdAt: new Date(),
+        gentleMoves: 1,
+      })
+
+      await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/entries/entry-1/move-to-tomorrow',
+      })
+      expect(prisma.$transaction).toHaveBeenCalledOnce()
+    })
+
+    it('increments gentleMoves on success', async () => {
+      prisma.dailyList.findUnique.mockResolvedValue({
+        ...makeList(),
+        entries: [makeEntry()],
+      } as Parameters<typeof prisma.dailyList.findUnique.mockResolvedValue>[0])
+      prisma.dailyList.upsert.mockResolvedValue(makeList({ id: 'list-2' }))
+      prisma.dailyEntry.findFirst.mockResolvedValue(null)
+      prisma.dailyEntry.create.mockResolvedValue(makeEntry({ id: 'entry-2' }))
+      prisma.dailyEntry.delete.mockResolvedValue(makeEntry())
+      prisma.user.update.mockResolvedValue({
+        id: 'user-1',
+        email: 'u@u.com',
+        name: '',
+        theme: 'light',
+        createdAt: new Date(),
+        gentleMoves: 1,
+      })
+
+      await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/entries/entry-1/move-to-tomorrow',
+      })
+      expect(prisma.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ gentleMoves: { increment: 1 } }),
+        }),
+      )
+    })
+  })
 })

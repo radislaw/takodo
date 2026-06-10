@@ -47,6 +47,7 @@ describe('Rewards routes', () => {
 
     it('all badges present', async () => {
       prisma.task.findMany.mockResolvedValue([])
+      prisma.user.findUnique.mockResolvedValue(null)
       const res = await app.inject({ method: 'GET', url: '/rewards' })
       const body = res.json() as { badges: { id: string }[] }
       const ids = body.badges.map((b) => b.id)
@@ -54,6 +55,21 @@ describe('Rewards routes', () => {
       expect(ids).toContain('streak_5')
       expect(ids).toContain('streak_7')
       expect(ids).toContain('gentle_mode')
+    })
+
+    it('gentle_mode badge earned when user has >= 3 gentleMoves', async () => {
+      prisma.task.findMany.mockResolvedValue([])
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        email: 'u@u.com',
+        name: '',
+        theme: 'light',
+        createdAt: new Date(),
+        gentleMoves: 3,
+      })
+      const res = await app.inject({ method: 'GET', url: '/rewards' })
+      const body = res.json() as { badges: { id: string; earned: boolean }[] }
+      expect(body.badges.find((b) => b.id === 'gentle_mode')?.earned).toBe(true)
     })
   })
 })

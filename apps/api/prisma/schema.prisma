@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id        String      @id @default(cuid())
-  email     String      @unique
-  name      String      @default("")
-  theme     String      @default("light")
-  createdAt DateTime    @default(now())
-  tasks     Task[]
-  dailyLists DailyList[]
+  id          String      @id @default(cuid())
+  email       String      @unique
+  name        String      @default("")
+  theme       String      @default("light")
+  gentleMoves Int         @default(0)
+  createdAt   DateTime    @default(now())
+  tasks       Task[]
+  dailyLists  DailyList[]
 }
 
 model Task {

@@ -150,6 +150,37 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       tags:
         - Daily
+  /daily/{date}/entries/{entryId}/move-to-tomorrow:
+    post:
+      operationId: Daily_moveToTomorrow
+      description: Move an entry from this day to tomorrow atomically. Increments the user's gentleMoves counter.
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyEntry'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
   /frequent:
     get:
       operationId: Frequent_list
