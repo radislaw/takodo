@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppIcon, LevelRing } from '@/shared/ui'
-import { useProfile, useUpdateProfile, useRewards } from '@/shared/api'
+import { useProfile, useUpdateProfile, useRewards, useNotifications } from '@/shared/api'
 import { isThemeUnlocked, themeUnlockLevel } from '@/shared/lib/unlocks'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -60,6 +60,26 @@ const A11Y_THEMES: ThemeMeta[] = [
 function selectTheme(id: string) {
   if (isLocked(id)) return
   updateProfile({ theme: id as ThemeId })
+}
+
+const {
+  isSupported: notifSupported,
+  isBlocked: notifBlocked,
+  isSubscribed,
+  isRequesting,
+  requestAndSubscribe,
+  unsubscribe,
+} = useNotifications()
+
+const notifMorning = computed(() => profile.value?.notifMorning ?? true)
+const notifEvening = computed(() => profile.value?.notifEvening ?? true)
+
+function toggleMorning() {
+  updateProfile({ notifMorning: !notifMorning.value })
+}
+
+function toggleEvening() {
+  updateProfile({ notifEvening: !notifEvening.value })
 }
 </script>
 
@@ -208,6 +228,117 @@ function selectTheme(id: string) {
             </span>
           </button>
         </div>
+      </div>
+
+      <!-- Notifications card -->
+      <div class="surface-card mt-5 rounded-2xl p-5 shadow-md" data-test="notifications-section">
+        <div class="mb-4 flex items-center gap-3">
+          <div
+            class="bg-sage-tint text-sage-deep flex h-10 w-10 items-center justify-center rounded-[11px]"
+          >
+            <AppIcon name="bell" :size="20" />
+          </div>
+          <div>
+            <div class="text-ink text-sm font-bold">{{ t('profile.notifications.label') }}</div>
+            <div class="text-ink-soft text-xs">{{ t('profile.notifications.sub') }}</div>
+          </div>
+        </div>
+
+        <!-- Unsupported -->
+        <p v-if="!notifSupported" class="text-ink-soft text-xs">
+          {{ t('profile.notifications.unsupported') }}
+        </p>
+
+        <!-- Permission blocked -->
+        <p v-else-if="notifBlocked" class="text-ink-soft text-xs">
+          {{ t('profile.notifications.permissionBlocked') }}
+        </p>
+
+        <template v-else>
+          <!-- Enable push button -->
+          <button
+            v-if="!isSubscribed"
+            type="button"
+            data-test="notif-enable-btn"
+            class="bg-sage mb-4 w-full cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-opacity disabled:opacity-60"
+            :disabled="isRequesting"
+            @click="requestAndSubscribe"
+          >
+            {{
+              isRequesting
+                ? t('profile.notifications.requesting')
+                : t('profile.notifications.enableCta')
+            }}
+          </button>
+
+          <template v-if="isSubscribed">
+            <!-- Morning toggle -->
+            <label
+              class="flex cursor-pointer items-center justify-between gap-4 py-2"
+              data-test="notif-morning"
+            >
+              <div>
+                <div class="text-ink text-sm font-semibold">
+                  {{ t('profile.notifications.morning') }}
+                </div>
+                <div class="text-ink-soft text-xs">
+                  {{ t('profile.notifications.morningHint') }}
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="notifMorning"
+                class="relative h-7 w-12 cursor-pointer rounded-full transition-colors"
+                :class="notifMorning ? 'bg-sage' : 'bg-line'"
+                @click="toggleMorning"
+              >
+                <span
+                  class="absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
+                  :class="notifMorning ? 'left-6' : 'left-1'"
+                />
+              </button>
+            </label>
+
+            <!-- Evening toggle -->
+            <label
+              class="flex cursor-pointer items-center justify-between gap-4 py-2"
+              data-test="notif-evening"
+            >
+              <div>
+                <div class="text-ink text-sm font-semibold">
+                  {{ t('profile.notifications.evening') }}
+                </div>
+                <div class="text-ink-soft text-xs">
+                  {{ t('profile.notifications.eveningHint') }}
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="notifEvening"
+                class="relative h-7 w-12 cursor-pointer rounded-full transition-colors"
+                :class="notifEvening ? 'bg-sage' : 'bg-line'"
+                @click="toggleEvening"
+              >
+                <span
+                  class="absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
+                  :class="notifEvening ? 'left-6' : 'left-1'"
+                />
+              </button>
+            </label>
+
+            <!-- Disable button -->
+            <button
+              type="button"
+              data-test="notif-disable-btn"
+              class="text-ink-soft mt-2 w-full cursor-pointer text-xs underline"
+              @click="unsubscribe"
+            >
+              {{ t('profile.notifications.disableCta') }}
+            </button>
+          </template>
+        </template>
       </div>
 
       <!-- Gentle note -->

@@ -12,6 +12,7 @@ tags:
   - name: Profile
   - name: Rewards
   - name: Quests
+  - name: Push
   - name: Frequent
 paths:
   /daily:
@@ -242,6 +243,69 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProfileUpdate'
+  /push/subscribe:
+    post:
+      operationId: Push_subscribe
+      description: Register a browser PushSubscription. Idempotent (upserts by endpoint).
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Push
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushSubscribeBody'
+    delete:
+      operationId: Push_unsubscribe
+      description: Remove a browser PushSubscription.
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Push
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushUnsubscribeBody'
+  /push/vapid-key:
+    get:
+      operationId: Push_getVapidKey
+      description: VAPID public key for the web client to create a PushSubscription.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VapidPublicKey'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Push
   /quests:
     get:
       operationId: Quests_list
@@ -686,6 +750,8 @@ components:
       required:
         - name
         - theme
+        - notifMorning
+        - notifEvening
       properties:
         name:
           type: string
@@ -693,6 +759,12 @@ components:
           description: Display name used in the greeting.
         theme:
           $ref: '#/components/schemas/Theme'
+        notifMorning:
+          type: boolean
+          description: Opt-in morning reminder (~9 AM).
+        notifEvening:
+          type: boolean
+          description: Opt-in evening reminder (~8 PM).
     ProfileUpdate:
       type: object
       properties:
@@ -703,6 +775,34 @@ components:
           allOf:
             - $ref: '#/components/schemas/Theme'
           description: Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level.
+        notifMorning:
+          type: boolean
+        notifEvening:
+          type: boolean
+    PushSubscribeBody:
+      type: object
+      required:
+        - endpoint
+        - p256dh
+        - auth
+      properties:
+        endpoint:
+          type: string
+          maxLength: 2048
+        p256dh:
+          type: string
+          maxLength: 256
+        auth:
+          type: string
+          maxLength: 64
+    PushUnsubscribeBody:
+      type: object
+      required:
+        - endpoint
+      properties:
+        endpoint:
+          type: string
+          maxLength: 2048
     Quest:
       type: object
       required:
@@ -965,3 +1065,10 @@ components:
         - amber
         - amoled
       description: Matches data-theme attribute values in tokens.css.
+    VapidPublicKey:
+      type: object
+      required:
+        - publicKey
+      properties:
+        publicKey:
+          type: string

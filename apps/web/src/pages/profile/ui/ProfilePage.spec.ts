@@ -17,9 +17,19 @@ const rewardsData = ref({
 })
 
 vi.mock('@/shared/api', () => ({
-  useProfile: () => ({ data: ref({ name: '', theme: 'light' }) }),
+  useProfile: () => ({
+    data: ref({ name: '', theme: 'light', notifMorning: true, notifEvening: true }),
+  }),
   useUpdateProfile: () => ({ mutate: mockUpdateProfile }),
   useRewards: () => ({ data: rewardsData }),
+  useNotifications: () => ({
+    isSupported: ref(true),
+    isBlocked: ref(false),
+    isSubscribed: ref(false),
+    isRequesting: ref(false),
+    requestAndSubscribe: vi.fn(),
+    unsubscribe: vi.fn(),
+  }),
 }))
 
 function mountPage() {
@@ -86,5 +96,24 @@ describe('ProfilePage theme unlocks', () => {
     const wrapper = mountPage()
     await themeButton(wrapper, 'dark').trigger('click')
     expect(mockUpdateProfile).toHaveBeenCalledWith({ theme: 'dark' })
+  })
+})
+
+describe('ProfilePage notifications', () => {
+  it('shows notifications section', () => {
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-test="notifications-section"]').exists()).toBe(true)
+  })
+
+  it('shows enable button when not subscribed', () => {
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-test="notif-enable-btn"]').exists()).toBe(true)
+  })
+
+  it('hides morning/evening toggles before subscribing', () => {
+    const wrapper = mountPage()
+    // Before subscription is granted, toggles are not shown
+    expect(wrapper.find('[data-test="notif-morning"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="notif-evening"]').exists()).toBe(false)
   })
 })

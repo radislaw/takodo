@@ -27,12 +27,22 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
     async Me_get(_req: FastifyRequest, _reply: FastifyReply) {
       const userId = await getUserId()
       const user = await prisma.user.findUnique({ where: { id: userId } })
-      return { name: user?.name ?? '', theme: user?.theme ?? 'light' }
+      return {
+        name: user?.name ?? '',
+        theme: user?.theme ?? 'light',
+        notifMorning: user?.notifMorning ?? true,
+        notifEvening: user?.notifEvening ?? true,
+      }
     },
 
     async Me_update(req: FastifyRequest, reply: FastifyReply) {
       const userId = await getUserId()
-      const body = req.body as { name?: string; theme?: string }
+      const body = req.body as {
+        name?: string
+        theme?: string
+        notifMorning?: boolean
+        notifEvening?: boolean
+      }
 
       // Level-1 themes skip the level computation entirely.
       if (body.theme !== undefined && themeUnlockLevel(body.theme) > 1) {
@@ -50,9 +60,16 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         data: {
           ...(body.name !== undefined ? { name: body.name } : {}),
           ...(body.theme !== undefined ? { theme: body.theme } : {}),
+          ...(body.notifMorning !== undefined ? { notifMorning: body.notifMorning } : {}),
+          ...(body.notifEvening !== undefined ? { notifEvening: body.notifEvening } : {}),
         },
       })
-      return { name: user.name, theme: user.theme }
+      return {
+        name: user.name,
+        theme: user.theme,
+        notifMorning: user.notifMorning,
+        notifEvening: user.notifEvening,
+      }
     },
   }
 }

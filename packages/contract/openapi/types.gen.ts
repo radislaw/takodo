@@ -119,6 +119,41 @@ export interface paths {
         patch: operations["Me_update"];
         trace?: never;
     };
+    "/push/subscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Register a browser PushSubscription. Idempotent (upserts by endpoint). */
+        post: operations["Push_subscribe"];
+        /** @description Remove a browser PushSubscription. */
+        delete: operations["Push_unsubscribe"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/push/vapid-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description VAPID public key for the web client to create a PushSubscription. */
+        get: operations["Push_getVapidKey"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/quests": {
         parameters: {
             query?: never;
@@ -371,11 +406,25 @@ export interface components {
             /** @description Display name used in the greeting. */
             name: string;
             theme: components["schemas"]["Theme"];
+            /** @description Opt-in morning reminder (~9 AM). */
+            notifMorning: boolean;
+            /** @description Opt-in evening reminder (~8 PM). */
+            notifEvening: boolean;
         };
         ProfileUpdate: {
             name?: string;
             /** @description Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level. */
             theme?: components["schemas"]["Theme"];
+            notifMorning?: boolean;
+            notifEvening?: boolean;
+        };
+        PushSubscribeBody: {
+            endpoint: string;
+            p256dh: string;
+            auth: string;
+        };
+        PushUnsubscribeBody: {
+            endpoint: string;
         };
         /** @description Daily quest with live progress. Title/description live in web i18n, keyed by id. */
         Quest: {
@@ -521,6 +570,9 @@ export interface components {
          * @enum {string}
          */
         Theme: "light" | "lavender" | "cloud" | "eco" | "ocean" | "silent" | "high-contrast" | "dark" | "lavender-dark" | "cyberpunk" | "amber" | "amoled";
+        VapidPublicKey: {
+            publicKey: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -780,6 +832,97 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Profile"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Push_subscribe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushSubscribeBody"];
+            };
+        };
+        responses: {
+            /** @description There is no content to send for this request, but the headers may be useful. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Push_unsubscribe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushUnsubscribeBody"];
+            };
+        };
+        responses: {
+            /** @description There is no content to send for this request, but the headers may be useful. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Push_getVapidKey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VapidPublicKey"];
                 };
             };
             /** @description An unexpected error response. */

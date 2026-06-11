@@ -226,6 +226,12 @@ model Profile {
   name: string;
 
   theme: Theme;
+
+  /** Opt-in morning reminder (~9 AM). */
+  notifMorning: boolean;
+
+  /** Opt-in evening reminder (~8 PM). */
+  notifEvening: boolean;
 }
 
 model ProfileUpdate {
@@ -234,6 +240,9 @@ model ProfileUpdate {
 
   /** Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level. */
   theme?: Theme;
+
+  notifMorning?: boolean;
+  notifEvening?: boolean;
 }
 
 @route("/me")
@@ -324,6 +333,41 @@ interface Quests {
 
   /** Claim a completed quest: server validates progress, rolls tier, awards XP. */
   @route("/{id}/claim") @post claim(@path id: string): Quest | ApiError;
+}
+
+// ─── Push notifications ─────────────────────────────────────────
+
+model VapidPublicKey {
+  publicKey: string;
+}
+
+model PushSubscribeBody {
+  @maxLength(2048)
+  endpoint: string;
+
+  @maxLength(256)
+  p256dh: string;
+
+  @maxLength(64)
+  auth: string;
+}
+
+model PushUnsubscribeBody {
+  @maxLength(2048)
+  endpoint: string;
+}
+
+@route("/push")
+@tag("Push")
+interface Push {
+  /** VAPID public key for the web client to create a PushSubscription. */
+  @route("/vapid-key") @get getVapidKey(): VapidPublicKey | ApiError;
+
+  /** Register a browser PushSubscription. Idempotent (upserts by endpoint). */
+  @route("/subscribe") @post subscribe(@body body: PushSubscribeBody): void | ApiError;
+
+  /** Remove a browser PushSubscription. */
+  @route("/subscribe") @delete unsubscribe(@body body: PushUnsubscribeBody): void | ApiError;
 }
 
 // ─── Frequently undone ──────────────────────────────────────────

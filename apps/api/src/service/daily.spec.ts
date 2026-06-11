@@ -210,6 +210,8 @@ describe('Daily routes', () => {
         theme: 'light',
         createdAt: new Date(),
         gentleMoves: 1,
+        notifMorning: true,
+        notifEvening: true,
       })
 
       const res = await app.inject({
@@ -238,6 +240,8 @@ describe('Daily routes', () => {
         theme: 'light',
         createdAt: new Date(),
         gentleMoves: 1,
+        notifMorning: true,
+        notifEvening: true,
       })
 
       await app.inject({
@@ -263,6 +267,8 @@ describe('Daily routes', () => {
         theme: 'light',
         createdAt: new Date(),
         gentleMoves: 1,
+        notifMorning: true,
+        notifEvening: true,
       })
 
       await app.inject({

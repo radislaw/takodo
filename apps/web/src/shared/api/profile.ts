@@ -30,7 +30,12 @@ export function useUpdateProfile() {
   const queryCache = useQueryCache()
   const { showError } = useErrorToast()
   return useMutation({
-    mutation: async (body: { name?: string; theme?: Theme }) => {
+    mutation: async (body: {
+      name?: string
+      theme?: Theme
+      notifMorning?: boolean
+      notifEvening?: boolean
+    }) => {
       const { data } = await apiClient.PATCH('/me', { body })
       if (!data) throw new Error('Failed to update profile')
       return data
