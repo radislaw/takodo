@@ -783,6 +783,10 @@ components:
           type: integer
           format: int32
           description: 'Current level, 1-based: level = floor(sqrt(xp/100)) + 1.'
+        comebackDays:
+          type: integer
+          format: int32
+          description: Full missed days before today; present only in comeback state (>= 2).
     Task:
       type: object
       required:

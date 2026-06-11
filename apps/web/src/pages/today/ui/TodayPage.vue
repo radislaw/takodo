@@ -19,6 +19,7 @@ import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 import { useReward } from '@/shared/lib/useReward'
 import TodayTaskCard from './TodayTaskCard.vue'
 import QuestPanel from './QuestPanel.vue'
+import ComebackBanner from './ComebackBanner.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const { showError } = useErrorToast()
@@ -68,6 +69,7 @@ const streak = computed(() => rewards.value?.streak ?? 0)
 const shields = computed(() => rewards.value?.shields ?? 0)
 const shieldUsedRecently = computed(() => rewards.value?.shieldUsedRecently ?? false)
 const level = computed(() => rewards.value?.level ?? 1)
+const isComeback = computed(() => (rewards.value?.comebackDays ?? 0) >= 2)
 
 watch(
   () => rewards.value?.streak,
@@ -212,6 +214,9 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
         </h1>
         <p class="font-body text-ink-soft mt-0.5 text-sm">{{ t('greeting.subtitle') }}</p>
       </div>
+
+      <!-- Comeback (anti-shame) banner -->
+      <ComebackBanner v-if="isComeback" />
 
       <!-- Summary card -->
       <div class="surface-card mb-6 flex items-center gap-4 rounded-2xl p-4 shadow-md">

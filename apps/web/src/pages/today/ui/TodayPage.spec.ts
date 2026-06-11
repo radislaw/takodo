@@ -23,6 +23,8 @@ const dailyData = ref<
 
 const tasksData = ref<{ id: string; parentId: string | null; title: string; status: string }[]>([])
 
+const rewardsData = ref<Record<string, unknown>>({})
+
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }))
@@ -39,16 +41,7 @@ vi.mock('@/shared/api', () => ({
   useProfile: () => ({ data: ref({ name: '', theme: 'amoled' }) }),
   useQuests: () => ({ data: ref([]) }),
   useClaimQuest: () => ({ mutateAsync: vi.fn() }),
-  useRewards: () => ({
-    data: ref({
-      streak: 0,
-      longestStreak: 0,
-      shields: 0,
-      shieldUsedRecently: false,
-      week: [],
-      badges: [],
-    }),
-  }),
+  useRewards: () => ({ data: rewardsData }),
 }))
 
 function mountPage() {
@@ -64,6 +57,14 @@ beforeEach(() => {
     entries: [],
   }
   tasksData.value = []
+  rewardsData.value = {
+    streak: 0,
+    longestStreak: 0,
+    shields: 0,
+    shieldUsedRecently: false,
+    week: [],
+    badges: [],
+  }
 })
 
 afterEach(() => {
@@ -284,6 +285,19 @@ describe('TodayPage', () => {
 
     const doBtn = wrapper.findAll('button').find((b) => b.text().includes('Что сейчас?'))
     expect(doBtn).toBeUndefined()
+  })
+
+  it('shows comeback banner when rewards report comebackDays', async () => {
+    rewardsData.value = { ...rewardsData.value, comebackDays: 3 }
+    const wrapper = mountPage()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-test="comeback-banner"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('С возвращением')
+  })
+
+  it('hides comeback banner without comebackDays', () => {
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-test="comeback-banner"]').exists()).toBe(false)
   })
 
   it('calls moveToTomorrow with entryId and taskId', async () => {

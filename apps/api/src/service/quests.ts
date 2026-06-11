@@ -8,6 +8,7 @@ import {
   type QuestDef,
   type DayStats,
 } from '../domain/quests.js'
+import { gapDays, isComeback } from '../domain/comeback.js'
 
 type GetUserId = () => Promise<string>
 type Db = PrismaClient | Prisma.TransactionClient
@@ -46,6 +47,17 @@ async function loadDayStats(db: Db, userId: string, dateStr: string): Promise<Da
   }
 }
 
+/** Comeback day → the easy quest is force-included. Stable within the day: only pre-today completions count. */
+async function isComebackDay(db: Db, userId: string, dateStr: string): Promise<boolean> {
+  const last = await db.task.findFirst({
+    where: { userId, status: 'done', completedAt: { not: null, lt: parseDate(dateStr) } },
+    orderBy: { completedAt: 'desc' },
+    select: { completedAt: true },
+  })
+  const lastDay = last?.completedAt ? dateToString(last.completedAt) : null
+  return isComeback(gapDays(lastDay, dateStr))
+}
+
 function toQuestShape(quest: QuestDef, progress: number, claim: QuestClaim | null) {
   return {
     id: quest.id,
@@ -67,12 +79,13 @@ export function buildQuestsHandlers(prisma: PrismaClient, getUserId: GetUserId) 
     async Quests_list(_req: FastifyRequest, _reply: FastifyReply) {
       const userId = await getUserId()
       const today = dateToString(new Date())
-      const quests = selectDailyQuests(userId, today)
 
-      const [stats, claims] = await Promise.all([
+      const [comeback, stats, claims] = await Promise.all([
+        isComebackDay(prisma, userId, today),
         loadDayStats(prisma, userId, today),
         prisma.questClaim.findMany({ where: { userId, date: parseDate(today) } }),
       ])
+      const quests = selectDailyQuests(userId, today, comeback)
 
       return quests.map((q) =>
         toQuestShape(q, questProgress(q, stats), claims.find((c) => c.questId === q.id) ?? null),
@@ -83,7 +96,8 @@ export function buildQuestsHandlers(prisma: PrismaClient, getUserId: GetUserId) 
       const userId = await getUserId()
       const { id } = req.params as { id: string }
       const today = dateToString(new Date())
-      const quest = selectDailyQuests(userId, today).find((q) => q.id === id)
+      const comeback = await isComebackDay(prisma, userId, today)
+      const quest = selectDailyQuests(userId, today, comeback).find((q) => q.id === id)
 
       if (!quest) {
         return reply.status(404).send({ code: 'not_found', message: 'Quest not in today set' })

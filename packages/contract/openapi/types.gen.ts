@@ -423,6 +423,11 @@ export interface components {
              * @description Current level, 1-based: level = floor(sqrt(xp/100)) + 1.
              */
             level: number;
+            /**
+             * Format: int32
+             * @description Full missed days before today; present only in comeback state (>= 2).
+             */
+            comebackDays?: number;
         };
         /** @description Task (read shape). Fields not client-writable are set by the server. */
         Task: {

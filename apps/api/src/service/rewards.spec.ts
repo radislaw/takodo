@@ -102,6 +102,24 @@ describe('Rewards routes', () => {
       expect(body.xp).toBe(35)
     })
 
+    it('reports comebackDays after a 2+ day gap', async () => {
+      const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)
+      prisma.task.findMany.mockResolvedValue([{ completedAt: fourDaysAgo, pomodoros: 0 } as never])
+      prisma.dailyEntry.count.mockResolvedValue(0)
+      const res = await app.inject({ method: 'GET', url: '/rewards' })
+      const body = res.json() as { comebackDays?: number }
+      expect(body.comebackDays).toBe(3)
+    })
+
+    it('omits comebackDays when active yesterday', async () => {
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+      prisma.task.findMany.mockResolvedValue([{ completedAt: yesterday, pomodoros: 0 } as never])
+      prisma.dailyEntry.count.mockResolvedValue(0)
+      const res = await app.inject({ method: 'GET', url: '/rewards' })
+      const body = res.json() as { comebackDays?: number }
+      expect(body.comebackDays).toBeUndefined()
+    })
+
     it('xp includes claimed quest bonus', async () => {
       prisma.task.findMany.mockResolvedValue([{ completedAt: new Date(), pomodoros: 0 } as never])
       prisma.dailyEntry.count.mockResolvedValue(0)
