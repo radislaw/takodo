@@ -95,6 +95,12 @@ describe('sw.js', () => {
     expect(sw).toContain("'/'")
     expect(sw).toContain('navigate')
   })
+
+  it('clones response before caching to avoid body-used error', () => {
+    sw = readFileSync(`${PUBLIC}/sw.js`, 'utf-8')
+    // clone() must be called on a local variable, not passed directly to caches.put
+    expect(sw).toMatch(/const \w+ = res\.clone\(\)/)
+  })
 })
 
 describe('index.html', () => {
