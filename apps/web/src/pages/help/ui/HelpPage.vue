@@ -17,6 +17,8 @@ const SECTIONS = [
   { key: 'levels', icon: 'award' },
   { key: 'settings', icon: 'settings' },
   { key: 'philosophy', icon: 'heart' },
+  { key: 'icons', icon: 'zap' },
+  { key: 'faq', icon: 'more' },
 ] as const
 
 const openSection = ref<string | null>(null)
