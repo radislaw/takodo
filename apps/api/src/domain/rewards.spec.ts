@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeRewards } from './rewards.js'
+import { computeRewards, computeXP, computeLevel, type CompletedTaskInfo } from './rewards.js'
 
 const NOW = new Date('2024-06-05T12:00:00Z') // Wednesday
 
@@ -7,6 +7,10 @@ function daysAgo(n: number): Date {
   const d = new Date(NOW)
   d.setUTCDate(d.getUTCDate() - n)
   return d
+}
+
+function td(date: Date, pomodoros = 0): CompletedTaskInfo {
+  return { completedAt: date, pomodoros }
 }
 
 describe('computeRewards', () => {
@@ -17,27 +21,32 @@ describe('computeRewards', () => {
   })
 
   it('streak counts consecutive days ending today', () => {
-    const dates = [daysAgo(0), daysAgo(1), daysAgo(2)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [td(daysAgo(0)), td(daysAgo(1)), td(daysAgo(2))]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(3)
   })
 
   it('streak falls back to yesterday if today has no completion', () => {
-    const dates = [daysAgo(1), daysAgo(2)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [td(daysAgo(1)), td(daysAgo(2))]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(2)
   })
 
   it('streak breaks on gap', () => {
-    const dates = [daysAgo(0), daysAgo(2)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [td(daysAgo(0)), td(daysAgo(2))]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(1)
   })
 
   it('longestStreak is max of all runs', () => {
-    // run of 4 in the past, current streak of 1
-    const dates = [daysAgo(0), daysAgo(10), daysAgo(11), daysAgo(12), daysAgo(13)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [
+      td(daysAgo(0)),
+      td(daysAgo(10)),
+      td(daysAgo(11)),
+      td(daysAgo(12)),
+      td(daysAgo(13)),
+    ]
+    const r = computeRewards(tasks, NOW)
     expect(r.longestStreak).toBe(4)
     expect(r.streak).toBe(1)
   })
@@ -45,19 +54,19 @@ describe('computeRewards', () => {
   it('week has 7 entries, Monday-first', () => {
     const r = computeRewards([], NOW)
     expect(r.week).toHaveLength(7)
-    expect(r.week[0]!.date).toBe('2024-06-03') // Monday of the week containing 2024-06-05
-    expect(r.week[6]!.date).toBe('2024-06-09') // Sunday
+    expect(r.week[0]!.date).toBe('2024-06-03')
+    expect(r.week[6]!.date).toBe('2024-06-09')
   })
 
   it('week marks active days', () => {
-    const r = computeRewards([NOW], NOW)
+    const r = computeRewards([td(NOW)], NOW)
     const today = r.week.find((d) => d.date === '2024-06-05')
     expect(today!.active).toBe(true)
     expect(r.week.filter((d) => d.active)).toHaveLength(1)
   })
 
   it('first_step badge earned after first completion', () => {
-    const r = computeRewards([daysAgo(0)], NOW)
+    const r = computeRewards([td(daysAgo(0))], NOW)
     expect(r.badges.find((b) => b.id === 'first_step')?.earned).toBe(true)
   })
 
@@ -67,34 +76,33 @@ describe('computeRewards', () => {
   })
 
   it('streak_5 badge earned when longestStreak >= 5', () => {
-    const dates = Array.from({ length: 5 }, (_, i) => daysAgo(i))
-    const r = computeRewards(dates, NOW)
+    const tasks = Array.from({ length: 5 }, (_, i) => td(daysAgo(i)))
+    const r = computeRewards(tasks, NOW)
     expect(r.badges.find((b) => b.id === 'streak_5')?.earned).toBe(true)
   })
 
   it('streak_5 remaining counts down from current streak', () => {
-    const dates = [daysAgo(0), daysAgo(1)] // streak = 2
-    const r = computeRewards(dates, NOW)
+    const tasks = [td(daysAgo(0)), td(daysAgo(1))]
+    const r = computeRewards(tasks, NOW)
     const badge = r.badges.find((b) => b.id === 'streak_5')
     expect(badge?.earned).toBe(false)
     expect(badge?.remaining).toBe(3)
   })
 
   it('deduplicates multiple completions on same day', () => {
-    const sameDay = [
-      new Date('2024-06-05T08:00:00Z'),
-      new Date('2024-06-05T14:00:00Z'),
-      new Date('2024-06-05T20:00:00Z'),
+    const tasks = [
+      td(new Date('2024-06-05T08:00:00Z')),
+      td(new Date('2024-06-05T14:00:00Z')),
+      td(new Date('2024-06-05T20:00:00Z')),
     ]
-    const r = computeRewards(sameDay, NOW)
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(1)
   })
 })
 
 describe('streak shields', () => {
-  /** Active streak run of `len` days ending `endAgo` days ago. */
-  function run(len: number, endAgo: number): Date[] {
-    return Array.from({ length: len }, (_, i) => daysAgo(endAgo + i))
+  function run(len: number, endAgo: number): CompletedTaskInfo[] {
+    return Array.from({ length: len }, (_, i) => td(daysAgo(endAgo + i)))
   }
 
   it('no shields below 5 streak days', () => {
@@ -113,32 +121,30 @@ describe('streak shields', () => {
   })
 
   it('1-day gap consumes a shield and preserves streak', () => {
-    // 5 active days, then gap yesterday... wait: days 6..2 active, day 1 gap, day 0 active
-    const dates = [...run(5, 2), daysAgo(0)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [...run(5, 2), td(daysAgo(0))]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(6)
     expect(r.shields).toBe(0)
     expect(r.shieldUsedRecently).toBe(true)
   })
 
   it('2-day gap with 2 shields preserves streak', () => {
-    // 10 active days → 2 shields, then 2-day gap, then today active
-    const dates = [...run(10, 3), daysAgo(0)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [...run(10, 3), td(daysAgo(0))]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(11)
     expect(r.shields).toBe(0)
   })
 
   it('3-day gap breaks streak even with 2 shields', () => {
-    const dates = [...run(10, 4), daysAgo(0)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [...run(10, 4), td(daysAgo(0))]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(1)
     expect(r.shields).toBe(0)
   })
 
   it('gap with no shields resets streak', () => {
-    const dates = [...run(3, 2), daysAgo(0)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [...run(3, 2), td(daysAgo(0))]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(1)
     expect(r.shieldUsedRecently).toBe(false)
   })
@@ -151,33 +157,30 @@ describe('streak shields', () => {
   })
 
   it('streak continues earning shields after a shielded gap', () => {
-    // 5 active (1 shield), gap (consume, not counted), 5 more active → 10th active day re-earns
-    const dates = [...run(5, 6), ...run(5, 0)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [...run(5, 6), ...run(5, 0)]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(10)
     expect(r.shields).toBe(1)
   })
 
   it('week marks shielded days', () => {
-    // NOW = Wed 2024-06-05; Tue gap covered by shield earned in prior 5-day run
-    const dates = [...run(5, 2), daysAgo(0)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [...run(5, 2), td(daysAgo(0))]
+    const r = computeRewards(tasks, NOW)
     const tue = r.week.find((d) => d.date === '2024-06-04')
     expect(tue?.active).toBe(false)
     expect(tue?.shielded).toBe(true)
   })
 
   it('shieldUsedRecently false when shield used more than 7 days ago', () => {
-    // shield consumed 10 days ago, streak continues since
-    const dates = [...run(5, 11), ...run(10, 0)]
-    const r = computeRewards(dates, NOW)
+    const tasks = [...run(5, 11), ...run(10, 0)]
+    const r = computeRewards(tasks, NOW)
     expect(r.streak).toBe(15)
     expect(r.shieldUsedRecently).toBe(false)
   })
 
   it('longestStreak counts shielded runs as continuous', () => {
-    const dates = [...run(5, 2), daysAgo(0)] // 6-day shielded run
-    const r = computeRewards(dates, NOW)
+    const tasks = [...run(5, 2), td(daysAgo(0))]
+    const r = computeRewards(tasks, NOW)
     expect(r.longestStreak).toBe(6)
   })
 
@@ -218,5 +221,94 @@ describe('streak shields', () => {
       const badge = r.badges.find((b) => b.id === 'gentle_mode')
       expect(badge?.earned).toBe(true)
     })
+  })
+})
+
+describe('computeXP', () => {
+  it('0 tasks → 0 XP', () => {
+    expect(computeXP([], 0)).toBe(0)
+  })
+
+  it('1 done task (no pomodoros, no MIT) → 10 XP', () => {
+    expect(computeXP([{ completedAt: NOW, pomodoros: 0 }], 0)).toBe(10)
+  })
+
+  it('MIT completion adds 5 XP per MIT', () => {
+    expect(computeXP([{ completedAt: NOW, pomodoros: 0 }], 2)).toBe(20)
+  })
+
+  it('each pomodoro adds 5 XP', () => {
+    expect(computeXP([{ completedAt: NOW, pomodoros: 3 }], 0)).toBe(25)
+  })
+
+  it('combined: 2 tasks, 1 MIT, 2 pomodoros total', () => {
+    const tasks: CompletedTaskInfo[] = [
+      { completedAt: NOW, pomodoros: 2 },
+      { completedAt: NOW, pomodoros: 0 },
+    ]
+    // done(2)*10 + mit(1)*5 + pomodoros(2)*5 = 20 + 5 + 10 = 35
+    expect(computeXP(tasks, 1)).toBe(35)
+  })
+})
+
+describe('computeLevel', () => {
+  it('level 1 at 0 XP', () => {
+    expect(computeLevel(0)).toBe(1)
+  })
+
+  it('level 1 just below 100 XP', () => {
+    expect(computeLevel(99)).toBe(1)
+  })
+
+  it('level 2 at 100 XP', () => {
+    expect(computeLevel(100)).toBe(2)
+  })
+
+  it('level 3 at 400 XP', () => {
+    expect(computeLevel(400)).toBe(3)
+  })
+
+  it('level 4 at 900 XP', () => {
+    expect(computeLevel(900)).toBe(4)
+  })
+
+  it('level 10 at 8100 XP', () => {
+    expect(computeLevel(8100)).toBe(10)
+  })
+})
+
+describe('computeRewards xp + level fields', () => {
+  it('xp = 0 and level = 1 with no completions', () => {
+    const r = computeRewards([], NOW)
+    expect(r.xp).toBe(0)
+    expect(r.level).toBe(1)
+  })
+
+  it('xp counts done tasks', () => {
+    const tasks = [td(daysAgo(0)), td(daysAgo(1))]
+    const r = computeRewards(tasks, NOW)
+    expect(r.xp).toBe(20)
+  })
+
+  it('xp includes pomodoros', () => {
+    const tasks = [{ completedAt: daysAgo(0), pomodoros: 2 }]
+    const r = computeRewards(tasks, NOW)
+    // 10 + 2*5 = 20
+    expect(r.xp).toBe(20)
+  })
+
+  it('xp includes MIT completions', () => {
+    const tasks = [td(daysAgo(0))]
+    const r = computeRewards(tasks, NOW, 0, 1)
+    // 10 + 1*5 = 15
+    expect(r.xp).toBe(15)
+  })
+
+  it('level advances when xp crosses threshold', () => {
+    // Need 10 tasks to get 100 XP → level 2
+    const tasks = Array.from({ length: 10 }, (_, i) => td(daysAgo(i)))
+    const r = computeRewards(tasks, NOW)
+    expect(r.xp).toBe(100)
+    expect(r.level).toBe(2)
   })
 })

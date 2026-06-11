@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { AppIcon } from '@/shared/ui'
-import { useProfile, useUpdateProfile } from '@/shared/api'
+import { AppIcon, LevelRing } from '@/shared/ui'
+import { useProfile, useUpdateProfile, useRewards } from '@/shared/api'
 
 const { t } = useI18n({ useScope: 'global' })
 const { data: profile } = useProfile()
 const { mutate: updateProfile } = useUpdateProfile()
+const { data: rewards } = useRewards()
 
 type ThemeId =
   | 'light'
@@ -61,6 +62,19 @@ function selectTheme(id: string) {
         {{ t('profile.title') }}
       </h1>
       <p class="font-body text-ink-soft mt-1 text-sm">{{ t('profile.subtitle') }}</p>
+
+      <!-- Level card -->
+      <div class="surface-card mt-5 flex items-center gap-5 rounded-2xl p-5 shadow-md">
+        <LevelRing :level="rewards?.level ?? 1" :xp="rewards?.xp ?? 0" />
+        <div>
+          <div class="text-ink text-sm font-bold">
+            {{ t('profile.levelRing.label') }} {{ rewards?.level ?? 1 }}
+          </div>
+          <div class="text-ink-soft text-xs">
+            {{ t('profile.levelRing.xp', { xp: rewards?.xp ?? 0 }) }}
+          </div>
+        </div>
+      </div>
 
       <!-- Theme card -->
       <div class="surface-card mt-5 rounded-2xl p-5 shadow-md">

@@ -24,6 +24,7 @@ describe('Rewards routes', () => {
   describe('GET /rewards', () => {
     it('returns rewards summary shape', async () => {
       prisma.task.findMany.mockResolvedValue([])
+      prisma.dailyEntry.count.mockResolvedValue(0)
       const res = await app.inject({ method: 'GET', url: '/rewards' })
       expect(res.statusCode).toBe(200)
       const body = res.json() as {
@@ -31,15 +32,20 @@ describe('Rewards routes', () => {
         longestStreak: number
         week: unknown[]
         badges: unknown[]
+        xp: number
+        level: number
       }
       expect(typeof body.streak).toBe('number')
       expect(typeof body.longestStreak).toBe('number')
       expect(body.week).toHaveLength(7)
       expect(Array.isArray(body.badges)).toBe(true)
+      expect(typeof body.xp).toBe('number')
+      expect(typeof body.level).toBe('number')
     })
 
     it('streak = 0 with no completions', async () => {
       prisma.task.findMany.mockResolvedValue([])
+      prisma.dailyEntry.count.mockResolvedValue(0)
       const res = await app.inject({ method: 'GET', url: '/rewards' })
       const body = res.json() as { streak: number }
       expect(body.streak).toBe(0)
@@ -47,6 +53,7 @@ describe('Rewards routes', () => {
 
     it('all badges present', async () => {
       prisma.task.findMany.mockResolvedValue([])
+      prisma.dailyEntry.count.mockResolvedValue(0)
       prisma.user.findUnique.mockResolvedValue(null)
       const res = await app.inject({ method: 'GET', url: '/rewards' })
       const body = res.json() as { badges: { id: string }[] }
@@ -59,6 +66,7 @@ describe('Rewards routes', () => {
 
     it('gentle_mode badge earned when user has >= 3 gentleMoves', async () => {
       prisma.task.findMany.mockResolvedValue([])
+      prisma.dailyEntry.count.mockResolvedValue(0)
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-1',
         email: 'u@u.com',
@@ -70,6 +78,27 @@ describe('Rewards routes', () => {
       const res = await app.inject({ method: 'GET', url: '/rewards' })
       const body = res.json() as { badges: { id: string; earned: boolean }[] }
       expect(body.badges.find((b) => b.id === 'gentle_mode')?.earned).toBe(true)
+    })
+
+    it('xp = 0 and level = 1 with no completions', async () => {
+      prisma.task.findMany.mockResolvedValue([])
+      prisma.dailyEntry.count.mockResolvedValue(0)
+      const res = await app.inject({ method: 'GET', url: '/rewards' })
+      const body = res.json() as { xp: number; level: number }
+      expect(body.xp).toBe(0)
+      expect(body.level).toBe(1)
+    })
+
+    it('xp counts completed tasks and pomodoros', async () => {
+      prisma.task.findMany.mockResolvedValue([
+        { completedAt: new Date(), pomodoros: 2 } as never,
+        { completedAt: new Date(), pomodoros: 0 } as never,
+      ])
+      prisma.dailyEntry.count.mockResolvedValue(1)
+      const res = await app.inject({ method: 'GET', url: '/rewards' })
+      // 2 done * 10 + 1 MIT * 5 + 2 pomodoros * 5 = 35
+      const body = res.json() as { xp: number }
+      expect(body.xp).toBe(35)
     })
   })
 })

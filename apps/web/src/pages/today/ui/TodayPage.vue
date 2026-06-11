@@ -66,6 +66,7 @@ const userName = computed(() => profile.value?.name ?? '')
 const streak = computed(() => rewards.value?.streak ?? 0)
 const shields = computed(() => rewards.value?.shields ?? 0)
 const shieldUsedRecently = computed(() => rewards.value?.shieldUsedRecently ?? false)
+const level = computed(() => rewards.value?.level ?? 1)
 
 watch(
   () => rewards.value?.streak,
@@ -220,7 +221,10 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
         />
         <div class="min-w-0 flex-1">
           <p class="font-body text-ink text-sm leading-snug font-semibold">{{ summaryMsg }}</p>
-          <div v-if="streak > 0 || entries.length > 0" class="mt-2 flex flex-wrap gap-1.5">
+          <div
+            v-if="streak > 0 || entries.length > 0 || level > 1"
+            class="mt-2 flex flex-wrap gap-1.5"
+          >
             <StreakFlame
               v-if="streak > 0"
               :streak="streak"
@@ -234,6 +238,15 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
               <AppIcon name="zap" :size="13" class="text-sage-deep" />
               <span class="text-sage-deep text-xs font-bold">{{
                 t('today.mitCounter', { count: mitCount })
+              }}</span>
+            </div>
+            <div
+              v-if="level > 1"
+              data-test="level-chip"
+              class="bg-cat-mauve/15 inline-flex items-center rounded-full px-2.5 py-1"
+            >
+              <span class="text-cat-mauve text-xs font-bold">{{
+                t('today.level', { n: level })
               }}</span>
             </div>
           </div>

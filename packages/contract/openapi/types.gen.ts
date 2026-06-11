@@ -357,6 +357,16 @@ export interface components {
             /** @description Last 7 days, Monday-first. */
             week: components["schemas"]["DayActivity"][];
             badges: components["schemas"]["Badge"][];
+            /**
+             * Format: int32
+             * @description Total experience points accumulated (done×10, MIT×5, pomodoro×5).
+             */
+            xp: number;
+            /**
+             * Format: int32
+             * @description Current level, 1-based: level = floor(sqrt(xp/100)) + 1.
+             */
+            level: number;
         };
         /** @description Task (read shape). Fields not client-writable are set by the server. */
         Task: {
