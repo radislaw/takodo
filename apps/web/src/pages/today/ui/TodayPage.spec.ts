@@ -37,6 +37,8 @@ vi.mock('@/shared/api', () => ({
   useReopenTask: () => ({ mutate: mockReopenTask }),
   useUpdateDailyEntry: () => ({ mutateAsync: mockUpdateEntry }),
   useProfile: () => ({ data: ref({ name: '', theme: 'amoled' }) }),
+  useQuests: () => ({ data: ref([]) }),
+  useClaimQuest: () => ({ mutateAsync: vi.fn() }),
   useRewards: () => ({
     data: ref({
       streak: 0,

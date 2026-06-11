@@ -11,6 +11,7 @@ tags:
   - name: Daily
   - name: Profile
   - name: Rewards
+  - name: Quests
   - name: Frequent
 paths:
   /daily:
@@ -241,6 +242,47 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProfileUpdate'
+  /quests:
+    get:
+      operationId: Quests_list
+      description: Today's three deterministic quests (hash of userId+date) with live progress.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quest'
+      tags:
+        - Quests
+  /quests/{id}/claim:
+    post:
+      operationId: Quests_claim
+      description: 'Claim a completed quest: server validates progress, rolls tier, awards XP.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quest'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Quests
   /rewards:
     get:
       operationId: Rewards_get
@@ -661,6 +703,44 @@ components:
           allOf:
             - $ref: '#/components/schemas/Theme'
           description: Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level.
+    Quest:
+      type: object
+      required:
+        - id
+        - target
+        - progress
+        - done
+        - claimed
+      properties:
+        id:
+          type: string
+          description: Stable quest definition id → maps to localized copy on the web.
+        target:
+          type: integer
+          format: int32
+        progress:
+          type: integer
+          format: int32
+        done:
+          type: boolean
+          description: progress >= target — the quest can be claimed.
+        claimed:
+          type: boolean
+        tier:
+          allOf:
+            - $ref: '#/components/schemas/QuestTier'
+          description: Rolled server-side on claim (70/25/5).
+        xp:
+          type: integer
+          format: int32
+          description: XP awarded on claim, by tier.
+      description: Daily quest with live progress. Title/description live in web i18n, keyed by id.
+    QuestTier:
+      type: string
+      enum:
+        - common
+        - rare
+        - epic
     RewardsSummary:
       type: object
       required:

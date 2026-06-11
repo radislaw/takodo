@@ -311,4 +311,19 @@ describe('computeRewards xp + level fields', () => {
     expect(r.xp).toBe(100)
     expect(r.level).toBe(2)
   })
+
+  it('xp includes quest bonus', () => {
+    const tasks = [td(daysAgo(0))]
+    const r = computeRewards(tasks, NOW, 0, 0, 35)
+    // 10 + 35 quest xp
+    expect(r.xp).toBe(45)
+  })
+
+  it('quest bonus counts toward level', () => {
+    // 5 tasks (50 xp) + 50 quest xp = 100 → level 2
+    const tasks = Array.from({ length: 5 }, (_, i) => td(daysAgo(i)))
+    const r = computeRewards(tasks, NOW, 0, 0, 50)
+    expect(r.xp).toBe(100)
+    expect(r.level).toBe(2)
+  })
 })

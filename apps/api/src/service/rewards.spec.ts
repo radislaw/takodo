@@ -13,6 +13,7 @@ describe('Rewards routes', () => {
   beforeEach(async () => {
     mockReset(prisma)
     getUserId.mockResolvedValue('user-1')
+    prisma.questClaim.aggregate.mockResolvedValue({ _sum: { xp: null } } as never)
     app = buildApp({ prisma, getUserId })
     await app.ready()
   })
@@ -99,6 +100,16 @@ describe('Rewards routes', () => {
       // 2 done * 10 + 1 MIT * 5 + 2 pomodoros * 5 = 35
       const body = res.json() as { xp: number }
       expect(body.xp).toBe(35)
+    })
+
+    it('xp includes claimed quest bonus', async () => {
+      prisma.task.findMany.mockResolvedValue([{ completedAt: new Date(), pomodoros: 0 } as never])
+      prisma.dailyEntry.count.mockResolvedValue(0)
+      prisma.questClaim.aggregate.mockResolvedValue({ _sum: { xp: 45 } } as never)
+      const res = await app.inject({ method: 'GET', url: '/rewards' })
+      // 1 done * 10 + 45 quest xp = 55
+      const body = res.json() as { xp: number }
+      expect(body.xp).toBe(55)
     })
   })
 })

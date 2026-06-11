@@ -200,6 +200,26 @@
       "amoled": "AMOLED"
     }
   },
+  "quests": {
+    "title": "Квесты дня",
+    "claim": "Забрать",
+    "claimed": "{tier} · +{xp} XP",
+    "progress": "{n} из {target}",
+    "claimAria": "Забрать награду за квест «{title}»",
+    "tier": {
+      "common": "Обычный",
+      "rare": "Редкий",
+      "epic": "Эпик"
+    },
+    "items": {
+      "complete_1": "Выполни 1 задачу",
+      "complete_2": "Выполни 2 задачи",
+      "complete_3": "Выполни 3 задачи",
+      "complete_mit": "Выполни главную задачу дня",
+      "add_3": "Добавь 3 задачи в список",
+      "before_noon": "Выполни задачу до полудня"
+    }
+  },
   "tasks": {
     "title": "Задачи",
     "addPlaceholder": "Добавить задачу...",

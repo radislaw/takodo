@@ -103,6 +103,7 @@ export function computeRewards(
   nowDate: Date,
   gentleMoves = 0,
   mitCompletions = 0,
+  questXp = 0,
 ): RewardsSummaryResult {
   const activeDays = new Set(completedTasks.map((t) => toDateStr(t.completedAt)))
   const { streak, longest, shields, shieldedDays } = replayStreak(activeDays, nowDate)
@@ -143,7 +144,7 @@ export function computeRewards(
     },
   ]
 
-  const xp = computeXP(completedTasks, mitCompletions)
+  const xp = computeXP(completedTasks, mitCompletions) + questXp
   const level = computeLevel(xp)
 
   return { streak, longestStreak: longest, shields, shieldUsedRecently, week, badges, xp, level }
