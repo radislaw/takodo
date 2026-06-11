@@ -1,5 +1,6 @@
 import { buildApp } from './app.js'
 import { prisma } from './db/client.js'
+import { buildScheduler } from './service/push-scheduler.js'
 
 const PORT = Number(process.env.PORT ?? 3001)
 const HOST = process.env.HOST ?? '127.0.0.1'
@@ -19,6 +20,7 @@ async function getUserId(): Promise<string> {
   return cachedUserId
 }
 
+buildScheduler(prisma)
 const app = buildApp({ logger: true, prisma, getUserId })
 
 try {

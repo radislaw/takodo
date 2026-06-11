@@ -14,6 +14,8 @@ function makeUser(overrides: Partial<User> = {}): User {
     name: 'Аня',
     theme: 'light',
     gentleMoves: 0,
+    notifMorning: true,
+    notifEvening: true,
     createdAt: new Date('2024-01-01T00:00:00Z'),
     ...overrides,
   }
@@ -38,9 +40,16 @@ describe('Profile routes', () => {
       prisma.user.findUnique.mockResolvedValue(makeUser())
       const res = await app.inject({ method: 'GET', url: '/me' })
       expect(res.statusCode).toBe(200)
-      const body = res.json() as { name: string; theme: string }
+      const body = res.json() as {
+        name: string
+        theme: string
+        notifMorning: boolean
+        notifEvening: boolean
+      }
       expect(body.name).toBe('Аня')
       expect(body.theme).toBe('light')
+      expect(body.notifMorning).toBe(true)
+      expect(body.notifEvening).toBe(true)
     })
 
     it('returns defaults when user has empty name', async () => {
@@ -145,6 +154,30 @@ describe('Profile routes', () => {
       })
       expect(res.statusCode).toBe(200)
       expect(prisma.task.findMany).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('PATCH /me notification prefs', () => {
+    it('updates notifMorning to false', async () => {
+      prisma.user.update.mockResolvedValue(makeUser({ notifMorning: false }))
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { notifMorning: false },
+      })
+      expect(res.statusCode).toBe(200)
+      expect((res.json() as { notifMorning: boolean }).notifMorning).toBe(false)
+    })
+
+    it('updates notifEvening to false', async () => {
+      prisma.user.update.mockResolvedValue(makeUser({ notifEvening: false }))
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { notifEvening: false },
+      })
+      expect(res.statusCode).toBe(200)
+      expect((res.json() as { notifEvening: boolean }).notifEvening).toBe(false)
     })
   })
 })

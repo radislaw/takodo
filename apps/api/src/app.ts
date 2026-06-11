@@ -12,6 +12,7 @@ import { buildFrequentHandlers } from './service/frequent.js'
 import { buildProfileHandlers } from './service/profile.js'
 import { buildRewardsHandlers } from './service/rewards.js'
 import { buildQuestsHandlers } from './service/quests.js'
+import { buildPushHandlers } from './service/push.js'
 
 const SPEC_PATH = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -50,6 +51,7 @@ export function buildApp(opts: AppOptions = {}) {
           ...buildProfileHandlers(opts.prisma, opts.getUserId),
           ...buildRewardsHandlers(opts.prisma, opts.getUserId),
           ...buildQuestsHandlers(opts.prisma, opts.getUserId),
+          ...buildPushHandlers(opts.prisma, opts.getUserId),
         }
       : stubService
 

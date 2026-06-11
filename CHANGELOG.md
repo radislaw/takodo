@@ -5,6 +5,28 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.19.0] — 2026-06-11 · Push notifications (VAPID Web Push)
+
+### Added
+
+- **`PushSubscription` Prisma model** — `endpoint` (unique), `p256dh`, `auth`; cascades on user delete
+- **`User.notifMorning / notifEvening`** — boolean prefs (`@default(true)`); managed via `PATCH /me`
+- **`domain/push.ts`** — `initVapid()`, `getVapidPublicKey()`, `buildPushPayload()`, `sendPushToSubscription()` (swallows 410/404 → stale-sub returns false for cleanup); VAPID keys from `process.env.VAPID_PUBLIC_KEY/PRIVATE_KEY`
+- **`service/push.ts`** — `Push_getVapidKey`, `Push_subscribe` (upsert by endpoint), `Push_unsubscribe`; 503 when keys not configured; `sendPushToUser()` helper auto-deletes stale subs
+- **`service/push-scheduler.ts`** — `buildScheduler(prisma)`: two `node-schedule` cron jobs (9:00 UTC morning, 20:00 UTC evening); skips gracefully when VAPID not configured
+- **`/push/vapid-key`, `/push/subscribe` (POST/DELETE)** routes in contract and `app.ts`
+- **`profile.notifications.*` i18n keys** — `label`, `sub`, `morning/morningHint`, `evening/eveningHint`, `enableCta`, `disableCta`, `permissionBlocked`, `unsupported`, `requesting`
+- **`shared/api/push.ts`** (`useNotifications` composable) — permission request, `urlBase64ToUint8Array`, `requestAndSubscribe()`, `unsubscribe()`; module-level singletons for `permissionState` and `isSubscribed`
+- **Profile page notifications section** — bell icon card; enable-push button (Notification.requestPermission flow); morning/evening toggle switches (ARIA role=switch); disable button; hides when permission blocked or browser unsupported
+- **`.env.example`** — `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` placeholders with generation hint
+
+### Changed
+
+- **`Profile` contract model** — added `notifMorning: boolean` and `notifEvening: boolean` fields
+- **`ProfileUpdate` contract model** — added optional `notifMorning?: boolean` and `notifEvening?: boolean`
+- **`Me_get` handler** — returns `notifMorning` and `notifEvening`
+- **`Me_update` handler** — accepts and persists `notifMorning` / `notifEvening`
+
 ## [0.18.0] — 2026-06-11 · PWA shell
 
 ### Added
