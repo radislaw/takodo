@@ -1,3 +1,8 @@
+export interface CompletedTaskInfo {
+  completedAt: Date
+  pomodoros: number
+}
+
 export interface DayActivityResult {
   date: string
   active: boolean
@@ -17,6 +22,8 @@ export interface RewardsSummaryResult {
   shieldUsedRecently: boolean
   week: DayActivityResult[]
   badges: BadgeResult[]
+  xp: number
+  level: number
 }
 
 const SHIELD_EARN_EVERY = 5
@@ -80,12 +87,24 @@ function replayStreak(activeDays: Set<string>, nowDate: Date): StreakReplay {
   return result
 }
 
+export function computeXP(tasks: CompletedTaskInfo[], mitCompletions: number): number {
+  const base = tasks.length * 10
+  const mit = mitCompletions * 5
+  const pomodoro = tasks.reduce((sum, t) => sum + t.pomodoros, 0) * 5
+  return base + mit + pomodoro
+}
+
+export function computeLevel(xp: number): number {
+  return Math.floor(Math.sqrt(xp / 100)) + 1
+}
+
 export function computeRewards(
-  completedAts: Date[],
+  completedTasks: CompletedTaskInfo[],
   nowDate: Date,
   gentleMoves = 0,
+  mitCompletions = 0,
 ): RewardsSummaryResult {
-  const activeDays = new Set(completedAts.map(toDateStr))
+  const activeDays = new Set(completedTasks.map((t) => toDateStr(t.completedAt)))
   const { streak, longest, shields, shieldedDays } = replayStreak(activeDays, nowDate)
 
   const todayMs = new Date(toDateStr(nowDate) + 'T00:00:00Z').getTime()
@@ -106,7 +125,7 @@ export function computeRewards(
     }
   })
 
-  const totalCompleted = completedAts.length
+  const totalCompleted = completedTasks.length
   const streakBadge = (id: string, threshold: number): BadgeResult => ({
     id,
     earned: longest >= threshold,
@@ -124,5 +143,8 @@ export function computeRewards(
     },
   ]
 
-  return { streak, longestStreak: longest, shields, shieldUsedRecently, week, badges }
+  const xp = computeXP(completedTasks, mitCompletions)
+  const level = computeLevel(xp)
+
+  return { streak, longestStreak: longest, shields, shieldUsedRecently, week, badges, xp, level }
 }

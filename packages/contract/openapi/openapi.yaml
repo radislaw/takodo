@@ -668,6 +668,8 @@ components:
         - shieldUsedRecently
         - week
         - badges
+        - xp
+        - level
       properties:
         streak:
           type: integer
@@ -691,6 +693,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Badge'
+        xp:
+          type: integer
+          format: int32
+          description: Total experience points accumulated (done×10, MIT×5, pomodoro×5).
+        level:
+          type: integer
+          format: int32
+          description: 'Current level, 1-based: level = floor(sqrt(xp/100)) + 1.'
     Task:
       type: object
       required:

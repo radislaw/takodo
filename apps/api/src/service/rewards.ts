@@ -8,15 +8,21 @@ export function buildRewardsHandlers(prisma: PrismaClient, getUserId: GetUserId)
   return {
     async Rewards_get(_req: FastifyRequest, _reply: FastifyReply) {
       const userId = await getUserId()
-      const [completedTasks, user] = await Promise.all([
+      const [completedTasks, mitCompletions, user] = await Promise.all([
         prisma.task.findMany({
           where: { userId, status: 'done', completedAt: { not: null } },
-          select: { completedAt: true },
+          select: { completedAt: true, pomodoros: true },
+        }),
+        prisma.dailyEntry.count({
+          where: { isMIT: true, dailyList: { userId }, task: { status: 'done' } },
         }),
         prisma.user.findUnique({ where: { id: userId }, select: { gentleMoves: true } }),
       ])
-      const completedAts = completedTasks.map((t) => t.completedAt!)
-      return computeRewards(completedAts, new Date(), user?.gentleMoves ?? 0)
+      const tasks = completedTasks.map((t) => ({
+        completedAt: t.completedAt!,
+        pomodoros: t.pomodoros,
+      }))
+      return computeRewards(tasks, new Date(), user?.gentleMoves ?? 0, mitCompletions)
     },
   }
 }

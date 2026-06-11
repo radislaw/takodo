@@ -272,6 +272,10 @@ model RewardsSummary {
   /** Last 7 days, Monday-first. */
   week: DayActivity[];
   badges: Badge[];
+  /** Total experience points accumulated (done×10, MIT×5, pomodoro×5). */
+  xp: int32;
+  /** Current level, 1-based: level = floor(sqrt(xp/100)) + 1. */
+  level: int32;
 }
 
 @route("/rewards")
