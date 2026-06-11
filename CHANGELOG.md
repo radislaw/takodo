@@ -5,6 +5,81 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.18.0] — 2026-06-11 · PWA shell
+
+### Added
+
+- **`manifest.webmanifest`** (`public/`) — `name`, `short_name`, `start_url: /today`, `display: standalone`, `theme_color: #7c9a92`, `background_color: #0d0d0d` (AMOLED); SVG icon with `purpose: any maskable`; `/today` shortcut
+- **`sw.js`** (`public/`) — ~30-line hand-rolled service worker: `install` precaches `/` + `skipWaiting`; `activate` clears stale caches + `clients.claim()`; `fetch` skips cross-origin, SPA navigation fallback to cached `/`, cache-first for static assets
+- **PWA meta tags in `index.html`** — `<link rel="manifest">`, `theme-color`, `apple-touch-icon`, `apple-mobile-web-app-*` tags for iOS
+- **SW registration** — inline script in `index.html` on `load` event
+- **`pwa.spec.ts`** (`src/test/`) — 16 tests: manifest fields, sw.js event handlers, index.html wiring; typed under `tsconfig.node.json` (Node types)
+
+## [0.17.0] — 2026-06-11 · Comeback: anti-shame return banner
+
+### Added
+
+- **`comeback.ts`** (`domain/`) — `gapDays(lastActiveDay, today)` counts full missed days strictly before today; `isComeback(gap)` threshold ≥ 2; `COMEBACK_MIN_GAP_DAYS` constant
+- **`RewardsSummary.comebackDays?`** in contract — optional field present only in comeback state (≥ 2 missed days)
+- **`selectDailyQuests(userId, date, ensureEasy?)`** — third param force-includes `complete_1` (easiest quest) when comeback is active; determinism and uniqueness preserved; stable within the day (based on completions before today)
+- **`ComebackBanner.vue`** (`pages/today/ui/`) — anti-shame gain-framing card above summary ("С возвращением!", "Перерывы — это нормально…"); dismissible with accessible ×; shown when `rewards.comebackDays >= 2`
+- **`comeback.*` i18n keys** — `title`, `message`, `dismissAria` in `ru.json`
+- **`quests service`** — detects comeback via `task.findFirst` (last done before today); uses `ensureEasy` so quest list and claim endpoint agree on today's set
+
+## [0.16.0] — 2026-06-11 · Daily quests with tier rewards
+
+### Added
+
+- **`quests.ts`** (`domain/`) — `QUEST_POOL` (6 defs: `complete_1/2/3`, `complete_mit`, `add_3`, `before_noon`); `selectDailyQuests(userId, date)` deterministic via FNV-1a hash → mulberry32 PRNG; `questProgress`, `rollTier` (70 % common / 25 % rare / 5 % epic), `TIER_XP` (10 / 25 / 50)
+- **`QuestClaim` Prisma model** — `unique [userId, date, questId]`; `onDelete: Cascade` on User relation
+- **`GET /quests`** — today's 3 deterministic quests with live progress and claim state
+- **`POST /quests/:id/claim`** — server validates progress inside `$transaction`; rolls tier with `Math.random()`; returns 404 (not in today set), 409 `quest_not_done` / `already_claimed` (P2002 race covered)
+- **`questXp`** fifth param in `computeRewards` — `questClaim.aggregate(_sum.xp)` added to rewards service
+- **`useQuests`, `useClaimQuest`** composables (`shared/api/quests.ts`) — invalidate `['quests']` + `['rewards']` on settle
+- **`QuestPanel.vue`** (`pages/today/ui/`) — per-quest status circle (claimed sage / done apricot / pending tint), progress text, tier badge `TIER_CLASS`, claim button; TIER colours common/rare/epic
+- **`quests.*` i18n keys** — title, claim, claimed (`{tier} · +{xp} XP`), progress, tier names, 6 quest item strings
+- **`Quest`, `QuestTier` enum** in TypeSpec contract; `comebackDays?` pre-wired in `RewardsSummary`
+
+## [0.15.0] — 2026-06-11 · Theme unlock by level
+
+### Added
+
+- **`unlocks.ts`** (`domain/` api + `shared/lib/` web) — `THEME_UNLOCK_LEVELS` map (12 themes, levels 1–5); `themeUnlockLevel(theme)` → `POSITIVE_INFINITY` for unknown; `isThemeUnlocked(theme, level)` — web mirror marked "server is the source of truth"
+- **Server-side theme validation in `PATCH /me`** — skips level query for level-1 themes; returns 403 `{ code: theme_locked }` otherwise; `ProfileUpdate.theme` doc-comment updated in TypeSpec
+- **`lock` icon** in shared icon registry — padlock SVG path
+- **Theme lock UI in `ProfilePage.vue`** — locked themes get `:disabled`, `opacity-50` swatch, lock badge (`data-test="theme-lock"`), caption shows `"Ур. N"` (`profile.theme.lockedLevel`) + aria `profile.theme.lockedAria`; `selectTheme` guards on `isLocked`
+- **`ProfilePage.spec.ts`** — 8 tests covering locked/unlocked theme display and guard
+
+## [0.14.0] — 2026-06-11 · XP and levels
+
+### Added
+
+- **`computeXP(tasks, mitCompletions)`** — `done×10 + MIT×5 + pomodoro×5`
+- **`computeLevel(xp)`** — `floor(sqrt(xp / 100)) + 1` (level 1 at 0 XP, level 2 at 100, etc.)
+- **`xp` + `level` fields** in `RewardsSummary` contract model
+- **Level chip** on Today summary card (`data-test="level-chip"`; `bg-cat-mauve/15`; shown when `level > 1`)
+- **Level display** on Rewards page — XP bar (visual fill) + level number
+
+## [0.13.0] — 2026-06-11 · Gentle badge and move-to-tomorrow
+
+### Added
+
+- **`POST /daily/:date/entries/:entryId/move-to-tomorrow`** — atomic move: removes entry from today, creates/updates tomorrow's daily list, adds entry; increments `User.gentleMoves` counter
+- **`User.gentleMoves`** field in Prisma schema + contract (`int @default(0)`)
+- **`gentle_mode` badge** — earned when `gentleMoves >= 3`; `remaining` field tracks progress
+- **`useMoveToTomorrow`** composable (`shared/api/daily.ts`) — invalidates `['daily', today]` + `['daily', tomorrow]` + `['rewards']`
+- **Move-to-tomorrow arrow button** on `TodayTaskCard` — calls `useMoveToTomorrow`, shows `today.movedTomorrow` success toast
+
+## [0.12.0] — 2026-06-11 · Streak shields
+
+### Added
+
+- **Shield-aware `replayStreak`** in `rewards.ts` — earns 1 shield every 5 consecutive active days (cap 2); consumes shield instead of breaking streak on missed days; `shieldedDays: Set<string>` tracked for week display
+- **`shields` + `shieldUsedRecently` fields** in `RewardsSummary` contract + domain
+- **`StreakFlame.vue`** (`shared/ui/streak-flame/`) — streak number + flame icon; shield indicator badge when `shields > 0`; shield-used-recently subtle glow; accessible via `aria-label`
+- **Epic burst on streak 21** — `celebrate({ epic: true })` watcher in `TodayPage`; `RewardBurst` gains `fireFireworks` epic variant
+- **`streak.*` + `shields.*` i18n keys** in `ru.json`
+
 ## [0.11.0] — 2026-06-11 · Pomodoro timer with focus tracking
 
 ### Added
