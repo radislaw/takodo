@@ -340,6 +340,7 @@ export interface components {
         };
         ProfileUpdate: {
             name?: string;
+            /** @description Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level. */
             theme?: components["schemas"]["Theme"];
         };
         RewardsSummary: {

@@ -658,7 +658,9 @@ components:
           type: string
           maxLength: 100
         theme:
-          $ref: '#/components/schemas/Theme'
+          allOf:
+            - $ref: '#/components/schemas/Theme'
+          description: Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level.
     RewardsSummary:
       type: object
       required:
