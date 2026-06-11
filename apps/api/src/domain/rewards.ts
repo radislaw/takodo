@@ -1,3 +1,5 @@
+import { gapDays, isComeback } from './comeback.js'
+
 export interface CompletedTaskInfo {
   completedAt: Date
   pomodoros: number
@@ -24,6 +26,8 @@ export interface RewardsSummaryResult {
   badges: BadgeResult[]
   xp: number
   level: number
+  /** Full missed days before today — present only in comeback state (>= 2). */
+  comebackDays?: number
 }
 
 const SHIELD_EARN_EVERY = 5
@@ -147,5 +151,25 @@ export function computeRewards(
   const xp = computeXP(completedTasks, mitCompletions) + questXp
   const level = computeLevel(xp)
 
-  return { streak, longestStreak: longest, shields, shieldUsedRecently, week, badges, xp, level }
+  // Comeback: gap counted from the last active day before today, so the
+  // banner stays for the whole return day even after the first completion.
+  const todayStr = toDateStr(nowDate)
+  const lastBeforeToday =
+    [...activeDays]
+      .filter((d) => d < todayStr)
+      .sort()
+      .pop() ?? null
+  const gap = gapDays(lastBeforeToday, todayStr)
+
+  return {
+    streak,
+    longestStreak: longest,
+    shields,
+    shieldUsedRecently,
+    week,
+    badges,
+    xp,
+    level,
+    ...(isComeback(gap) ? { comebackDays: gap } : {}),
+  }
 }

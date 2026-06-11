@@ -277,6 +277,9 @@ model RewardsSummary {
   xp: int32;
   /** Current level, 1-based: level = floor(sqrt(xp/100)) + 1. */
   level: int32;
+
+  /** Full missed days before today; present only in comeback state (>= 2). */
+  comebackDays?: int32;
 }
 
 @route("/rewards")

@@ -3,7 +3,7 @@ import { mockDeep, mockReset } from 'vitest-mock-extended'
 import type { FastifyInstance } from 'fastify'
 import type { PrismaClient, QuestClaim } from '@prisma/client'
 import { buildApp } from '../app.js'
-import { selectDailyQuests, TIER_XP } from '../domain/quests.js'
+import { selectDailyQuests, TIER_XP, EASY_QUEST_ID } from '../domain/quests.js'
 
 const prisma = mockDeep<PrismaClient>()
 const getUserId = vi.fn().mockResolvedValue('user-1')
@@ -39,6 +39,12 @@ function mockStats(opts: {
     Promise.resolve(args?.where?.isMIT ? (opts.mit ?? 0) : (opts.entries ?? 0))) as never)
 }
 
+function mockLastCompletionDaysAgo(days: number) {
+  prisma.task.findFirst.mockResolvedValue({
+    completedAt: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
+  } as never)
+}
+
 function makeClaim(questId: string, overrides: Partial<QuestClaim> = {}): QuestClaim {
   return {
     id: 'claim-1',
@@ -59,6 +65,7 @@ describe('Quests routes', () => {
     mockReset(prisma)
     getUserId.mockResolvedValue('user-1')
     prisma.questClaim.findMany.mockResolvedValue([])
+    prisma.task.findFirst.mockResolvedValue(null)
     prisma.$transaction.mockImplementation((async (fn: (tx: PrismaClient) => unknown) =>
       fn(prisma)) as never)
     mockStats({})
@@ -98,6 +105,23 @@ describe('Quests routes', () => {
         expect(q.progress).toBe(q.target)
         expect(q.done).toBe(true)
       }
+    })
+
+    it('force-includes the easy quest after a 2+ day gap (comeback)', async () => {
+      mockLastCompletionDaysAgo(5)
+      const res = await app.inject({ method: 'GET', url: '/quests' })
+      const body = res.json() as QuestShape[]
+      expect(body.map((q) => q.id)).toEqual(
+        selectDailyQuests('user-1', today, true).map((q) => q.id),
+      )
+      expect(body.some((q) => q.id === EASY_QUEST_ID)).toBe(true)
+    })
+
+    it('keeps the natural set when last completion was yesterday', async () => {
+      mockLastCompletionDaysAgo(1)
+      const res = await app.inject({ method: 'GET', url: '/quests' })
+      const body = res.json() as QuestShape[]
+      expect(body.map((q) => q.id)).toEqual(todayQuests.map((q) => q.id))
     })
 
     it('marks claimed quests with tier and xp', async () => {
@@ -170,6 +194,18 @@ describe('Quests routes', () => {
           xp: TIER_XP.epic,
         }) as unknown,
       })
+    })
+
+    it('allows claiming the easy quest on a comeback day', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.1)
+      mockLastCompletionDaysAgo(5)
+      mockStats({ completed: 5, mit: 3, entries: 5, beforeNoon: 5 })
+      prisma.questClaim.findUnique.mockResolvedValue(null)
+      prisma.questClaim.create.mockResolvedValue(makeClaim(EASY_QUEST_ID))
+
+      const res = await app.inject({ method: 'POST', url: `/quests/${EASY_QUEST_ID}/claim` })
+      expect(res.statusCode).toBe(200)
+      expect((res.json() as QuestShape).id).toBe(EASY_QUEST_ID)
     })
 
     it('runs the claim inside a transaction', async () => {

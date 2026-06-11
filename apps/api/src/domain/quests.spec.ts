@@ -70,6 +70,37 @@ describe('selectDailyQuests', () => {
   })
 })
 
+describe('selectDailyQuests with ensureEasy', () => {
+  it('always includes the easy quest', () => {
+    for (let i = 0; i < 30; i++) {
+      const quests = selectDailyQuests(`user-${i}`, '2026-06-11', true)
+      expect(quests.some((q) => q.id === 'complete_1')).toBe(true)
+    }
+  })
+
+  it('still returns exactly 3 unique quests', () => {
+    for (let i = 0; i < 30; i++) {
+      const quests = selectDailyQuests(`user-${i}`, '2026-06-11', true)
+      expect(quests).toHaveLength(3)
+      expect(new Set(quests.map((q) => q.id)).size).toBe(3)
+    }
+  })
+
+  it('is deterministic', () => {
+    const a = selectDailyQuests('user-1', '2026-06-11', true)
+    const b = selectDailyQuests('user-1', '2026-06-11', true)
+    expect(a).toEqual(b)
+  })
+
+  it('keeps the natural set when it already contains the easy quest', () => {
+    const date = Array.from({ length: 60 }, (_, i) => {
+      const d = new Date(Date.UTC(2026, 6, 1 + i))
+      return d.toISOString().slice(0, 10)
+    }).find((d) => selectDailyQuests('user-1', d).some((q) => q.id === 'complete_1'))!
+    expect(selectDailyQuests('user-1', date, true)).toEqual(selectDailyQuests('user-1', date))
+  })
+})
+
 describe('questProgress', () => {
   it('counts completed tasks for complete kind', () => {
     const quest = QUEST_POOL.find((q) => q.id === 'complete_3')!

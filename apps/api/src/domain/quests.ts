@@ -51,13 +51,22 @@ function mulberry32(seed: number): () => number {
   }
 }
 
-/** Deterministic 3 quests for a user+date — same input always yields the same set. */
-export function selectDailyQuests(userId: string, date: string): QuestDef[] {
+/** Easiest quest in the pool — force-included on comeback days. */
+export const EASY_QUEST_ID = 'complete_1'
+
+/**
+ * Deterministic 3 quests for a user+date — same input always yields the same set.
+ * With `ensureEasy` the easy quest is guaranteed in the set (comeback days).
+ */
+export function selectDailyQuests(userId: string, date: string, ensureEasy = false): QuestDef[] {
   const rand = mulberry32(fnv1a(`${userId}:${date}`))
   const shuffled = QUEST_POOL.map((q) => ({ q, sort: rand() }))
     .sort((a, b) => a.sort - b.sort)
     .map((x) => x.q)
-  return shuffled.slice(0, DAILY_QUEST_COUNT)
+  const picked = shuffled.slice(0, DAILY_QUEST_COUNT)
+  if (!ensureEasy || picked.some((q) => q.id === EASY_QUEST_ID)) return picked
+  const easy = QUEST_POOL.find((q) => q.id === EASY_QUEST_ID)!
+  return [easy, ...picked.slice(0, DAILY_QUEST_COUNT - 1)]
 }
 
 export function questProgress(quest: QuestDef, stats: DayStats): number {

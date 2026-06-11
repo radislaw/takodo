@@ -327,3 +327,27 @@ describe('computeRewards xp + level fields', () => {
     expect(r.level).toBe(2)
   })
 })
+
+describe('computeRewards comebackDays', () => {
+  it('is absent with no completions', () => {
+    expect(computeRewards([], NOW).comebackDays).toBeUndefined()
+  })
+
+  it('is absent when last active yesterday', () => {
+    expect(computeRewards([td(daysAgo(1))], NOW).comebackDays).toBeUndefined()
+  })
+
+  it('is absent after a single missed day', () => {
+    expect(computeRewards([td(daysAgo(2))], NOW).comebackDays).toBeUndefined()
+  })
+
+  it('reports the gap when 2+ full days were missed', () => {
+    expect(computeRewards([td(daysAgo(3))], NOW).comebackDays).toBe(2)
+    expect(computeRewards([td(daysAgo(6))], NOW).comebackDays).toBe(5)
+  })
+
+  it('stays present on the return day after completing a task today', () => {
+    const r = computeRewards([td(daysAgo(0)), td(daysAgo(4))], NOW)
+    expect(r.comebackDays).toBe(3)
+  })
+})
