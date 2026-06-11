@@ -341,6 +341,16 @@ function toggleEvening() {
         </template>
       </div>
 
+      <!-- Help link -->
+      <RouterLink
+        to="/help"
+        class="border-line text-ink-soft hover:text-ink mt-5 flex items-center gap-3 rounded-2xl border px-5 py-3.5 transition-colors"
+      >
+        <AppIcon name="sparkles" :size="18" class="text-sage-deep flex-shrink-0" />
+        <span class="flex-1 text-sm font-semibold">{{ t('help.title') }}</span>
+        <AppIcon name="chevronR" :size="16" class="text-ink-faint" />
+      </RouterLink>
+
       <!-- Gentle note -->
       <div class="bg-sage-tint mt-5 flex gap-3 rounded-2xl p-4">
         <AppIcon name="heart" :size="20" class="text-sage-deep mt-0.5 flex-shrink-0" />

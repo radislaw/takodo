@@ -36,6 +36,10 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/profile').then((m) => m.ProfilePage),
   },
   {
+    path: '/help',
+    component: () => import('@/pages/help').then((m) => m.HelpPage),
+  },
+  {
     path: '/design/tokens',
     meta: { chrome: false },
     component: () => import('@/pages/design-tokens').then((m) => m.DesignTokensPage),
