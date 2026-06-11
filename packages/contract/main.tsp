@@ -285,6 +285,44 @@ interface Rewards {
   @get get(): RewardsSummary;
 }
 
+// ─── Daily quests ───────────────────────────────────────────────
+
+enum QuestTier {
+  common,
+  rare,
+  epic,
+}
+
+/** Daily quest with live progress. Title/description live in web i18n, keyed by id. */
+model Quest {
+  /** Stable quest definition id → maps to localized copy on the web. */
+  id: string;
+
+  target: int32;
+  progress: int32;
+
+  /** progress >= target — the quest can be claimed. */
+  done: boolean;
+
+  claimed: boolean;
+
+  /** Rolled server-side on claim (70/25/5). */
+  tier?: QuestTier;
+
+  /** XP awarded on claim, by tier. */
+  xp?: int32;
+}
+
+@route("/quests")
+@tag("Quests")
+interface Quests {
+  /** Today's three deterministic quests (hash of userId+date) with live progress. */
+  @get list(): Quest[];
+
+  /** Claim a completed quest: server validates progress, rolls tier, awards XP. */
+  @route("/{id}/claim") @post claim(@path id: string): Quest | ApiError;
+}
+
 // ─── Frequently undone ──────────────────────────────────────────
 
 model FrequentTask {

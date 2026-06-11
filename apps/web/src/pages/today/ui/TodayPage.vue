@@ -18,6 +18,7 @@ import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 import { useReward } from '@/shared/lib/useReward'
 import TodayTaskCard from './TodayTaskCard.vue'
+import QuestPanel from './QuestPanel.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const { showError } = useErrorToast()
@@ -306,6 +307,11 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
           </div>
         </template>
       </template>
+
+      <!-- Daily quests -->
+      <div class="mt-5">
+        <QuestPanel />
+      </div>
     </main>
 
     <!-- FAB -->

@@ -22,3 +22,4 @@ export {
 export { useFrequent } from './frequent'
 export { useProfile, useUpdateProfile } from './profile'
 export { useRewards } from './rewards'
+export { useQuests, useClaimQuest } from './quests'

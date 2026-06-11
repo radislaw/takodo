@@ -119,6 +119,40 @@ export interface paths {
         patch: operations["Me_update"];
         trace?: never;
     };
+    "/quests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Today's three deterministic quests (hash of userId+date) with live progress. */
+        get: operations["Quests_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/quests/{id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Claim a completed quest: server validates progress, rolls tier, awards XP. */
+        post: operations["Quests_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/rewards": {
         parameters: {
             query?: never;
@@ -343,6 +377,27 @@ export interface components {
             /** @description Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level. */
             theme?: components["schemas"]["Theme"];
         };
+        /** @description Daily quest with live progress. Title/description live in web i18n, keyed by id. */
+        Quest: {
+            /** @description Stable quest definition id → maps to localized copy on the web. */
+            id: string;
+            /** Format: int32 */
+            target: number;
+            /** Format: int32 */
+            progress: number;
+            /** @description progress >= target — the quest can be claimed. */
+            done: boolean;
+            claimed: boolean;
+            /** @description Rolled server-side on claim (70/25/5). */
+            tier?: components["schemas"]["QuestTier"];
+            /**
+             * Format: int32
+             * @description XP awarded on claim, by tier.
+             */
+            xp?: number;
+        };
+        /** @enum {string} */
+        QuestTier: "common" | "rare" | "epic";
         RewardsSummary: {
             /** Format: int32 */
             streak: number;
@@ -720,6 +775,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Profile"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Quests_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quest"][];
+                };
+            };
+        };
+    };
+    Quests_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quest"];
                 };
             };
             /** @description An unexpected error response. */
