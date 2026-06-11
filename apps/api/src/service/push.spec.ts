@@ -28,11 +28,13 @@ function makeUser(overrides: Partial<User> = {}): User {
   }
 }
 
+const ENDPOINT = 'https://fcm.googleapis.com/fcm/send/abc'
+
 function makeSub(overrides: Partial<PushSubscription> = {}): PushSubscription {
   return {
     id: 'sub-1',
     userId: 'user-1',
-    endpoint: 'https://push.example.com/sub/abc',
+    endpoint: ENDPOINT,
     p256dh: 'key123',
     auth: 'auth123',
     createdAt: new Date(),
@@ -46,6 +48,7 @@ describe('Push routes', () => {
   beforeEach(async () => {
     mockReset(prisma)
     getUserId.mockResolvedValue('user-1')
+    prisma.$transaction.mockImplementation(async (fn) => fn(prisma))
     process.env.VAPID_PUBLIC_KEY = 'BFake-public-key-for-testing'
     process.env.VAPID_PRIVATE_KEY = 'fake-private-key-for-testing'
     app = buildApp({ prisma, getUserId })
@@ -79,12 +82,13 @@ describe('Push routes', () => {
 
   describe('POST /push/subscribe', () => {
     it('upserts subscription and returns 200', async () => {
+      prisma.pushSubscription.findUnique.mockResolvedValue(null)
       prisma.pushSubscription.upsert.mockResolvedValue(makeSub())
       const res = await app.inject({
         method: 'POST',
         url: '/push/subscribe',
         payload: {
-          endpoint: 'https://push.example.com/sub/abc',
+          endpoint: ENDPOINT,
           p256dh: 'key123',
           auth: 'auth123',
         },
@@ -102,12 +106,57 @@ describe('Push routes', () => {
         method: 'POST',
         url: '/push/subscribe',
         payload: {
-          endpoint: 'https://push.example.com/sub/abc',
+          endpoint: ENDPOINT,
           p256dh: 'key123',
           auth: 'auth123',
         },
       })
       expect(res.statusCode).toBe(503)
+    })
+
+    it('rejects endpoint outside known push services with 400 (SSRF guard)', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/push/subscribe',
+        payload: {
+          endpoint: 'https://evil.example.com/collect',
+          p256dh: 'key123',
+          auth: 'auth123',
+        },
+      })
+      expect(res.statusCode).toBe(400)
+      expect((res.json() as { code: string }).code).toBe('invalid_endpoint')
+      expect(prisma.pushSubscription.upsert).not.toHaveBeenCalled()
+    })
+
+    it('rejects http (non-TLS) endpoint with 400', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/push/subscribe',
+        payload: {
+          endpoint: 'http://fcm.googleapis.com/fcm/send/abc',
+          p256dh: 'key123',
+          auth: 'auth123',
+        },
+      })
+      expect(res.statusCode).toBe(400)
+      expect(prisma.pushSubscription.upsert).not.toHaveBeenCalled()
+    })
+
+    it("returns 409 when endpoint belongs to another user's subscription", async () => {
+      prisma.pushSubscription.findUnique.mockResolvedValue(makeSub({ userId: 'user-2' }))
+      const res = await app.inject({
+        method: 'POST',
+        url: '/push/subscribe',
+        payload: {
+          endpoint: ENDPOINT,
+          p256dh: 'key123',
+          auth: 'auth123',
+        },
+      })
+      expect(res.statusCode).toBe(409)
+      expect((res.json() as { code: string }).code).toBe('endpoint_conflict')
+      expect(prisma.pushSubscription.upsert).not.toHaveBeenCalled()
     })
   })
 
@@ -117,12 +166,31 @@ describe('Push routes', () => {
       const res = await app.inject({
         method: 'DELETE',
         url: '/push/subscribe',
-        payload: { endpoint: 'https://push.example.com/sub/abc' },
+        payload: { endpoint: ENDPOINT },
       })
       expect(res.statusCode).toBe(200)
       expect(prisma.pushSubscription.deleteMany).toHaveBeenCalledWith({
-        where: { userId: 'user-1', endpoint: 'https://push.example.com/sub/abc' },
+        where: { userId: 'user-1', endpoint: ENDPOINT },
       })
+    })
+  })
+
+  describe('sendPushToUser resilience', () => {
+    it('continues with remaining subscriptions when one send fails hard', async () => {
+      const webpush = (await import('web-push')).default
+      const send = webpush.sendNotification as ReturnType<typeof vi.fn>
+      send.mockRejectedValueOnce(Object.assign(new Error('boom'), { statusCode: 500 }))
+      send.mockResolvedValueOnce(undefined)
+      prisma.pushSubscription.findMany.mockResolvedValue([
+        makeSub(),
+        makeSub({ id: 'sub-2', endpoint: 'https://fcm.googleapis.com/fcm/send/def' }),
+      ])
+
+      const { sendPushToUser } = await import('./push.js')
+      await expect(sendPushToUser(prisma, 'user-1', 'T', 'B')).resolves.toBeUndefined()
+      expect(send).toHaveBeenCalledTimes(2)
+      // hard failure is not a stale subscription — must not be deleted
+      expect(prisma.pushSubscription.delete).not.toHaveBeenCalled()
     })
   })
 

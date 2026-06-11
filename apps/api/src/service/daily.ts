@@ -155,16 +155,15 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       const tomorrow = new Date(today)
       tomorrow.setUTCDate(tomorrow.getUTCDate() + 1)
 
-      const todayList = await prisma.dailyList.findUnique({
-        where: { userId_date: { userId, date: today } },
-        include: { entries: { where: { id: entryId } } },
-      })
-      if (!todayList || todayList.entries.length === 0) {
-        return reply.status(404).send({ code: 'not_found', message: 'Entry not found' })
-      }
-      const entry = todayList.entries[0]!
-
       const newEntry = await prisma.$transaction(async (tx) => {
+        // Ownership check inside the transaction — no TOCTOU window.
+        const todayList = await tx.dailyList.findUnique({
+          where: { userId_date: { userId, date: today } },
+          include: { entries: { where: { id: entryId } } },
+        })
+        if (!todayList || todayList.entries.length === 0) return null
+        const entry = todayList.entries[0]!
+
         const tomorrowList = await tx.dailyList.upsert({
           where: { userId_date: { userId, date: tomorrow } },
           create: { userId, date: tomorrow },
@@ -186,6 +185,10 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
         await tx.user.update({ where: { id: userId }, data: { gentleMoves: { increment: 1 } } })
         return created
       })
+
+      if (!newEntry) {
+        return reply.status(404).send({ code: 'not_found', message: 'Entry not found' })
+      }
 
       return {
         id: newEntry.id,
