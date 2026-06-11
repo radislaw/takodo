@@ -1,12 +1,20 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppIcon, LevelRing } from '@/shared/ui'
 import { useProfile, useUpdateProfile, useRewards } from '@/shared/api'
+import { isThemeUnlocked, themeUnlockLevel } from '@/shared/lib/unlocks'
 
 const { t } = useI18n({ useScope: 'global' })
 const { data: profile } = useProfile()
 const { mutate: updateProfile } = useUpdateProfile()
 const { data: rewards } = useRewards()
+
+const level = computed(() => rewards.value?.level ?? 1)
+
+function isLocked(id: string): boolean {
+  return !isThemeUnlocked(id, level.value)
+}
 
 type ThemeId =
   | 'light'
@@ -50,6 +58,7 @@ const A11Y_THEMES: ThemeMeta[] = [
 ]
 
 function selectTheme(id: string) {
+  if (isLocked(id)) return
   updateProfile({ theme: id as ThemeId })
 }
 </script>
@@ -96,13 +105,24 @@ function selectTheme(id: string) {
             v-for="th in THEMES"
             :key="th.id"
             type="button"
-            class="flex w-14 cursor-pointer flex-col items-center gap-1.5 rounded-lg border-none bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)] focus-visible:ring-offset-2"
-            :aria-label="t('profile.themes.' + th.id)"
+            :data-test="`theme-${th.id}`"
+            class="flex w-14 flex-col items-center gap-1.5 rounded-lg border-none bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)] focus-visible:ring-offset-2"
+            :class="isLocked(th.id) ? 'cursor-not-allowed' : 'cursor-pointer'"
+            :disabled="isLocked(th.id)"
+            :aria-label="
+              isLocked(th.id)
+                ? t('profile.theme.lockedAria', {
+                    name: t('profile.themes.' + th.id),
+                    level: themeUnlockLevel(th.id),
+                  })
+                : t('profile.themes.' + th.id)
+            "
             :aria-pressed="profile?.theme === th.id"
             @click="selectTheme(th.id)"
           >
             <div
               class="relative box-border flex h-14 w-14 items-end rounded-[15px] p-2"
+              :class="{ 'opacity-50': isLocked(th.id) }"
               :style="{
                 background: th.bg,
                 border: th.border ? `1px solid ${th.border}` : '1px solid rgba(0,0,0,.1)',
@@ -121,12 +141,23 @@ function selectTheme(id: string) {
               >
                 <AppIcon name="check" :size="12" color="#fff" :stroke-width="3" />
               </span>
+              <span
+                v-if="isLocked(th.id)"
+                data-test="theme-lock"
+                class="bg-ink-soft absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full shadow-sm"
+              >
+                <AppIcon name="lock" :size="11" color="#fff" :stroke-width="2.5" />
+              </span>
             </div>
             <span
               class="text-center text-[11px] font-bold whitespace-nowrap"
               :class="profile?.theme === th.id ? 'text-ink' : 'text-ink-soft'"
             >
-              {{ t(`profile.themes.${th.id}`) }}
+              {{
+                isLocked(th.id)
+                  ? t('profile.theme.lockedLevel', { n: themeUnlockLevel(th.id) })
+                  : t(`profile.themes.${th.id}`)
+              }}
             </span>
           </button>
         </div>
@@ -142,6 +173,7 @@ function selectTheme(id: string) {
             v-for="th in A11Y_THEMES"
             :key="th.id"
             type="button"
+            :data-test="`theme-${th.id}`"
             class="flex w-14 cursor-pointer flex-col items-center gap-1.5 rounded-lg border-none bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)] focus-visible:ring-offset-2"
             :aria-label="t('profile.themes.' + th.id)"
             :aria-pressed="profile?.theme === th.id"

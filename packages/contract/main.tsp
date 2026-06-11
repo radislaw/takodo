@@ -232,6 +232,7 @@ model ProfileUpdate {
   @maxLength(100)
   name?: string;
 
+  /** Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level. */
   theme?: Theme;
 }
 
