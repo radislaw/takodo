@@ -9,6 +9,17 @@ const permissionState = ref<PermissionState>(
 )
 const isSubscribed = ref(false)
 
+// Sync subscription state from browser on first load.
+if ('serviceWorker' in navigator && permissionState.value === 'granted') {
+  navigator.serviceWorker
+    .getRegistration('/')
+    .then((reg) => reg?.pushManager.getSubscription())
+    .then((sub) => {
+      isSubscribed.value = !!sub
+    })
+    .catch(() => undefined)
+}
+
 async function getVapidPublicKey(): Promise<string | null> {
   const { data, error } = await apiClient.GET('/push/vapid-key')
   if (error) return null
