@@ -96,6 +96,26 @@ describe('buildScheduler', () => {
     expect(webpush.sendNotification).not.toHaveBeenCalled()
   })
 
+  it('survives a hard send failure and continues with the next user', async () => {
+    const schedule = (await import('node-schedule')).default
+    const webpush = (await import('web-push')).default
+    const send = webpush.sendNotification as ReturnType<typeof vi.fn>
+    const hardError = Object.assign(new Error('push service down'), { statusCode: 500 })
+    send.mockRejectedValueOnce(hardError).mockRejectedValueOnce(hardError)
+
+    prisma.user.findMany.mockResolvedValue([makeUser(), makeUser({ id: 'user-2' })])
+    prisma.pushSubscription.findMany.mockResolvedValue([makeSub()])
+
+    buildScheduler(prisma)
+
+    const calls = (schedule.scheduleJob as ReturnType<typeof vi.fn>).mock.calls as Array<
+      [string, () => Promise<void>]
+    >
+    // The job must not reject — an unhandled rejection here would crash the process.
+    await expect(calls[0]![1]()).resolves.toBeUndefined()
+    expect(send).toHaveBeenCalledTimes(2)
+  })
+
   it('does nothing when push is not configured', async () => {
     delete process.env.VAPID_PUBLIC_KEY
     delete process.env.VAPID_PRIVATE_KEY

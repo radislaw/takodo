@@ -11,7 +11,12 @@ vi.mock('web-push', () => ({
   },
 }))
 
-import { buildPushPayload, sendPushToSubscription, type StoredSubscription } from './push.js'
+import {
+  buildPushPayload,
+  isAllowedPushEndpoint,
+  sendPushToSubscription,
+  type StoredSubscription,
+} from './push.js'
 
 const SUB: StoredSubscription = {
   endpoint: 'https://push.example.com/sub/abc',
@@ -66,5 +71,37 @@ describe('sendPushToSubscription', () => {
   it('returns true on success', async () => {
     const result = await sendPushToSubscription(SUB, 'Hello', 'Body')
     expect(result).toBe(true)
+  })
+})
+
+describe('isAllowedPushEndpoint', () => {
+  it.each([
+    'https://fcm.googleapis.com/fcm/send/abc123',
+    'https://updates.push.services.mozilla.com/wpush/v2/abc',
+    'https://web.push.apple.com/QGbnL1eP',
+    'https://sin.notify.windows.com/w/?token=abc',
+  ])('accepts known push service endpoint %s', (endpoint) => {
+    expect(isAllowedPushEndpoint(endpoint)).toBe(true)
+  })
+
+  it('rejects plain http scheme', () => {
+    expect(isAllowedPushEndpoint('http://fcm.googleapis.com/fcm/send/abc')).toBe(false)
+  })
+
+  it('rejects unknown hosts (SSRF guard)', () => {
+    expect(isAllowedPushEndpoint('https://evil.example.com/collect')).toBe(false)
+    expect(isAllowedPushEndpoint('https://127.0.0.1:5432/')).toBe(false)
+    expect(isAllowedPushEndpoint('https://internal.corp/admin')).toBe(false)
+  })
+
+  it('rejects lookalike hosts and userinfo tricks', () => {
+    expect(isAllowedPushEndpoint('https://fcm.googleapis.com.evil.com/send')).toBe(false)
+    expect(isAllowedPushEndpoint('https://fcm.googleapis.com@evil.com/send')).toBe(false)
+    expect(isAllowedPushEndpoint('https://notify.windows.com.attacker.io/w')).toBe(false)
+  })
+
+  it('rejects non-URL garbage', () => {
+    expect(isAllowedPushEndpoint('not a url')).toBe(false)
+    expect(isAllowedPushEndpoint('')).toBe(false)
   })
 })

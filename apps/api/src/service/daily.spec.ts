@@ -192,6 +192,18 @@ describe('Daily routes', () => {
       expect(res.statusCode).toBe(404)
     })
 
+    it('checks entry ownership inside the transaction (no TOCTOU window)', async () => {
+      prisma.dailyList.findUnique.mockResolvedValue({ ...makeList(), entries: [] } as Parameters<
+        typeof prisma.dailyList.findUnique.mockResolvedValue
+      >[0])
+      const res = await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/entries/entry-1/move-to-tomorrow',
+      })
+      expect(res.statusCode).toBe(404)
+      expect(prisma.$transaction).toHaveBeenCalledOnce()
+    })
+
     it('moves entry atomically and returns new entry', async () => {
       prisma.dailyList.findUnique.mockResolvedValue({
         ...makeList(),

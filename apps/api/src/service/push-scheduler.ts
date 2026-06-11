@@ -13,31 +13,39 @@ const EVENING_CRON = '0 20 * * *'
 export function buildScheduler(prisma: PrismaClient): void {
   initVapid(VAPID_SUBJECT)
 
-  schedule.scheduleJob(MORNING_CRON, async () => {
-    if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return
-    const users = await prisma.user.findMany({ where: { notifMorning: true } })
-    for (const user of users) {
-      await sendPushToUser(
-        prisma,
-        user.id,
-        'tootoo',
-        'Что сегодня в фокусе? Выгрузи мысли и выбери главное.',
-        'morning',
-      )
-    }
-  })
+  schedule.scheduleJob(MORNING_CRON, () =>
+    sendToOptedIn(
+      prisma,
+      'notifMorning',
+      'Что сегодня в фокусе? Выгрузи мысли и выбери главное.',
+      'morning',
+    ),
+  )
 
-  schedule.scheduleJob(EVENING_CRON, async () => {
+  schedule.scheduleJob(EVENING_CRON, () =>
+    sendToOptedIn(
+      prisma,
+      'notifEvening',
+      'Как прошёл день? Отметь сделанное и запланируй завтра.',
+      'evening',
+    ),
+  )
+}
+
+/** Never throws: an unhandled rejection inside a cron job would crash the process. */
+async function sendToOptedIn(
+  prisma: PrismaClient,
+  pref: 'notifMorning' | 'notifEvening',
+  body: string,
+  tag: string,
+): Promise<void> {
+  try {
     if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return
-    const users = await prisma.user.findMany({ where: { notifEvening: true } })
+    const users = await prisma.user.findMany({ where: { [pref]: true } })
     for (const user of users) {
-      await sendPushToUser(
-        prisma,
-        user.id,
-        'tootoo',
-        'Как прошёл день? Отметь сделанное и запланируй завтра.',
-        'evening',
-      )
+      await sendPushToUser(prisma, user.id, 'tootoo', body, tag)
     }
-  })
+  } catch (error) {
+    console.error(`Push cron job (${tag}) failed:`, error)
+  }
 }

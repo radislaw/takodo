@@ -91,11 +91,18 @@ function replayStreak(activeDays: Set<string>, nowDate: Date): StreakReplay {
   return result
 }
 
+/** XP from pre-aggregated totals — lets callers use DB aggregates instead of row scans. */
+export function computeXPFromTotals(
+  completedCount: number,
+  pomodoroSum: number,
+  mitCompletions: number,
+): number {
+  return completedCount * 10 + mitCompletions * 5 + pomodoroSum * 5
+}
+
 export function computeXP(tasks: CompletedTaskInfo[], mitCompletions: number): number {
-  const base = tasks.length * 10
-  const mit = mitCompletions * 5
-  const pomodoro = tasks.reduce((sum, t) => sum + t.pomodoros, 0) * 5
-  return base + mit + pomodoro
+  const pomodoroSum = tasks.reduce((sum, t) => sum + t.pomodoros, 0)
+  return computeXPFromTotals(tasks.length, pomodoroSum, mitCompletions)
 }
 
 export function computeLevel(xp: number): number {

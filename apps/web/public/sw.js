@@ -24,16 +24,45 @@ self.addEventListener('fetch', (e) => {
     return
   }
 
-  // Static assets: cache first, populate on miss.
+  // Static assets: cache first, populate on miss. Never cache error responses —
+  // a cached 404/500 would poison the asset until the cache version changes.
   e.respondWith(
     caches.match(e.request).then(
       (cached) =>
         cached ||
         fetch(e.request).then((res) => {
-          const clone = res.clone()
-          caches.open(CACHE).then((c) => c.put(e.request, clone))
+          if (res.ok) {
+            const clone = res.clone()
+            caches.open(CACHE).then((c) => c.put(e.request, clone))
+          }
           return res
         }),
     ),
+  )
+})
+
+self.addEventListener('push', (e) => {
+  if (!e.data) return
+  let data
+  try {
+    data = e.data.json()
+  } catch {
+    data = { body: e.data.text() }
+  }
+  e.waitUntil(
+    self.registration.showNotification(data.title || 'tootoo', {
+      body: data.body || '',
+      tag: data.tag,
+      icon: '/logo.svg',
+    }),
+  )
+})
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close()
+  e.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((list) => (list[0] ? list[0].focus() : self.clients.openWindow('/'))),
   )
 })

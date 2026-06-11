@@ -21,6 +21,16 @@ function makeUser(overrides: Partial<User> = {}): User {
   }
 }
 
+/** Mock the aggregate-based level sources (no row scans). */
+function mockLevelSources({ completedCount = 0, pomodoroSum = 0, mitCount = 0, questXp = 0 } = {}) {
+  prisma.task.aggregate.mockResolvedValue({
+    _count: { _all: completedCount },
+    _sum: { pomodoros: pomodoroSum },
+  } as never)
+  prisma.dailyEntry.count.mockResolvedValue(mitCount)
+  prisma.questClaim.aggregate.mockResolvedValue({ _sum: { xp: questXp } } as never)
+}
+
 describe('Profile routes', () => {
   let app: FastifyInstance
 
@@ -65,13 +75,7 @@ describe('Profile routes', () => {
   describe('PATCH /me', () => {
     it('updates theme', async () => {
       // amoled unlocks at level 5 → 1600 xp → 160 completed tasks
-      prisma.task.findMany.mockResolvedValue(
-        Array.from({ length: 160 }, () => ({
-          completedAt: new Date('2026-06-01T10:00:00Z'),
-          pomodoros: 0,
-        })) as never,
-      )
-      prisma.dailyEntry.count.mockResolvedValue(0)
+      mockLevelSources({ completedCount: 160 })
       prisma.user.update.mockResolvedValue(makeUser({ theme: 'amoled' }))
       const res = await app.inject({
         method: 'PATCH',
@@ -97,19 +101,8 @@ describe('Profile routes', () => {
   })
 
   describe('PATCH /me theme unlocks', () => {
-    function mockLevel(completedCount: number) {
-      // level = floor(sqrt(xp/100)) + 1, xp = completedCount * 10
-      prisma.task.findMany.mockResolvedValue(
-        Array.from({ length: completedCount }, (_, i) => ({
-          completedAt: new Date(`2026-06-0${(i % 9) + 1}T10:00:00Z`),
-          pomodoros: 0,
-        })) as never,
-      )
-      prisma.dailyEntry.count.mockResolvedValue(0)
-    }
-
     it('rejects locked theme with 403 theme_locked', async () => {
-      mockLevel(0) // level 1
+      mockLevelSources({ completedCount: 0 }) // level 1
       const res = await app.inject({
         method: 'PATCH',
         url: '/me',
@@ -122,7 +115,7 @@ describe('Profile routes', () => {
     })
 
     it('accepts theme when level is high enough', async () => {
-      mockLevel(10) // 100 xp → level 2
+      mockLevelSources({ completedCount: 10 }) // 100 xp → level 2
       prisma.user.update.mockResolvedValue(makeUser({ theme: 'lavender' }))
       const res = await app.inject({
         method: 'PATCH',
@@ -133,6 +126,25 @@ describe('Profile routes', () => {
       expect((res.json() as { theme: string }).theme).toBe('lavender')
     })
 
+    it('counts quest XP toward the unlock level (parity with rewards)', async () => {
+      mockLevelSources({ completedCount: 0, questXp: 100 }) // 100 xp → level 2
+      prisma.user.update.mockResolvedValue(makeUser({ theme: 'lavender' }))
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { theme: 'lavender' },
+      })
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('computes level via aggregates, not row scans', async () => {
+      mockLevelSources({ completedCount: 10 })
+      prisma.user.update.mockResolvedValue(makeUser({ theme: 'lavender' }))
+      await app.inject({ method: 'PATCH', url: '/me', payload: { theme: 'lavender' } })
+      expect(prisma.task.aggregate).toHaveBeenCalledOnce()
+      expect(prisma.task.findMany).not.toHaveBeenCalled()
+    })
+
     it('accepts base theme without level queries', async () => {
       prisma.user.update.mockResolvedValue(makeUser({ theme: 'dark' }))
       const res = await app.inject({
@@ -141,7 +153,7 @@ describe('Profile routes', () => {
         payload: { theme: 'dark' },
       })
       expect(res.statusCode).toBe(200)
-      expect(prisma.task.findMany).not.toHaveBeenCalled()
+      expect(prisma.task.aggregate).not.toHaveBeenCalled()
       expect(prisma.dailyEntry.count).not.toHaveBeenCalled()
     })
 
@@ -153,7 +165,7 @@ describe('Profile routes', () => {
         payload: { name: 'Лёша' },
       })
       expect(res.statusCode).toBe(200)
-      expect(prisma.task.findMany).not.toHaveBeenCalled()
+      expect(prisma.task.aggregate).not.toHaveBeenCalled()
     })
   })
 
