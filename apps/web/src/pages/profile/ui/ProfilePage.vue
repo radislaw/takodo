@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { AppIcon, LevelRing } from '@/shared/ui'
 import { useProfile, useUpdateProfile, useRewards, useNotifications } from '@/shared/api'
 import { isThemeUnlocked, themeUnlockLevel } from '@/shared/lib/unlocks'
+import ThemeSwatch from './ThemeSwatch.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const { data: profile } = useProfile()
@@ -74,12 +75,9 @@ const {
 const notifMorning = computed(() => profile.value?.notifMorning ?? true)
 const notifEvening = computed(() => profile.value?.notifEvening ?? true)
 
-function toggleMorning() {
-  updateProfile({ notifMorning: !notifMorning.value })
-}
-
-function toggleEvening() {
-  updateProfile({ notifEvening: !notifEvening.value })
+function toggleNotif(key: 'notifMorning' | 'notifEvening') {
+  const current = key === 'notifMorning' ? notifMorning.value : notifEvening.value
+  updateProfile({ [key]: !current })
 }
 </script>
 
@@ -121,65 +119,15 @@ function toggleEvening() {
 
         <!-- Regular themes -->
         <div class="flex flex-wrap gap-x-2 gap-y-4">
-          <button
+          <ThemeSwatch
             v-for="th in THEMES"
             :key="th.id"
-            type="button"
-            :data-test="`theme-${th.id}`"
-            class="flex w-14 flex-col items-center gap-1.5 rounded-lg border-none bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)] focus-visible:ring-offset-2"
-            :class="isLocked(th.id) ? 'cursor-not-allowed' : 'cursor-pointer'"
-            :disabled="isLocked(th.id)"
-            :aria-label="
-              isLocked(th.id)
-                ? t('profile.theme.lockedAria', {
-                    name: t('profile.themes.' + th.id),
-                    level: themeUnlockLevel(th.id),
-                  })
-                : t('profile.themes.' + th.id)
-            "
-            :aria-pressed="profile?.theme === th.id"
-            @click="selectTheme(th.id)"
-          >
-            <div
-              class="relative box-border flex h-14 w-14 items-end rounded-[15px] p-2"
-              :class="{ 'opacity-50': isLocked(th.id) }"
-              :style="{
-                background: th.bg,
-                border: th.border ? `1px solid ${th.border}` : '1px solid rgba(0,0,0,.1)',
-                boxShadow:
-                  profile?.theme === th.id ? '0 0 0 2.5px var(--sage)' : 'var(--shadow-sm)',
-              }"
-            >
-              <span class="h-2.5 w-6 rounded-full" :style="{ background: th.accent }" />
-              <span
-                class="absolute top-2 right-2 h-3 w-3 rounded-full"
-                :style="{ background: th.reward }"
-              />
-              <span
-                v-if="profile?.theme === th.id"
-                class="bg-sage absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full shadow-sm"
-              >
-                <AppIcon name="check" :size="12" color="#fff" :stroke-width="3" />
-              </span>
-              <span
-                v-if="isLocked(th.id)"
-                data-test="theme-lock"
-                class="bg-ink-soft absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full shadow-sm"
-              >
-                <AppIcon name="lock" :size="11" color="#fff" :stroke-width="2.5" />
-              </span>
-            </div>
-            <span
-              class="text-center text-[11px] font-bold whitespace-nowrap"
-              :class="profile?.theme === th.id ? 'text-ink' : 'text-ink-soft'"
-            >
-              {{
-                isLocked(th.id)
-                  ? t('profile.theme.lockedLevel', { n: themeUnlockLevel(th.id) })
-                  : t(`profile.themes.${th.id}`)
-              }}
-            </span>
-          </button>
+            v-bind="th"
+            :active="profile?.theme === th.id"
+            :locked="isLocked(th.id)"
+            :locked-level="themeUnlockLevel(th.id)"
+            @select="selectTheme"
+          />
         </div>
       </div>
 
@@ -189,44 +137,15 @@ function toggleEvening() {
       </p>
       <div class="surface-card rounded-2xl p-5 shadow-md">
         <div class="flex flex-wrap gap-x-2 gap-y-4">
-          <button
+          <!-- A11y themes are level 1 by domain rule — never locked. -->
+          <ThemeSwatch
             v-for="th in A11Y_THEMES"
             :key="th.id"
-            type="button"
-            :data-test="`theme-${th.id}`"
-            class="flex w-14 cursor-pointer flex-col items-center gap-1.5 rounded-lg border-none bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)] focus-visible:ring-offset-2"
-            :aria-label="t('profile.themes.' + th.id)"
-            :aria-pressed="profile?.theme === th.id"
-            @click="selectTheme(th.id)"
-          >
-            <div
-              class="relative box-border flex h-14 w-14 items-end rounded-[15px] p-2"
-              :style="{
-                background: th.bg,
-                border: th.border ? `1px solid ${th.border}` : '1px solid rgba(0,0,0,.1)',
-                boxShadow:
-                  profile?.theme === th.id ? '0 0 0 2.5px var(--sage)' : 'var(--shadow-sm)',
-              }"
-            >
-              <span class="h-2.5 w-6 rounded-full" :style="{ background: th.accent }" />
-              <span
-                class="absolute top-2 right-2 h-3 w-3 rounded-full"
-                :style="{ background: th.reward }"
-              />
-              <span
-                v-if="profile?.theme === th.id"
-                class="bg-sage absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full shadow-sm"
-              >
-                <AppIcon name="check" :size="12" color="#fff" :stroke-width="3" />
-              </span>
-            </div>
-            <span
-              class="text-center text-[11px] font-bold whitespace-nowrap"
-              :class="profile?.theme === th.id ? 'text-ink' : 'text-ink-soft'"
-            >
-              {{ t(`profile.themes.${th.id}`) }}
-            </span>
-          </button>
+            v-bind="th"
+            :active="profile?.theme === th.id"
+            :locked="false"
+            @select="selectTheme"
+          />
         </div>
       </div>
 
@@ -291,7 +210,7 @@ function toggleEvening() {
                 :aria-checked="notifMorning"
                 class="relative h-7 w-12 cursor-pointer rounded-full transition-colors"
                 :class="notifMorning ? 'bg-sage' : 'bg-line'"
-                @click="toggleMorning"
+                @click="toggleNotif('notifMorning')"
               >
                 <span
                   class="absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
@@ -319,7 +238,7 @@ function toggleEvening() {
                 :aria-checked="notifEvening"
                 class="relative h-7 w-12 cursor-pointer rounded-full transition-colors"
                 :class="notifEvening ? 'bg-sage' : 'bg-line'"
-                @click="toggleEvening"
+                @click="toggleNotif('notifEvening')"
               >
                 <span
                   class="absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform"

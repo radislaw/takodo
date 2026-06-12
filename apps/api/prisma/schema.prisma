@@ -30,17 +30,25 @@ model PushSubscription {
   auth      String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum QuestTier {
+  common
+  rare
+  epic
 }
 
 model QuestClaim {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  date      DateTime @db.Date
+  date      DateTime  @db.Date
   questId   String
-  tier      String
+  tier      QuestTier
   xp        Int
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date, questId])
 }

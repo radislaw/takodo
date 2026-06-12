@@ -7,13 +7,6 @@ export function todayDate(timeZone?: string): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
 }
 
-export function tomorrowDate(timeZone?: string): string {
-  const tz = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
-  const d = new Date()
-  d.setDate(d.getDate() + 1)
-  return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d)
-}
-
 export async function fetchDailyByDate(date: string) {
   const { data, response } = await apiClient.GET('/daily/{date}', {
     params: { path: { date } },
