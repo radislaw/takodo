@@ -21,6 +21,21 @@ function parseDate(dateStr: string): Date {
   return new Date(`${dateStr}T00:00:00.000Z`)
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000
+
+/**
+ * The client's local day may differ from server UTC by up to one calendar day
+ * (UTC-12…UTC+14). Accept it within that window; otherwise reject so a client
+ * cannot claim quests for arbitrary past/future days.
+ */
+function resolveQuestDate(raw: string | undefined): string | null {
+  const serverToday = dateToString(new Date())
+  if (!raw) return serverToday
+  const diff = Math.abs(parseDate(raw).getTime() - parseDate(serverToday).getTime())
+  if (Number.isNaN(diff) || diff > DAY_MS) return null
+  return raw
+}
+
 async function loadDayStats(db: Db, userId: string, dateStr: string): Promise<DayStats> {
   const dayStart = parseDate(dateStr)
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000)
@@ -76,9 +91,14 @@ type ClaimOutcome =
 
 export function buildQuestsHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
-    async Quests_list(_req: FastifyRequest, _reply: FastifyReply) {
+    async Quests_list(req: FastifyRequest, reply: FastifyReply) {
       const userId = await getUserId()
-      const today = dateToString(new Date())
+      const today = resolveQuestDate((req.query as { date?: string }).date)
+      if (!today) {
+        return reply
+          .status(400)
+          .send({ code: 'invalid_date', message: 'Date must be within 1 day of server today' })
+      }
 
       const [comeback, stats, claims] = await Promise.all([
         isComebackDay(prisma, userId, today),
@@ -95,7 +115,12 @@ export function buildQuestsHandlers(prisma: PrismaClient, getUserId: GetUserId) 
     async Quests_claim(req: FastifyRequest, reply: FastifyReply) {
       const userId = await getUserId()
       const { id } = req.params as { id: string }
-      const today = dateToString(new Date())
+      const today = resolveQuestDate((req.query as { date?: string }).date)
+      if (!today) {
+        return reply
+          .status(400)
+          .send({ code: 'invalid_date', message: 'Date must be within 1 day of server today' })
+      }
       const comeback = await isComebackDay(prisma, userId, today)
       const quest = selectDailyQuests(userId, today, comeback).find((q) => q.id === id)
 

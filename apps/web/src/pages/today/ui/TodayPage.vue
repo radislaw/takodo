@@ -74,7 +74,9 @@ const isComeback = computed(() => (rewards.value?.comebackDays ?? 0) >= 2)
 watch(
   () => rewards.value?.streak,
   (next, prev) => {
-    if (next === 21 && (prev ?? 0) < 21) {
+    // prev === undefined is the initial query load — celebrating there would
+    // re-fire the epic burst on every page open while the streak sits at 21.
+    if (prev !== undefined && next === 21 && prev < 21) {
       celebrate({ epic: true })
     }
   },

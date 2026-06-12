@@ -328,11 +328,15 @@ model Quest {
 @route("/quests")
 @tag("Quests")
 interface Quests {
-  /** Today's three deterministic quests (hash of userId+date) with live progress. */
-  @get list(): Quest[];
+  /**
+   * Today's three deterministic quests (hash of userId+date) with live progress.
+   * `date` is the client's local day (timezones differ from server UTC);
+   * must be within ±1 day of server UTC today. Defaults to server UTC today.
+   */
+  @get list(@query date?: plainDate): Quest[] | ApiError;
 
-  /** Claim a completed quest: server validates progress, rolls tier, awards XP. */
-  @route("/{id}/claim") @post claim(@path id: string): Quest | ApiError;
+  /** Claim a completed quest: server validates progress, rolls tier, awards XP. Same `date` semantics as list. */
+  @route("/{id}/claim") @post claim(@path id: string, @query date?: plainDate): Quest | ApiError;
 }
 
 // ─── Push notifications ─────────────────────────────────────────

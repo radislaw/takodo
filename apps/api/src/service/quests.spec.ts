@@ -124,6 +124,26 @@ describe('Quests routes', () => {
       expect(body.map((q) => q.id)).toEqual(todayQuests.map((q) => q.id))
     })
 
+    it('uses the client-provided date for day stats (timezone east of UTC)', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+      const res = await app.inject({ method: 'GET', url: `/quests?date=${tomorrow}` })
+      expect(res.statusCode).toBe(200)
+      expect(prisma.dailyEntry.count).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            dailyList: expect.objectContaining({ date: new Date(`${tomorrow}T00:00:00.000Z`) }),
+          }) as unknown,
+        }),
+      )
+    })
+
+    it('rejects a date more than 1 day away from server today with 400', async () => {
+      const farPast = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+      const res = await app.inject({ method: 'GET', url: `/quests?date=${farPast}` })
+      expect(res.statusCode).toBe(400)
+      expect((res.json() as { code: string }).code).toBe('invalid_date')
+    })
+
     it('marks claimed quests with tier and xp', async () => {
       const questId = firstQuest.id
       prisma.questClaim.findMany.mockResolvedValue([makeClaim(questId, { tier: 'rare', xp: 25 })])
@@ -206,6 +226,34 @@ describe('Quests routes', () => {
       const res = await app.inject({ method: 'POST', url: `/quests/${EASY_QUEST_ID}/claim` })
       expect(res.statusCode).toBe(200)
       expect((res.json() as QuestShape).id).toBe(EASY_QUEST_ID)
+    })
+
+    it('claims against the client-provided date', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.1)
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+      const quests = selectDailyQuests('user-1', yesterday)
+      mockStats({ completed: 5, mit: 3, entries: 5, beforeNoon: 5 })
+      prisma.questClaim.findUnique.mockResolvedValue(null)
+      prisma.questClaim.create.mockResolvedValue(makeClaim(quests[0]!.id))
+
+      const res = await app.inject({
+        method: 'POST',
+        url: `/quests/${quests[0]!.id}/claim?date=${yesterday}`,
+      })
+      expect(res.statusCode).toBe(200)
+      expect(prisma.questClaim.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({ date: new Date(`${yesterday}T00:00:00.000Z`) }) as unknown,
+      })
+    })
+
+    it('rejects a claim date outside the ±1 day window with 400', async () => {
+      const farFuture = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+      const res = await app.inject({
+        method: 'POST',
+        url: `/quests/${firstQuest.id}/claim?date=${farFuture}`,
+      })
+      expect(res.statusCode).toBe(400)
+      expect((res.json() as { code: string }).code).toBe('invalid_date')
     })
 
     it('runs the claim inside a transaction', async () => {

@@ -72,7 +72,10 @@ export function useCompleteTask() {
       showError('errors.saveFailed')
     },
     onSettled: () => {
+      // Completion changes streak/XP/badges and quest progress too.
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: true })
+      queryCache.invalidateQueries({ key: ['quests'], exact: false })
     },
   })
 }
@@ -93,6 +96,8 @@ export function useReopenTask() {
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: true })
+      queryCache.invalidateQueries({ key: ['quests'], exact: false })
     },
   })
 }
@@ -185,7 +190,9 @@ export function useRecordFocus() {
       return data!
     },
     onSettled: () => {
+      // Pomodoros feed XP/level.
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: true })
     },
   })
 }
