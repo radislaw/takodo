@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { todayDate } from '@/shared/api/daily'
 
@@ -21,7 +21,35 @@ const props = withDefaults(
 const { t } = useI18n({ useScope: 'global' })
 
 const today = computed(() => todayDate())
-const columns = computed(() => Math.ceil(props.days.length / 7))
+
+// Target cell footprint — how wide one column wants to be before we add another.
+const CELL_PX = 14
+
+const rootEl = ref<HTMLElement | null>(null)
+const containerWidth = ref(0)
+let observer: ResizeObserver | null = null
+
+onMounted(() => {
+  if (typeof ResizeObserver === 'undefined') return
+  observer = new ResizeObserver((entries) => {
+    containerWidth.value = entries[0]?.contentRect.width ?? 0
+  })
+  if (rootEl.value) observer.observe(rootEl.value)
+})
+
+onBeforeUnmount(() => observer?.disconnect())
+
+const totalColumns = computed(() => Math.ceil(props.days.length / 7))
+
+// Show as many trailing columns as fit at the target cell size; the visible
+// columns then stretch (1fr) to fill the width exactly with small squares.
+const columns = computed(() => {
+  if (containerWidth.value <= 0) return totalColumns.value
+  const fit = Math.max(1, Math.floor(containerWidth.value / CELL_PX))
+  return Math.min(fit, totalColumns.value)
+})
+
+const visibleDays = computed(() => props.days.slice((totalColumns.value - columns.value) * 7))
 
 // 0 = empty; 1..4 buckets relative to the window's busiest day.
 const LEVEL_CLASS = ['bg-sage/10', 'bg-sage/30', 'bg-sage/55', 'bg-sage/80', 'bg-sage']
@@ -42,7 +70,7 @@ const monthLabels = computed(() => {
   const labels: { col: number; label: string }[] = []
   let lastMonth = -1
   for (let c = 0; c < columns.value; c++) {
-    const first = props.days[c * 7]
+    const first = visibleDays.value[c * 7]
     if (!first || !first.date.includes('-')) continue
     const month = Number(first.date.slice(5, 7)) - 1
     if (month !== lastMonth) {
@@ -60,17 +88,16 @@ function cellAria(day: HeatmapDay): string {
 </script>
 
 <template>
-  <div
-    data-test="activity-heatmap"
-    class="w-full"
-    :style="{ '--cell': '0.6875rem', '--rgap': '3px' }"
-  >
+  <div ref="rootEl" data-test="activity-heatmap" class="w-full" :style="{ '--gap': '3px' }">
     <!-- Month labels -->
     <div
       v-if="props.showLabels"
       data-test="heatmap-months"
-      class="text-ink-faint mb-1 grid w-full justify-between text-[10px] font-semibold whitespace-nowrap"
-      :style="{ gridTemplateColumns: `repeat(${columns}, var(--cell))` }"
+      class="text-ink-faint mb-1 grid w-full text-[10px] font-semibold whitespace-nowrap"
+      :style="{
+        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+        columnGap: 'var(--gap)',
+      }"
       aria-hidden="true"
     >
       <span v-for="ml in monthLabels" :key="ml.col" :style="{ gridColumnStart: ml.col + 1 }">
@@ -80,25 +107,24 @@ function cellAria(day: HeatmapDay): string {
 
     <!-- Cells -->
     <div
-      class="grid w-full grid-flow-col justify-between"
+      class="grid w-full grid-flow-col"
       :style="{
-        gridTemplateRows: 'repeat(7, var(--cell))',
-        gridAutoColumns: 'var(--cell)',
-        rowGap: 'var(--rgap)',
+        gridTemplateRows: 'repeat(7, minmax(0, 1fr))',
+        gridAutoColumns: 'minmax(0, 1fr)',
+        gap: 'var(--gap)',
       }"
       role="img"
       :aria-label="t('rewards.heatmap.title')"
     >
       <div
-        v-for="day in props.days"
+        v-for="day in visibleDays"
         :key="day.date"
         data-test="heatmap-cell"
         :data-date="day.date"
         :data-level="level(day.count)"
         :data-today="day.date === today"
         :data-shielded="day.shielded === true"
-        class="rounded-[2px]"
-        :style="{ width: 'var(--cell)', height: 'var(--cell)' }"
+        class="aspect-square rounded-[2px]"
         :class="[
           LEVEL_CLASS[level(day.count)],
           day.date === today ? 'ring-sage-deep ring-1' : '',

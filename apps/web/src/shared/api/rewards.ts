@@ -13,7 +13,8 @@ export function useRewards() {
   })
 }
 
-const HEATMAP_DEFAULT_WEEKS = 12
+// Fetch a full year; the component shows as many trailing columns as fit the width.
+const HEATMAP_DEFAULT_WEEKS = 53
 
 export function useHeatmap(weeks = HEATMAP_DEFAULT_WEEKS) {
   return useQuery({
