@@ -406,10 +406,13 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
     <!-- Add sheet -->
     <Teleport to="body">
       <Transition name="sheet" :duration="{ enter: 300, leave: 250 }" @after-enter="focusInput">
-        <div v-if="showSheet" class="fixed inset-0 z-50 flex flex-col justify-end">
+        <div
+          v-if="showSheet"
+          class="fixed inset-0 z-50 flex flex-col justify-end sm:items-center sm:justify-center"
+        >
           <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="closeSheet" />
           <div
-            class="surface-card relative rounded-t-3xl px-5 pt-5 shadow-xl"
+            class="surface-card relative rounded-t-3xl px-5 pt-5 shadow-xl sm:w-full sm:max-w-md sm:rounded-3xl"
             style="padding-bottom: calc(2rem + env(safe-area-inset-bottom))"
           >
             <div class="mb-4 flex items-start justify-between">

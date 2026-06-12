@@ -51,7 +51,7 @@ function tips(key: string): string[] {
       </div>
     </header>
 
-    <main class="mx-auto max-w-xl px-4 pt-4 pb-6">
+    <main class="mx-auto max-w-xl px-4 pt-4 pb-6 md:max-w-2xl md:px-8">
       <p class="font-body text-ink-soft mb-5 text-sm">{{ t('help.subtitle') }}</p>
 
       <div class="flex flex-col gap-2">

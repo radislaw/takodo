@@ -97,7 +97,7 @@ function goBack() {
   <div class="surface-app flex min-h-full flex-col">
     <!-- Header -->
     <header
-      class="flex items-center justify-between px-5 pb-2"
+      class="mx-auto flex w-full max-w-3xl items-center justify-between px-5 pb-2"
       style="padding-top: calc(1rem + env(safe-area-inset-top))"
     >
       <p v-if="queue.length > 0" class="font-body text-ink-soft text-sm font-semibold">
@@ -120,7 +120,7 @@ function goBack() {
     </div>
 
     <!-- Current task -->
-    <main v-else-if="current" class="flex flex-1 flex-col px-6">
+    <main v-else-if="current" class="mx-auto flex w-full max-w-xl flex-1 flex-col px-6">
       <div class="flex flex-1 flex-col items-center justify-center text-center">
         <p class="font-body text-ink-soft mb-3 text-sm">{{ t('do.subtitle') }}</p>
         <div
