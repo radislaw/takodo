@@ -62,15 +62,15 @@ function cellAria(day: HeatmapDay): string {
 <template>
   <div
     data-test="activity-heatmap"
-    class="overflow-x-auto"
-    :style="{ '--cell': '0.6875rem', '--gap': '3px' }"
+    class="w-full"
+    :style="{ '--cell': '0.6875rem', '--rgap': '3px' }"
   >
     <!-- Month labels -->
     <div
       v-if="props.showLabels"
       data-test="heatmap-months"
-      class="text-ink-faint mb-1 grid w-max text-[10px] font-semibold whitespace-nowrap"
-      :style="{ gridTemplateColumns: `repeat(${columns}, var(--cell))`, columnGap: 'var(--gap)' }"
+      class="text-ink-faint mb-1 grid w-full justify-between text-[10px] font-semibold whitespace-nowrap"
+      :style="{ gridTemplateColumns: `repeat(${columns}, var(--cell))` }"
       aria-hidden="true"
     >
       <span v-for="ml in monthLabels" :key="ml.col" :style="{ gridColumnStart: ml.col + 1 }">
@@ -80,11 +80,11 @@ function cellAria(day: HeatmapDay): string {
 
     <!-- Cells -->
     <div
-      class="grid w-max grid-flow-col"
+      class="grid w-full grid-flow-col justify-between"
       :style="{
         gridTemplateRows: 'repeat(7, var(--cell))',
         gridAutoColumns: 'var(--cell)',
-        gap: 'var(--gap)',
+        rowGap: 'var(--rgap)',
       }"
       role="img"
       :aria-label="t('rewards.heatmap.title')"
