@@ -5,6 +5,28 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- **`/help` page** — accordion with 11 sections (today, do-mode, tasks, frequent, quests, rewards, levels, settings, philosophy, icons guide, FAQ); all content in `ru.json` via `help.sections.*` tips arrays; `rt()` used to render i18n array items
+- **ProfilePage** — «Справка» link before gentle note navigates to `/help`
+
+## [0.19.1] — 2026-06-12 · Quality audit: bug fixes and refactors
+
+### Fixed
+
+- **Quest UTC/local date mismatch** — quests endpoints now accept optional `?date=` (client local day, validated ±1 day of server UTC); web passes `todayDate()`; fixes 409 on visibly-done quests in timezones east of UTC
+- **Stale gamification caches** — completing/reopening tasks, recording focus, moving to tomorrow and editing entries now also invalidate `['rewards']` and `['quests']`; StreakFlame, level chip and QuestPanel no longer stay stale
+- **Push subscribe/unsubscribe silent failures** — mutations now check `{error}` from openapi-fetch; `requestAndSubscribe` awaits and shows error toast on failure; `unsubscribe` treats server cleanup as best-effort (410 self-heals)
+- **Epic burst race on streak 21** — `RewardBurst` watch now tracks `[show, epic]` and restarts celebration on escalation; `TodayPage` streak watch requires a real transition (`prev !== undefined`) to skip initial load re-burst
+- **SW cache unbounded growth** — cache writes go through `putBounded()` (60-entry cap, oldest-first eviction) under `e.waitUntil`; cache name never rotated between deploys, so hashed assets from old builds accumulated indefinitely
+- **Push scheduler not stoppable** — `buildScheduler` now returns a handle with `stop()`; `server.ts` wires it to `SIGINT`/`SIGTERM` for graceful shutdown
+
+### Refactored
+
+- **`domain/date.ts`** — single source for `YYYY-MM-DD` conversions; three duplicated copies removed from `daily.ts`, `quests.ts`, `profile.ts`
+- **`service/xp.ts`** — aggregate XP/level extracted; private copy in `profile.ts` removed
+- **`ThemeSwatch.vue`** — replaces two ~80%-identical theme loops in `ProfilePage`; `toggleNotif` generic helper replaces twin morning/evening functions
+- **Push scheduler** — reuses `pushEnabled()`; notification copy moved to constants; fan-out via `Promise.all`
+- **`QuestClaim.tier`** — Prisma enum (was `String`); `PushSubscription.userId` indexed
+
 ## [0.19.0] — 2026-06-11 · Push notifications (VAPID Web Push)
 
 ### Added
