@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppIcon } from '@/shared/ui'
 
-const { t, tm } = useI18n({ useScope: 'global' })
+const { t, tm, rt } = useI18n({ useScope: 'global' })
 const router = useRouter()
 
 const SECTIONS = [
@@ -28,7 +28,9 @@ function toggle(key: string) {
 }
 
 function tips(key: string): string[] {
-  return tm(`help.sections.${key}.tips`) as string[]
+  return (tm(`help.sections.${key}.tips`) as unknown[]).map((item) =>
+    rt(item as Parameters<typeof rt>[0]),
+  )
 }
 </script>
 
@@ -77,8 +79,8 @@ function tips(key: string): string[] {
               class="text-ink-soft flex-shrink-0 transition-transform duration-200"
               :style="
                 openSection === section.key
-                  ? 'transform: rotate(90deg)'
-                  : 'transform: rotate(-90deg)'
+                  ? 'transform: rotate(-90deg)'
+                  : 'transform: rotate(90deg)'
               "
             />
           </button>
