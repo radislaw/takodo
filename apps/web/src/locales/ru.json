@@ -309,7 +309,9 @@
     "loading": "Загрузка..."
   },
   "app": {
-    "name": "TooToo"
+    "name": "TooToo",
+    "namePart1": "Too",
+    "namePart2": "Too"
   },
   "help": {
     "title": "Справка",

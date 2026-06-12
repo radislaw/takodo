@@ -6,6 +6,9 @@ import AppLayout from './AppLayout.vue'
 
 vi.mock('@/shared/api', () => ({
   useProfile: () => ({ data: ref({ name: '', theme: 'amoled' }) }),
+  useRewards: () => ({
+    data: ref({ streak: 6, shields: 1, shieldUsedRecently: false, week: [], badges: [] }),
+  }),
 }))
 
 function makeRouter(path: string) {
@@ -70,5 +73,47 @@ describe('AppLayout', () => {
   it('hides nav when route.meta.chrome is false', async () => {
     const wrapper = await mountLayout('/design/ui')
     expect(wrapper.findComponent({ name: 'AppBottomNav' }).exists()).toBe(false)
+  })
+
+  it('renders sidebar with desktop-only visibility classes', async () => {
+    const wrapper = await mountLayout('/today')
+    const sidebar = wrapper.findComponent({ name: 'AppSidebar' })
+    expect(sidebar.exists()).toBe(true)
+    expect(sidebar.classes()).toContain('hidden')
+    expect(sidebar.classes()).toContain('lg:flex')
+  })
+
+  it('bottom nav has lg:hidden class', async () => {
+    const wrapper = await mountLayout('/today')
+    const nav = wrapper.findComponent({ name: 'AppBottomNav' })
+    expect(nav.classes()).toContain('lg:hidden')
+  })
+
+  it('hides sidebar when route.meta.chrome is false', async () => {
+    const wrapper = await mountLayout('/design/ui')
+    expect(wrapper.findComponent({ name: 'AppSidebar' }).exists()).toBe(false)
+  })
+
+  it('sidebar gets main items without profile and profile as footer item', async () => {
+    const wrapper = await mountLayout('/today')
+    const sidebar = wrapper.findComponent({ name: 'AppSidebar' })
+    const items = sidebar.props('items') as { id: string }[]
+    expect(items.map((i) => i.id)).toEqual(['today', 'tasks', 'frequent', 'rewards'])
+    expect((sidebar.props('footerItem') as { id: string }).id).toBe('profile')
+  })
+
+  it('sidebar receives streak data from rewards', async () => {
+    const wrapper = await mountLayout('/today')
+    const sidebar = wrapper.findComponent({ name: 'AppSidebar' })
+    expect(sidebar.props('streak')).toBe(6)
+    expect(sidebar.props('shields')).toBe(1)
+  })
+
+  it('sidebar tab change calls router.push', async () => {
+    const wrapper = await mountLayout('/today')
+    const pushSpy = vi.spyOn(wrapper.vm.$router, 'push')
+    const sidebar = wrapper.findComponent({ name: 'AppSidebar' })
+    await sidebar.vm.$emit('update:modelValue', 'rewards')
+    expect(pushSpy).toHaveBeenCalledWith('/rewards')
   })
 })
