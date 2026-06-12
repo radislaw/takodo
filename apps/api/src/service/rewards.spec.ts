@@ -132,4 +132,47 @@ describe('Rewards routes', () => {
       expect(body.xp).toBe(55)
     })
   })
+
+  describe('GET /rewards/heatmap', () => {
+    it('returns weeks*7 cells and max (default 12 weeks)', async () => {
+      prisma.task.findMany.mockResolvedValue([])
+      const res = await app.inject({ method: 'GET', url: '/rewards/heatmap' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as { days: unknown[]; max: number }
+      expect(body.days).toHaveLength(84)
+      expect(body.max).toBe(0)
+    })
+
+    it('respects the weeks query param', async () => {
+      prisma.task.findMany.mockResolvedValue([])
+      const res = await app.inject({ method: 'GET', url: '/rewards/heatmap?weeks=2' })
+      const body = res.json() as { days: unknown[] }
+      expect(body.days).toHaveLength(14)
+    })
+
+    it('counts tasks completed per day and reports max', async () => {
+      const today = new Date()
+      prisma.task.findMany.mockResolvedValue([
+        { completedAt: today, pomodoros: 0 } as never,
+        { completedAt: today, pomodoros: 0 } as never,
+      ])
+      const res = await app.inject({ method: 'GET', url: '/rewards/heatmap?weeks=2' })
+      const body = res.json() as { days: { date: string; count: number }[]; max: number }
+      const todayStr = today.toISOString().slice(0, 10)
+      expect(body.days.find((d) => d.date === todayStr)?.count).toBe(2)
+      expect(body.max).toBe(2)
+    })
+
+    it('rejects a date outside the ±1 day window', async () => {
+      const res = await app.inject({ method: 'GET', url: '/rewards/heatmap?date=2020-01-01' })
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('clamps weeks to the allowed range', async () => {
+      prisma.task.findMany.mockResolvedValue([])
+      const res = await app.inject({ method: 'GET', url: '/rewards/heatmap?weeks=999' })
+      const body = res.json() as { days: unknown[] }
+      expect(body.days.length).toBeLessThanOrEqual(53 * 7)
+    })
+  })
 })

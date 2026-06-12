@@ -52,6 +52,7 @@ vi.mock('@/shared/api', () => ({
   useQuests: () => ({ data: ref([]) }),
   useClaimQuest: () => ({ mutateAsync: vi.fn() }),
   useRewards: () => ({ data: rewardsData }),
+  useHeatmap: () => ({ data: ref({ days: [], max: 0 }) }),
 }))
 
 function mountPage() {

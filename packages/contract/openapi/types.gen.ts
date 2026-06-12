@@ -208,6 +208,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/rewards/heatmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Activity heatmap; `weeks` window (default 12), `date` is the client's local day. */
+        get: operations["Rewards_heatmap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tasks": {
         parameters: {
             query?: never;
@@ -405,6 +422,28 @@ export interface components {
              * @description In how many past days the task stayed undone.
              */
             undoneDays: number;
+        };
+        /** @description One day cell in the activity heatmap. */
+        HeatmapDay: {
+            /** Format: date */
+            date: string;
+            /**
+             * Format: int32
+             * @description Tasks completed that day.
+             */
+            count: number;
+            /** @description Inactive day covered by a streak shield (streak preserved). */
+            shielded?: boolean;
+        };
+        /** @description GitHub-style activity grid, oldest→newest, Monday-aligned. */
+        HeatmapSummary: {
+            /** @description Exactly weeks×7 cells, ending on the Sunday of the current week. */
+            days: components["schemas"]["HeatmapDay"][];
+            /**
+             * Format: int32
+             * @description Highest single-day count in the window (for intensity scaling); 0 if empty.
+             */
+            max: number;
         };
         Profile: {
             /** @description Display name used in the greeting. */
@@ -1020,6 +1059,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RewardsSummary"];
+                };
+            };
+        };
+    };
+    Rewards_heatmap: {
+        parameters: {
+            query?: {
+                weeks?: number;
+                date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HeatmapSummary"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
                 };
             };
         };

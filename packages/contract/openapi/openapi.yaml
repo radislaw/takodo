@@ -383,6 +383,40 @@ paths:
                 $ref: '#/components/schemas/RewardsSummary'
       tags:
         - Rewards
+  /rewards/heatmap:
+    get:
+      operationId: Rewards_heatmap
+      description: Activity heatmap; `weeks` window (default 12), `date` is the client's local day.
+      parameters:
+        - name: weeks
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeatmapSummary'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Rewards
   /tasks:
     get:
       operationId: Tasks_list
@@ -768,6 +802,39 @@ components:
           type: integer
           format: int32
           description: In how many past days the task stayed undone.
+    HeatmapDay:
+      type: object
+      required:
+        - date
+        - count
+      properties:
+        date:
+          type: string
+          format: date
+        count:
+          type: integer
+          format: int32
+          description: Tasks completed that day.
+        shielded:
+          type: boolean
+          description: Inactive day covered by a streak shield (streak preserved).
+      description: One day cell in the activity heatmap.
+    HeatmapSummary:
+      type: object
+      required:
+        - days
+        - max
+      properties:
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/HeatmapDay'
+          description: Exactly weeks×7 cells, ending on the Sunday of the current week.
+        max:
+          type: integer
+          format: int32
+          description: Highest single-day count in the window (for intensity scaling); 0 if empty.
+      description: GitHub-style activity grid, oldest→newest, Monday-aligned.
     Profile:
       type: object
       required:

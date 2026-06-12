@@ -1,8 +1,28 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
-import { computeRewards } from '../domain/rewards.js'
+import { computeRewards, computeHeatmap } from '../domain/rewards.js'
+import { toDateStr, parseDate } from '../domain/date.js'
 
 type GetUserId = () => Promise<string>
+
+const DAY_MS = 24 * 60 * 60 * 1000
+const DEFAULT_WEEKS = 12
+const MAX_WEEKS = 53
+
+/** Client local day may differ from server UTC by ≤1 calendar day; reject anything outside. */
+function resolveDate(raw: string | undefined): string | null {
+  const serverToday = toDateStr(new Date())
+  if (!raw) return serverToday
+  const diff = Math.abs(parseDate(raw).getTime() - parseDate(serverToday).getTime())
+  if (Number.isNaN(diff) || diff > DAY_MS) return null
+  return raw
+}
+
+function resolveWeeks(raw: string | number | undefined): number {
+  const n = typeof raw === 'string' ? Number.parseInt(raw, 10) : raw
+  if (!n || Number.isNaN(n) || n < 1) return DEFAULT_WEEKS
+  return Math.min(n, MAX_WEEKS)
+}
 
 export function buildRewardsHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
@@ -30,6 +50,27 @@ export function buildRewardsHandlers(prisma: PrismaClient, getUserId: GetUserId)
         mitCompletions,
         questXpSum._sum.xp ?? 0,
       )
+    },
+
+    async Rewards_heatmap(req: FastifyRequest, reply: FastifyReply) {
+      const userId = await getUserId()
+      const query = req.query as { weeks?: string; date?: string }
+      const dateStr = resolveDate(query.date)
+      if (!dateStr) {
+        return reply
+          .status(400)
+          .send({ code: 'invalid_date', message: 'Date must be within 1 day of server today' })
+      }
+      const weeks = resolveWeeks(query.weeks)
+
+      // Window the query: only completions from the grid's first day onward.
+      const windowStart = new Date(parseDate(dateStr).getTime() - weeks * 7 * DAY_MS)
+      const completedTasks = await prisma.task.findMany({
+        where: { userId, status: 'done', completedAt: { gte: windowStart } },
+        select: { completedAt: true },
+      })
+      const tasks = completedTasks.map((t) => ({ completedAt: t.completedAt!, pomodoros: 0 }))
+      return computeHeatmap(tasks, parseDate(dateStr), weeks)
     },
   }
 }

@@ -20,6 +20,6 @@ export {
 } from './tasks'
 export { useFrequent } from './frequent'
 export { useProfile, useUpdateProfile } from './profile'
-export { useRewards } from './rewards'
+export { useRewards, useHeatmap } from './rewards'
 export { useQuests, useClaimQuest } from './quests'
 export { useNotifications } from './push'

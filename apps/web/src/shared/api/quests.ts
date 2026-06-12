@@ -33,7 +33,7 @@ export function useClaimQuest() {
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: true })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
     },
   })
 }

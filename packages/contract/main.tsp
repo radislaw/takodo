@@ -291,10 +291,33 @@ model RewardsSummary {
   comebackDays?: int32;
 }
 
+/** One day cell in the activity heatmap. */
+model HeatmapDay {
+  date: plainDate;
+  /** Tasks completed that day. */
+  count: int32;
+  /** Inactive day covered by a streak shield (streak preserved). */
+  shielded?: boolean;
+}
+
+/** GitHub-style activity grid, oldest→newest, Monday-aligned. */
+model HeatmapSummary {
+  /** Exactly weeks×7 cells, ending on the Sunday of the current week. */
+  days: HeatmapDay[];
+  /** Highest single-day count in the window (for intensity scaling); 0 if empty. */
+  max: int32;
+}
+
 @route("/rewards")
 @tag("Rewards")
 interface Rewards {
   @get get(): RewardsSummary;
+
+  /** Activity heatmap; `weeks` window (default 12), `date` is the client's local day. */
+  @route("/heatmap") @get heatmap(
+    @query weeks?: int32,
+    @query date?: plainDate,
+  ): HeatmapSummary | ApiError;
 }
 
 // ─── Daily quests ───────────────────────────────────────────────
