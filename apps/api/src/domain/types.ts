@@ -9,6 +9,8 @@ export interface DomainTask {
   completedAt: Date | null
   normalizedTitle: string
   createdAt: Date
+  focusSeconds?: number
+  pomodoros?: number
 }
 
 export interface TaskNode extends DomainTask {

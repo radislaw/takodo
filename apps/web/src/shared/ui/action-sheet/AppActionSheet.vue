@@ -51,9 +51,14 @@ onUnmounted(() => {
 <template>
   <Teleport to="body">
     <Transition name="sheet">
-      <div v-if="open" class="fixed inset-0 z-50 flex items-end" role="dialog" aria-modal="true">
+      <div
+        v-if="open"
+        class="fixed inset-0 z-50 flex items-end sm:justify-center"
+        role="dialog"
+        aria-modal="true"
+      >
         <div class="bg-ink/40 absolute inset-0" aria-hidden="true" @click="emit('close')" />
-        <div class="relative w-full">
+        <div class="relative w-full sm:max-w-md">
           <AppSheet :title="title" :subtitle="subtitle">
             <slot />
           </AppSheet>

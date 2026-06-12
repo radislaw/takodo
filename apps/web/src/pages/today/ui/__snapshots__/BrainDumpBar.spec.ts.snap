@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BrainDumpBar > matches snapshot 1`] = `
+"<div class="surface-card flex items-center gap-3.5 rounded-[28px] px-4 py-4 shadow-md"><span class="bg-sage-tint text-sage-deep flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><!--v-if--><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path><!--v-if--></svg></span>
+  <div class="flex flex-col gap-1 flex-1">
+    <!--v-if--><input id="v-0" placeholder="Выгрузи, что крутится в голове…" class="font-body text-ink bg-cream-deep border-line placeholder:text-ink-faint focus:border-sage focus:shadow-ring focus:surface-card w-full rounded-xl border-[1.5px] px-3 py-3 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-45">
+    <!--v-if-->
+    <!--v-if-->
+  </div>
+</div>"
+`;

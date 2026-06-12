@@ -83,7 +83,7 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
 
 <template>
   <div class="surface-app pb-nav min-h-full">
-    <div class="mx-auto max-w-xl px-5 pt-8 pb-6">
+    <div class="mx-auto max-w-xl px-5 pt-8 pb-6 md:max-w-2xl">
       <!-- Header -->
       <h1 class="font-display text-ink text-3xl leading-tight font-extrabold">
         {{ t('profile.title') }}

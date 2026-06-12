@@ -150,6 +150,29 @@ describe('Tasks routes', () => {
     })
   })
 
+  describe('GET /tasks/:id/tree', () => {
+    it('returns the task tree with focusSeconds and pomodoros (serializes)', async () => {
+      prisma.task.findMany.mockResolvedValue([
+        makeTask({ id: 'task-1', focusSeconds: 300, pomodoros: 2 }),
+        makeTask({ id: 'task-2', parentId: 'task-1', normalizedTitle: 'child' }),
+      ])
+      const res = await app.inject({ method: 'GET', url: '/tasks/task-1/tree' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as Record<string, unknown>
+      expect(body.focusSeconds).toBe(300)
+      expect(body.pomodoros).toBe(2)
+      const children = body.children as Record<string, unknown>[]
+      expect(children[0]!.focusSeconds).toBe(0)
+      expect(children[0]!.pomodoros).toBe(0)
+    })
+
+    it('returns 404 when the task is missing', async () => {
+      prisma.task.findMany.mockResolvedValue([])
+      const res = await app.inject({ method: 'GET', url: '/tasks/missing/tree' })
+      expect(res.statusCode).toBe(404)
+    })
+  })
+
   describe('PATCH /tasks/:id', () => {
     it('updates normalizedTitle when title changes', async () => {
       prisma.task.findUnique.mockResolvedValue(makeTask())

@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AppStatCard > matches snapshot 1`] = `
+"<div class="surface-card flex flex-col gap-1 rounded-2xl p-4 shadow-sm">
+  <div class="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="text-ink-faint flex-shrink-0">
+      <!--v-if-->
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6 M18 9h1.5a2.5 2.5 0 0 0 0-5H18 M4 22h16 M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22 M14 14.66V17c0 .55.47.98.97 1.21 1.18.54 2.03 2.03 2.03 3.79 M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+      <!--v-if-->
+    </svg><span class="text-ink-soft text-xs font-semibold tracking-wide">Рекорд</span></div><span class="font-display text-ink text-2xl leading-none font-extrabold">21</span>
+</div>"
+`;

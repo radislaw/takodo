@@ -2,13 +2,13 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppBottomNav, RewardBurst, AppToast } from '@/shared/ui'
+import { AppBottomNav, AppSidebar, RewardBurst, AppToast } from '@/shared/ui'
 import type { IconName } from '@/shared/ui/icon/icons'
 import { useReward } from '@/shared/lib/useReward'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 import { useUndoDelete } from '@/shared/lib/useUndoDelete'
-import { useProfile } from '@/shared/api'
+import { useProfile, useRewards } from '@/shared/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -18,6 +18,7 @@ const { key: errorKey, hideError } = useErrorToast()
 const { key: successKey, hideSuccess } = useSuccessToast()
 const { pending: undoPending } = useUndoDelete()
 const { data: profile } = useProfile()
+const { data: rewards } = useRewards()
 
 const theme = computed(() => profile.value?.theme ?? 'amoled')
 
@@ -37,6 +38,9 @@ const activeTab = computed(() => {
   return 'today'
 })
 
+const sidebarMainItems = computed(() => navItems.value.filter((item) => item.id !== 'profile'))
+const profileItem = computed(() => navItems.value.find((item) => item.id === 'profile'))
+
 const showChrome = computed(() => route.meta.chrome !== false)
 
 function handleTabChange(id: string) {
@@ -45,17 +49,30 @@ function handleTabChange(id: string) {
 </script>
 
 <template>
-  <div class="surface-app relative h-dvh overflow-hidden" :data-theme="theme">
-    <div class="absolute inset-0 overflow-y-auto">
-      <RouterView />
-    </div>
-    <AppBottomNav
+  <div class="surface-app relative flex h-dvh overflow-hidden" :data-theme="theme">
+    <AppSidebar
       v-if="showChrome"
-      class="absolute inset-x-0 bottom-0"
+      class="hidden lg:flex"
       :model-value="activeTab"
-      :items="navItems"
+      :items="sidebarMainItems"
+      :footer-item="profileItem"
+      :streak="rewards?.streak ?? 0"
+      :shields="rewards?.shields ?? 0"
+      :shield-used-recently="rewards?.shieldUsedRecently ?? false"
       @update:model-value="handleTabChange"
     />
+    <div class="relative h-full min-w-0 flex-1">
+      <div class="absolute inset-0 overflow-y-auto">
+        <RouterView />
+      </div>
+      <AppBottomNav
+        v-if="showChrome"
+        class="absolute inset-x-0 bottom-0 lg:hidden"
+        :model-value="activeTab"
+        :items="navItems"
+        @update:model-value="handleTabChange"
+      />
+    </div>
     <RewardBurst :show="isVisible" :epic="isEpic" @close="hide" />
 
     <Teleport to="body">

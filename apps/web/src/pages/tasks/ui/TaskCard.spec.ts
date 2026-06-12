@@ -80,6 +80,19 @@ describe('TaskCard', () => {
     w2.unmount()
   })
 
+  it('applies selected styling when selected', () => {
+    const w1 = mount(TaskCard, { props: { task: openTask, selected: true } })
+    expect(w1.element.firstElementChild?.className).toContain('bg-sage-tint')
+    expect(w1.element.firstElementChild?.className).toContain('border-sage')
+
+    const w2 = mount(TaskCard, { props: { task: openTask } })
+    expect(w2.element.firstElementChild?.className).toContain('surface-card')
+    expect(w2.element.firstElementChild?.className).not.toContain('bg-sage-tint')
+
+    w1.unmount()
+    w2.unmount()
+  })
+
   it('applies strikethrough when done', () => {
     wrapper = mount(TaskCard, { props: { task: doneTask } })
     const btn = wrapper.findAll('button').find((b) => b.text().includes('Buy milk'))

@@ -122,6 +122,16 @@
     "shieldUsed": "Щит сберёг серию на этой неделе",
     "badgesLabel": "Значки",
     "gentleNote": "Пропущенный день — не провал. Серия продолжается с того места, где ты остановился.",
+    "stats": {
+      "streak": "Серия",
+      "longest": "Рекорд серии",
+      "level": "Уровень",
+      "xp": "Очки опыта",
+      "done": "Выполнено за год",
+      "active": "Активных дней",
+      "best": "Лучший день",
+      "shields": "Щиты"
+    },
     "heatmap": {
       "title": "Твоя активность",
       "less": "меньше",
@@ -297,7 +307,8 @@
       "addSubtaskPlaceholder": "Новый шаг...",
       "notePlaceholder": "Заметка...",
       "notFound": "Задача не найдена",
-      "focusStats": "Фокус: {time}"
+      "focusStats": "Фокус: {time}",
+      "selectHint": "Выбери задачу из списка"
     }
   },
   "frequent": {
@@ -309,7 +320,9 @@
     "loading": "Загрузка..."
   },
   "app": {
-    "name": "TooToo"
+    "name": "TooToo",
+    "namePart1": "Too",
+    "namePart2": "Too"
   },
   "help": {
     "title": "Справка",
@@ -452,7 +465,20 @@
     },
     "moveTomorrow": "На завтра",
     "movedTomorrow": "Перенесено на завтра",
-    "level": "Ур. {n}"
+    "level": "Ур. {n}",
+    "dump": {
+      "label": "Быстрая выгрузка",
+      "placeholder": "Выгрузи, что крутится в голове…"
+    },
+    "focus": {
+      "label": "Сейчас одно",
+      "start": "Начать фокус"
+    },
+    "categories": {
+      "label": "Категории",
+      "count": "нет дел | {n} дело | {n} дела | {n} дел"
+    },
+    "softNote": "Не спеши. Одно дело — уже хорошо."
   },
   "do": {
     "subtitle": "Одно дело. Только оно.",

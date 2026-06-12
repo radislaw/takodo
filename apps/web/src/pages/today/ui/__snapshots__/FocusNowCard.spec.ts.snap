@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FocusNowCard > matches snapshot 1`] = `
+"<div class="surface-card rounded-[28px] p-5 shadow-md">
+  <p class="text-sage-deep text-xs font-bold tracking-widest uppercase">Сейчас одно</p>
+  <p class="font-display text-ink mt-2.5 text-base leading-snug font-extrabold">Задача</p><button type="button" class="font-body inline-flex cursor-pointer items-center justify-center gap-2 border-none font-bold outline-none focus-visible:shadow-ring disabled:cursor-not-allowed disabled:opacity-40 fill-accent rounded-2xl px-5 text-sm text-white shadow-[0_4px_14px_rgba(124,154,146,0.28)] py-3 mt-4 w-full"><span class="inline-flex items-center justify-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><!--v-if--><path d="M6 3l14 9-14 9V3z"></path><!--v-if--></svg> Начать фокус</span></button>
+</div>"
+`;
