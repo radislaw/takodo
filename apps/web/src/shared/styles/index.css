@@ -78,6 +78,10 @@
 }
 @utility pb-nav {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  /* no bottom nav at lg — sidebar replaces it */
+  @media (width >= 64rem) {
+    padding-bottom: 2rem;
+  }
 }
 
 /* ── Bridge extension: warm shadows, ring, press colors, font families ── */
