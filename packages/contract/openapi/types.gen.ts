@@ -161,7 +161,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Today's three deterministic quests (hash of userId+date) with live progress. */
+        /**
+         * @description Today's three deterministic quests (hash of userId+date) with live progress.
+         *     `date` is the client's local day (timezones differ from server UTC);
+         *     must be within ±1 day of server UTC today. Defaults to server UTC today.
+         */
         get: operations["Quests_list"];
         put?: never;
         post?: never;
@@ -180,7 +184,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Claim a completed quest: server validates progress, rolls tier, awards XP. */
+        /** @description Claim a completed quest: server validates progress, rolls tier, awards XP. Same `date` semantics as list. */
         post: operations["Quests_claim"];
         delete?: never;
         options?: never;
@@ -938,7 +942,9 @@ export interface operations {
     };
     Quests_list: {
         parameters: {
-            query?: never;
+            query?: {
+                date?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -954,11 +960,22 @@ export interface operations {
                     "application/json": components["schemas"]["Quest"][];
                 };
             };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
         };
     };
     Quests_claim: {
         parameters: {
-            query?: never;
+            query?: {
+                date?: string;
+            };
             header?: never;
             path: {
                 id: string;

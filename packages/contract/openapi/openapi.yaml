@@ -309,8 +309,18 @@ paths:
   /quests:
     get:
       operationId: Quests_list
-      description: Today's three deterministic quests (hash of userId+date) with live progress.
-      parameters: []
+      description: |-
+        Today's three deterministic quests (hash of userId+date) with live progress.
+        `date` is the client's local day (timezones differ from server UTC);
+        must be within ±1 day of server UTC today. Defaults to server UTC today.
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          explode: false
       responses:
         '200':
           description: The request has succeeded.
@@ -320,18 +330,31 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Quest'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
       tags:
         - Quests
   /quests/{id}/claim:
     post:
       operationId: Quests_claim
-      description: 'Claim a completed quest: server validates progress, rolls tier, awards XP.'
+      description: 'Claim a completed quest: server validates progress, rolls tier, awards XP. Same `date` semantics as list.'
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          explode: false
       responses:
         '200':
           description: The request has succeeded.
