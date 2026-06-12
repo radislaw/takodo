@@ -24,6 +24,8 @@ function toDomain(task: Task): DomainTask {
     completedAt: task.completedAt,
     normalizedTitle: task.normalizedTitle,
     createdAt: task.createdAt,
+    focusSeconds: task.focusSeconds,
+    pomodoros: task.pomodoros,
   }
 }
 
