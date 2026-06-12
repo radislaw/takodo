@@ -102,6 +102,58 @@ export function computeXP(tasks: CompletedTaskInfo[], mitCompletions: number): n
   return computeXPFromTotals(tasks.length, pomodoroSum, mitCompletions)
 }
 
+export interface HeatmapDayResult {
+  date: string
+  count: number
+  shielded?: boolean
+}
+
+export interface HeatmapResult {
+  days: HeatmapDayResult[]
+  max: number
+}
+
+const HEATMAP_DEFAULT_WEEKS = 12
+
+/**
+ * GitHub-style activity grid: `weeks` Monday-aligned columns ending on the
+ * Sunday of the week containing `nowDate`. Each cell counts tasks completed
+ * that day; shielded gap-days (streak preserved) are flagged for annotation.
+ */
+export function computeHeatmap(
+  completedTasks: CompletedTaskInfo[],
+  nowDate: Date,
+  weeks = HEATMAP_DEFAULT_WEEKS,
+): HeatmapResult {
+  const counts = new Map<string, number>()
+  for (const t of completedTasks) {
+    const key = toDateStr(t.completedAt)
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  const { shieldedDays } = replayStreak(new Set(counts.keys()), nowDate)
+
+  const sunday = mondayOf(nowDate)
+  sunday.setUTCDate(sunday.getUTCDate() + 6)
+  const cursor = new Date(sunday)
+  cursor.setUTCDate(cursor.getUTCDate() - (weeks * 7 - 1))
+
+  let max = 0
+  const days: HeatmapDayResult[] = []
+  while (cursor.getTime() <= sunday.getTime()) {
+    const dateStr = toDateStr(cursor)
+    const count = counts.get(dateStr) ?? 0
+    if (count > max) max = count
+    days.push({
+      date: dateStr,
+      count,
+      ...(shieldedDays.has(dateStr) ? { shielded: true } : {}),
+    })
+    cursor.setUTCDate(cursor.getUTCDate() + 1)
+  }
+
+  return { days, max }
+}
+
 export function computeLevel(xp: number): number {
   return Math.floor(Math.sqrt(xp / 100)) + 1
 }

@@ -52,7 +52,7 @@ export function useAddDailyEntry() {
       // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: true })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
     },
   })
 }
@@ -91,7 +91,7 @@ export function useUpdateDailyEntry() {
       // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: true })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
     },
   })
 }
@@ -116,7 +116,7 @@ export function useMoveToTomorrow() {
       // Server increments gentleMoves (badge) and today's entry set changes.
       queryCache.invalidateQueries({ key: ['daily', today], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: true })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
     },
   })
 }
@@ -139,7 +139,7 @@ export function useRemoveDailyEntry() {
       // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: true })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
     },
   })
 }

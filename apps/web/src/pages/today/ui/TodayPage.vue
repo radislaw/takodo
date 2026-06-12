@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppProgressRing, AppToast, AppIcon, AppButton, AppInput, StreakFlame } from '@/shared/ui'
+import {
+  AppProgressRing,
+  AppToast,
+  AppIcon,
+  AppButton,
+  AppInput,
+  StreakFlame,
+  ActivityHeatmap,
+} from '@/shared/ui'
 import {
   useDailyToday,
   useAddDailyEntry,
@@ -13,6 +21,7 @@ import {
   useReopenTask,
   useProfile,
   useRewards,
+  useHeatmap,
 } from '@/shared/api'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useSuccessToast } from '@/shared/lib/useSuccessToast'
@@ -29,6 +38,7 @@ const { data: daily, isPending } = useDailyToday()
 const { data: taskList } = useTasks()
 const { data: profile } = useProfile()
 const { data: rewards } = useRewards()
+const { data: heatmap } = useHeatmap()
 
 const { mutateAsync: createTaskAsync } = useCreateTask()
 const { mutateAsync: addEntryAsync } = useAddDailyEntry()
@@ -259,6 +269,17 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Activity heatmap (compact) -->
+      <div v-if="heatmap && heatmap.max > 0" class="surface-card mb-6 rounded-2xl p-4 shadow-sm">
+        <div class="mb-3 flex items-center gap-1.5">
+          <AppIcon name="flame" :size="14" class="text-apricot-deep" />
+          <p class="font-display text-ink text-xs font-extrabold">
+            {{ t('rewards.heatmap.title') }}
+          </p>
+        </div>
+        <ActivityHeatmap :days="heatmap.days" :max="heatmap.max" :show-labels="false" />
       </div>
 
       <!-- Loading -->

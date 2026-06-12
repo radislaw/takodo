@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { computeRewards, computeXP, computeLevel, type CompletedTaskInfo } from './rewards.js'
+import {
+  computeRewards,
+  computeXP,
+  computeLevel,
+  computeHeatmap,
+  type CompletedTaskInfo,
+} from './rewards.js'
 
 const NOW = new Date('2024-06-05T12:00:00Z') // Wednesday
 
@@ -349,5 +355,50 @@ describe('computeRewards comebackDays', () => {
   it('stays present on the return day after completing a task today', () => {
     const r = computeRewards([td(daysAgo(0)), td(daysAgo(4))], NOW)
     expect(r.comebackDays).toBe(3)
+  })
+})
+
+describe('computeHeatmap', () => {
+  it('returns weeks*7 cells (default 12 weeks), max 0 when empty', () => {
+    const r = computeHeatmap([], NOW)
+    expect(r.days).toHaveLength(84)
+    expect(r.max).toBe(0)
+  })
+
+  it('respects the weeks param', () => {
+    expect(computeHeatmap([], NOW, 2).days).toHaveLength(14)
+  })
+
+  it('grid is Monday-aligned, ending on Sunday of the current week', () => {
+    const r = computeHeatmap([], NOW, 2)
+    expect(r.days[0]!.date).toBe('2024-05-27') // Monday two weeks back
+    expect(r.days.at(-1)!.date).toBe('2024-06-09') // Sunday of NOW's week
+  })
+
+  it('includes today in the window', () => {
+    const r = computeHeatmap([], NOW)
+    expect(r.days.some((d) => d.date === '2024-06-05')).toBe(true)
+  })
+
+  it('counts tasks completed per day and reports max', () => {
+    const tasks = [td(NOW), td(new Date('2024-06-05T20:00:00Z')), td(daysAgo(1))]
+    const r = computeHeatmap(tasks, NOW, 2)
+    expect(r.days.find((d) => d.date === '2024-06-05')!.count).toBe(2)
+    expect(r.days.find((d) => d.date === '2024-06-04')!.count).toBe(1)
+    expect(r.max).toBe(2)
+  })
+
+  it('flags shielded gap-days', () => {
+    const tasks = [...Array.from({ length: 5 }, (_, i) => td(daysAgo(2 + i))), td(daysAgo(0))]
+    const r = computeHeatmap(tasks, NOW, 2)
+    const tue = r.days.find((d) => d.date === '2024-06-04')
+    expect(tue!.shielded).toBe(true)
+    expect(tue!.count).toBe(0)
+  })
+
+  it('ignores completions outside the window', () => {
+    const r = computeHeatmap([td(daysAgo(200))], NOW, 2)
+    expect(r.max).toBe(0)
+    expect(r.days.every((d) => d.count === 0)).toBe(true)
   })
 })

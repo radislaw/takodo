@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppIcon } from '@/shared/ui'
-import { useRewards } from '@/shared/api'
+import { AppIcon, ActivityHeatmap } from '@/shared/ui'
+import { useRewards, useHeatmap } from '@/shared/api'
 
 const BADGE_ICONS: Record<string, string> = {
   first_step: 'sparkles',
@@ -14,6 +14,7 @@ const BADGE_ICONS: Record<string, string> = {
 
 const { t } = useI18n({ useScope: 'global' })
 const { data: rewards, isPending } = useRewards()
+const { data: heatmap } = useHeatmap()
 
 const weekdayLabel = computed(() => {
   if (!rewards.value) return []
@@ -111,6 +112,14 @@ const weekdayLabel = computed(() => {
               {{ t('rewards.shieldUsedSep') }} {{ t('rewards.shieldUsed') }}
             </span>
           </div>
+        </div>
+
+        <!-- Activity heatmap -->
+        <div v-if="heatmap" class="surface-card mt-5 rounded-2xl p-5 shadow-sm">
+          <p class="font-display text-ink mb-4 text-sm font-extrabold">
+            {{ t('rewards.heatmap.title') }}
+          </p>
+          <ActivityHeatmap :days="heatmap.days" :max="heatmap.max" />
         </div>
 
         <!-- Badges -->

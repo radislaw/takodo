@@ -7,6 +7,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **`/help` page** — accordion with 11 sections (today, do-mode, tasks, frequent, quests, rewards, levels, settings, philosophy, icons guide, FAQ); all content in `ru.json` via `help.sections.*` tips arrays; `rt()` used to render i18n array items
 - **ProfilePage** — «Справка» link before gentle note navigates to `/help`
+- **Activity heatmap** — GitHub-style 12-week grid of daily task completions
+  - `GET /rewards/heatmap` (`weeks` window default 12, max 53; client-local `date` validated within ±1 day; query windowed by `completedAt` to bound growth)
+  - `computeHeatmap` domain fn: Monday-aligned columns ending on the current week's Sunday; per-day counts, `max` for intensity scaling, shielded-day flags (reuses the streak replay)
+  - `ActivityHeatmap.vue` shared component: 5 intensity levels (sage), today ring, shield annotation, month labels + legend; `showLabels` toggle for compact use
+  - Rendered on the Rewards page (full grid) and Today screen (compact, labels off, shown only once there's activity)
+  - `useHeatmap` Pinia Colada composable, key `['rewards', 'heatmap', weeks]`; rewards cache invalidations switched from exact to prefix match so the heatmap refreshes on completion / reopen / focus / move-to-tomorrow / MIT toggle / quest claim
 
 ## [0.19.1] — 2026-06-12 · Quality audit: bug fixes and refactors
 
