@@ -105,6 +105,33 @@ describe('RewardBurst', () => {
     expect(mockFireFireworks).toHaveBeenCalledTimes(2)
   })
 
+  it('extends the celebration when epic escalates while visible', async () => {
+    wrapper = mount(RewardBurst, { props: { show: true, epic: false }, attachTo: document.body })
+    vi.advanceTimersByTime(1000)
+    await wrapper.setProps({ epic: true })
+    vi.advanceTimersByTime(1799)
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('close')).toBeFalsy()
+    vi.advanceTimersByTime(801)
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('close')).toBeTruthy()
+  })
+
+  it('fires epic fireworks when escalating while visible', async () => {
+    wrapper = mount(RewardBurst, { props: { show: true, epic: false }, attachTo: document.body })
+    expect(mockFireFireworks).toHaveBeenCalledTimes(1)
+    await wrapper.setProps({ epic: true })
+    expect(mockFireFireworks).toHaveBeenCalledTimes(3)
+  })
+
+  it('switches praise to the epic pool when escalating', async () => {
+    wrapper = mount(RewardBurst, { props: { show: true, epic: false }, attachTo: document.body })
+    await wrapper.setProps({ epic: true })
+    await wrapper.vm.$nextTick()
+    const text = findStatus()?.textContent ?? ''
+    expect(EPIC_PRAISE.some((p) => text.includes(p))).toBe(true)
+  })
+
   it('epic stays longer before close (~2600ms)', async () => {
     wrapper = mount(RewardBurst, { props: { show: true, epic: true }, attachTo: document.body })
     vi.advanceTimersByTime(1800)

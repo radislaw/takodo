@@ -33,32 +33,40 @@ function clearTimer() {
   }
 }
 
+function start() {
+  const praises = getList(praiseKey.value)
+  const emojis = getList('reward.emoji')
+  praiseIndex.value = Math.floor(Math.random() * praises.length)
+  emojiIndex.value = Math.floor(Math.random() * emojis.length)
+
+  if (!isReducedMotion()) {
+    fireConfetti()
+    fireFireworks()
+    if (props.epic) fireFireworks()
+  }
+
+  clearTimer()
+  closeTimer = setTimeout(
+    () => {
+      emit('close')
+    },
+    props.epic ? 2600 : 1800,
+  )
+}
+
+// Restart on open AND on epic escalation while visible — an epic celebrate()
+// can land while a regular burst is still showing (e.g. completing the task
+// that crosses the 21-day streak), and it must not inherit the shorter timer.
 watch(
-  () => props.show,
-  (val) => {
-    if (!val) {
+  () => [props.show, props.epic ?? false] as const,
+  ([show, epic], prev) => {
+    if (!show) {
       clearTimer()
       return
     }
-
-    const praises = getList(praiseKey.value)
-    const emojis = getList('reward.emoji')
-    praiseIndex.value = Math.floor(Math.random() * praises.length)
-    emojiIndex.value = Math.floor(Math.random() * emojis.length)
-
-    if (!isReducedMotion()) {
-      fireConfetti()
-      fireFireworks()
-      if (props.epic) fireFireworks()
-    }
-
-    clearTimer()
-    closeTimer = setTimeout(
-      () => {
-        emit('close')
-      },
-      props.epic ? 2600 : 1800,
-    )
+    const wasShown = prev?.[0] ?? false
+    const wasEpic = prev?.[1] ?? false
+    if (!wasShown || (epic && !wasEpic)) start()
   },
   { immediate: true },
 )

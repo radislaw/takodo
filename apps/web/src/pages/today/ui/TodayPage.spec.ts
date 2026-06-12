@@ -1,8 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import TodayPage from './TodayPage.vue'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
+
+const mockCelebrate = vi.fn()
+vi.mock('@/shared/lib/useReward', () => ({
+  useReward: () => ({
+    celebrate: mockCelebrate,
+    hide: vi.fn(),
+    isVisible: ref(false),
+    isEpic: ref(false),
+  }),
+}))
 
 const mockCreateTask = vi.fn()
 const mockAddEntry = vi.fn()
@@ -298,6 +308,29 @@ describe('TodayPage', () => {
   it('hides comeback banner without comebackDays', () => {
     const wrapper = mountPage()
     expect(wrapper.find('[data-test="comeback-banner"]').exists()).toBe(false)
+  })
+
+  it('celebrates epic when the streak crosses to 21', async () => {
+    rewardsData.value = { ...rewardsData.value, streak: 20 }
+    mountPage()
+    rewardsData.value = { ...rewardsData.value, streak: 21 }
+    await nextTick()
+    expect(mockCelebrate).toHaveBeenCalledWith({ epic: true })
+  })
+
+  it('does not celebrate epic on initial rewards load with streak already at 21', async () => {
+    rewardsData.value = {}
+    mountPage()
+    rewardsData.value = {
+      streak: 21,
+      longestStreak: 21,
+      shields: 0,
+      shieldUsedRecently: false,
+      week: [],
+      badges: [],
+    }
+    await nextTick()
+    expect(mockCelebrate).not.toHaveBeenCalled()
   })
 
   it('calls moveToTomorrow with entryId and taskId', async () => {
