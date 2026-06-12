@@ -9,17 +9,10 @@ import {
   type DayStats,
 } from '../domain/quests.js'
 import { gapDays, isComeback } from '../domain/comeback.js'
+import { toDateStr, parseDate } from '../domain/date.js'
 
 type GetUserId = () => Promise<string>
 type Db = PrismaClient | Prisma.TransactionClient
-
-function dateToString(d: Date): string {
-  return d.toISOString().slice(0, 10)
-}
-
-function parseDate(dateStr: string): Date {
-  return new Date(`${dateStr}T00:00:00.000Z`)
-}
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -29,7 +22,7 @@ const DAY_MS = 24 * 60 * 60 * 1000
  * cannot claim quests for arbitrary past/future days.
  */
 function resolveQuestDate(raw: string | undefined): string | null {
-  const serverToday = dateToString(new Date())
+  const serverToday = toDateStr(new Date())
   if (!raw) return serverToday
   const diff = Math.abs(parseDate(raw).getTime() - parseDate(serverToday).getTime())
   if (Number.isNaN(diff) || diff > DAY_MS) return null
@@ -69,7 +62,7 @@ async function isComebackDay(db: Db, userId: string, dateStr: string): Promise<b
     orderBy: { completedAt: 'desc' },
     select: { completedAt: true },
   })
-  const lastDay = last?.completedAt ? dateToString(last.completedAt) : null
+  const lastDay = last?.completedAt ? toDateStr(last.completedAt) : null
   return isComeback(gapDays(lastDay, dateStr))
 }
 

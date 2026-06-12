@@ -1,7 +1,7 @@
 import schedule from 'node-schedule'
 import type { PrismaClient } from '@prisma/client'
 import { initVapid } from '../domain/push.js'
-import { sendPushToUser } from './push.js'
+import { sendPushToUser, pushEnabled } from './push.js'
 
 const VAPID_SUBJECT = 'mailto:hello@tootoo.app'
 
@@ -9,6 +9,11 @@ const VAPID_SUBJECT = 'mailto:hello@tootoo.app'
 const MORNING_CRON = '0 9 * * *'
 // 8:00 PM UTC every day
 const EVENING_CRON = '0 20 * * *'
+
+// Notification copy (Russian — MVP product language). Web i18n does not reach
+// the server, so the strings live here as constants until locales do.
+const MORNING_BODY = 'Что сегодня в фокусе? Выгрузи мысли и выбери главное.'
+const EVENING_BODY = 'Как прошёл день? Отметь сделанное и запланируй завтра.'
 
 export interface SchedulerHandle {
   /** Cancels the cron jobs — for graceful shutdown and to keep re-registration safe. */
@@ -20,20 +25,10 @@ export function buildScheduler(prisma: PrismaClient): SchedulerHandle {
 
   const jobs = [
     schedule.scheduleJob(MORNING_CRON, () =>
-      sendToOptedIn(
-        prisma,
-        'notifMorning',
-        'Что сегодня в фокусе? Выгрузи мысли и выбери главное.',
-        'morning',
-      ),
+      sendToOptedIn(prisma, 'notifMorning', MORNING_BODY, 'morning'),
     ),
     schedule.scheduleJob(EVENING_CRON, () =>
-      sendToOptedIn(
-        prisma,
-        'notifEvening',
-        'Как прошёл день? Отметь сделанное и запланируй завтра.',
-        'evening',
-      ),
+      sendToOptedIn(prisma, 'notifEvening', EVENING_BODY, 'evening'),
     ),
   ]
 
@@ -52,11 +47,10 @@ async function sendToOptedIn(
   tag: string,
 ): Promise<void> {
   try {
-    if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return
+    if (!pushEnabled()) return
     const users = await prisma.user.findMany({ where: { [pref]: true } })
-    for (const user of users) {
-      await sendPushToUser(prisma, user.id, 'tootoo', body, tag)
-    }
+    // sendPushToUser never throws — safe to fan out.
+    await Promise.all(users.map((user) => sendPushToUser(prisma, user.id, 'tootoo', body, tag)))
   } catch (error) {
     console.error(`Push cron job (${tag}) failed:`, error)
   }

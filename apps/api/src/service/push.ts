@@ -4,7 +4,7 @@ import { getVapidPublicKey, isAllowedPushEndpoint, sendPushToSubscription } from
 
 type GetUserId = () => Promise<string>
 
-function pushEnabled(): boolean {
+export function pushEnabled(): boolean {
   return Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY)
 }
 
@@ -78,14 +78,16 @@ export async function sendPushToUser(
 ): Promise<void> {
   if (!pushEnabled()) return
   const subs = await prisma.pushSubscription.findMany({ where: { userId } })
-  for (const sub of subs) {
-    try {
-      const ok = await sendPushToSubscription(sub, title, body, tag)
-      if (!ok) {
-        await prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => undefined)
+  await Promise.all(
+    subs.map(async (sub) => {
+      try {
+        const ok = await sendPushToSubscription(sub, title, body, tag)
+        if (!ok) {
+          await prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => undefined)
+        }
+      } catch (error) {
+        console.error(`Push send failed for subscription ${sub.id}:`, error)
       }
-    } catch (error) {
-      console.error(`Push send failed for subscription ${sub.id}:`, error)
-    }
-  }
+    }),
+  )
 }

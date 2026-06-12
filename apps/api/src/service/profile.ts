@@ -1,27 +1,9 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
-import { computeXPFromTotals, computeLevel } from '../domain/rewards.js'
 import { isThemeUnlocked, themeUnlockLevel } from '../domain/unlocks.js'
+import { getUserLevel } from './xp.js'
 
 type GetUserId = () => Promise<string>
-
-async function getUserLevel(prisma: PrismaClient, userId: string): Promise<number> {
-  const [taskTotals, mitCompletions, questXp] = await Promise.all([
-    prisma.task.aggregate({
-      where: { userId, status: 'done', completedAt: { not: null } },
-      _count: { _all: true },
-      _sum: { pomodoros: true },
-    }),
-    prisma.dailyEntry.count({
-      where: { isMIT: true, dailyList: { userId }, task: { status: 'done' } },
-    }),
-    prisma.questClaim.aggregate({ _sum: { xp: true }, where: { userId } }),
-  ])
-  const xp =
-    computeXPFromTotals(taskTotals._count._all, taskTotals._sum.pomodoros ?? 0, mitCompletions) +
-    (questXp._sum.xp ?? 0)
-  return computeLevel(xp)
-}
 
 export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {

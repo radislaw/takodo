@@ -5,7 +5,6 @@ export {
   useUpdateDailyEntry,
   useRemoveDailyEntry,
   todayDate,
-  tomorrowDate,
   fetchDailyByDate,
 } from './daily'
 export {

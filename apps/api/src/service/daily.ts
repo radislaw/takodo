@@ -1,15 +1,8 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
+import { toDateStr, parseDate } from '../domain/date.js'
 
 type GetUserId = () => Promise<string>
-
-function dateToString(d: Date): string {
-  return d.toISOString().slice(0, 10)
-}
-
-function parseDate(dateStr: string): Date {
-  return new Date(`${dateStr}T00:00:00.000Z`)
-}
 
 export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
@@ -22,13 +15,13 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
         where: { userId_date: { userId, date: dateVal } },
       })
       if (existing) {
-        return { ...existing, date: dateToString(existing.date) }
+        return { ...existing, date: toDateStr(existing.date) }
       }
 
       const list = await prisma.dailyList.create({
         data: { userId, date: dateVal },
       })
-      return { id: list.id, date: dateToString(list.date), createdAt: list.createdAt }
+      return { id: list.id, date: toDateStr(list.date), createdAt: list.createdAt }
     },
 
     async Daily_getByDate(req: FastifyRequest, reply: FastifyReply) {
@@ -52,7 +45,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
 
       return {
         id: list.id,
-        date: dateToString(list.date),
+        date: toDateStr(list.date),
         createdAt: list.createdAt,
         entries: list.entries,
       }

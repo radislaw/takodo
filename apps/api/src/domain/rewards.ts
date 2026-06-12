@@ -1,4 +1,5 @@
 import { gapDays, isComeback } from './comeback.js'
+import { toDateStr } from './date.js'
 
 export interface CompletedTaskInfo {
   completedAt: Date
@@ -33,10 +34,6 @@ export interface RewardsSummaryResult {
 const SHIELD_EARN_EVERY = 5
 const SHIELD_CAP = 2
 const SHIELD_RECENT_DAYS = 7
-
-function toDateStr(d: Date): string {
-  return d.toISOString().slice(0, 10)
-}
 
 function mondayOf(date: Date): Date {
   const d = new Date(date)
