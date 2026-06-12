@@ -1,0 +1,163 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { AppButton, AppInput, AppIcon } from '@/shared/ui'
+import { useTasks, useCreateTask, useAddDailyEntry } from '@/shared/api'
+import TaskCard from './TaskCard.vue'
+
+defineProps<{
+  selectedId?: string
+}>()
+
+const { t } = useI18n({ useScope: 'global' })
+const { data: taskList, isPending } = useTasks()
+const { mutateAsync: createTask } = useCreateTask()
+const { mutateAsync: addEntryAsync } = useAddDailyEntry()
+
+const newTitle = ref('')
+const isAdding = ref(false)
+const expandedIds = ref(new Set<string>())
+
+function toggleExpand(id: string) {
+  const next = new Set(expandedIds.value)
+  if (next.has(id)) next.delete(id)
+  else next.add(id)
+  expandedIds.value = next
+}
+
+const rootTasks = computed(() => (taskList.value ?? []).filter((task) => !task.parentId))
+
+const childrenByParent = computed(() => {
+  const map = new Map<string, typeof rootTasks.value>()
+  for (const task of taskList.value ?? []) {
+    if (!task.parentId) continue
+    const arr = map.get(task.parentId) ?? []
+    arr.push(task)
+    map.set(task.parentId, arr)
+  }
+  return map
+})
+
+const childProgress = computed(() => {
+  const map = new Map<string, { done: number; total: number }>()
+  for (const task of taskList.value ?? []) {
+    if (!task.parentId) continue
+    const entry = map.get(task.parentId) ?? { done: 0, total: 0 }
+    entry.total++
+    if (task.status === 'done') entry.done++
+    map.set(task.parentId, entry)
+  }
+  return map
+})
+
+function formatDateLabel(dateStr: string): string {
+  const now = new Date()
+  const today = now.toLocaleDateString('en-CA')
+  const yesterday = new Date(now.getTime() - 86400000).toLocaleDateString('en-CA')
+  if (dateStr === today) return t('tasks.dateGroup.today')
+  if (dateStr === yesterday) return t('tasks.dateGroup.yesterday')
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+  })
+}
+
+const groupedTasks = computed(() => {
+  const groups = new Map<string, typeof rootTasks.value>()
+  for (const task of rootTasks.value) {
+    const date = task.createdAt ? new Date(task.createdAt).toLocaleDateString('en-CA') : 'unknown'
+    const arr = groups.get(date) ?? []
+    arr.push(task)
+    groups.set(date, arr)
+  }
+  return [...groups.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([date, tasks]) => ({ date, label: formatDateLabel(date), tasks }))
+})
+
+async function handleAdd() {
+  const title = newTitle.value.trim()
+  if (!title) return
+  isAdding.value = true
+  try {
+    const task = await createTask({ title })
+    await addEntryAsync(task.id)
+    newTitle.value = ''
+  } finally {
+    isAdding.value = false
+  }
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter') handleAdd()
+}
+</script>
+
+<template>
+  <div>
+    <div class="surface-card mb-5 flex gap-2 rounded-2xl p-4 shadow-sm">
+      <AppInput
+        v-model="newTitle"
+        :placeholder="t('tasks.addPlaceholder')"
+        class="flex-1"
+        @keydown="handleKeydown"
+      />
+      <AppButton
+        variant="primary"
+        :disabled="isAdding || !newTitle.trim()"
+        class="!px-3 sm:!px-5"
+        @click="handleAdd"
+      >
+        <AppIcon v-if="isAdding" name="sparkles" :size="16" color="#fff" />
+        <AppIcon v-else name="plus" :size="16" color="#fff" :stroke-width="2.4" />
+        <span class="hidden sm:inline">{{ t('tasks.addButton') }}</span>
+      </AppButton>
+    </div>
+
+    <div v-if="isPending" class="text-ink-soft font-body py-12 text-center text-sm">
+      {{ t('tasks.loading') }}
+    </div>
+
+    <div
+      v-else-if="rootTasks.length === 0"
+      class="text-ink-soft font-body py-12 text-center text-sm"
+    >
+      {{ t('tasks.empty') }}
+    </div>
+
+    <div v-else class="flex flex-col gap-4">
+      <section
+        v-for="group in groupedTasks"
+        :key="group.date"
+        class="md:break-inside-avoid lg:break-inside-auto"
+      >
+        <h2
+          class="font-body text-ink-soft mb-2 px-1 text-xs font-semibold tracking-widest uppercase"
+        >
+          {{ group.label }}
+        </h2>
+        <div class="flex flex-col">
+          <template v-for="task in group.tasks" :key="task.id">
+            <TaskCard
+              :task="task"
+              :selected="task.id === selectedId"
+              :child-done="childProgress.get(task.id)?.done"
+              :child-total="childProgress.get(task.id)?.total"
+              :expanded="expandedIds.has(task.id)"
+              @toggle-expand="toggleExpand(task.id)"
+            />
+            <template v-if="expandedIds.has(task.id)">
+              <div
+                v-for="child in childrenByParent.get(task.id) ?? []"
+                :key="child.id"
+                class="ml-6"
+              >
+                <TaskCard :task="child" :selected="child.id === selectedId" />
+              </div>
+            </template>
+          </template>
+        </div>
+      </section>
+    </div>
+  </div>
+</template>

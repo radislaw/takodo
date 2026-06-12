@@ -192,6 +192,11 @@ describe('TasksPage', () => {
     expect(wrapper.text()).toContain('Сегодня')
   })
 
+  it('shows the desktop select hint placeholder', () => {
+    wrapper = mount(TasksPage)
+    expect(wrapper.text()).toContain('Выбери задачу из списка')
+  })
+
   it('calls createTask and addEntry on add button click', async () => {
     mockCreateTask.mockResolvedValueOnce({ id: 't-new', title: 'Test task' })
     mockAddEntry.mockResolvedValueOnce({})

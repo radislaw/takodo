@@ -30,6 +30,7 @@ const props = defineProps<{
   childDone?: number
   childTotal?: number
   expanded?: boolean
+  selected?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -103,7 +104,10 @@ async function handleAddToToday() {
 </script>
 
 <template>
-  <div class="surface-card mb-2 flex items-center gap-3 rounded-2xl px-3 py-2.5 shadow-sm">
+  <div
+    class="mb-2 flex items-center gap-3 rounded-2xl border-[1.5px] px-3 py-2.5 shadow-sm"
+    :class="selected ? 'bg-sage-tint border-sage' : 'surface-card border-transparent'"
+  >
     <AppCheckbox
       :model-value="task.status === 'done'"
       :aria-label="task.title"

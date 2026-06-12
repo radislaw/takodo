@@ -297,7 +297,8 @@
       "addSubtaskPlaceholder": "Новый шаг...",
       "notePlaceholder": "Заметка...",
       "notFound": "Задача не найдена",
-      "focusStats": "Фокус: {time}"
+      "focusStats": "Фокус: {time}",
+      "selectHint": "Выбери задачу из списка"
     }
   },
   "frequent": {
