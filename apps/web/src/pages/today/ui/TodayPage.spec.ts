@@ -354,4 +354,55 @@ describe('TodayPage', () => {
 
     expect(mockMoveToTomorrow).toHaveBeenCalledWith({ entryId: 'e1', taskId: 't1' })
   })
+
+  it('renders BrainDumpBar with tablet-up visibility classes', () => {
+    const wrapper = mountPage()
+    const bar = wrapper.findComponent({ name: 'BrainDumpBar' })
+    expect(bar.exists()).toBe(true)
+    expect(bar.classes()).toContain('hidden')
+    expect(bar.classes()).toContain('md:flex')
+  })
+
+  it('BrainDumpBar submit calls createTask then addEntry', async () => {
+    mockCreateTask.mockResolvedValueOnce({ id: 't-dump', title: 'Dumped' })
+    mockAddEntry.mockResolvedValueOnce({ id: 'e-dump', taskId: 't-dump', isMIT: false, order: 0 })
+
+    const wrapper = mountPage()
+    const bar = wrapper.findComponent({ name: 'BrainDumpBar' })
+    await bar.vm.$emit('submit', 'Dumped')
+    await new Promise((r) => setTimeout(r, 10))
+
+    expect(mockCreateTask).toHaveBeenCalledWith({ title: 'Dumped' })
+    expect(mockAddEntry).toHaveBeenCalledWith('t-dump')
+  })
+
+  it('desktop rail passes the MIT-first task to FocusNowCard', async () => {
+    tasksData.value = [
+      { id: 't1', parentId: null, title: 'Plain task', status: 'open' },
+      { id: 't2', parentId: null, title: 'Main task', status: 'open' },
+    ]
+    dailyData.value = {
+      id: 'list-1',
+      date: '2026-06-05',
+      createdAt: '2026-06-05T00:00:00Z',
+      entries: [
+        { id: 'e1', taskId: 't1', isMIT: false, order: 0 },
+        { id: 'e2', taskId: 't2', isMIT: true, order: 1 },
+      ],
+    }
+    const wrapper = mountPage()
+    await wrapper.vm.$nextTick()
+    const card = wrapper.findComponent({ name: 'FocusNowCard' })
+    expect(card.props('title')).toBe('Main task')
+    expect(card.props('taskId')).toBe('t2')
+  })
+
+  it('desktop rail is hidden below lg and FAB is hidden at lg', () => {
+    const wrapper = mountPage()
+    const aside = wrapper.find('aside')
+    expect(aside.classes()).toContain('hidden')
+    expect(aside.classes()).toContain('lg:flex')
+    const fab = document.body.querySelector('button[aria-label="Новое дело"]')
+    expect(fab?.className).toContain('lg:hidden')
+  })
 })

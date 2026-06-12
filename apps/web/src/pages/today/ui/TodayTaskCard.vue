@@ -75,7 +75,7 @@ function handleToggleMit() {
 </script>
 
 <template>
-  <div class="surface-card mb-2.5 cursor-pointer rounded-2xl px-3 py-3 shadow-sm">
+  <div class="surface-card cursor-pointer rounded-2xl px-3 py-3 shadow-sm">
     <div class="flex gap-3" :class="hasBottomRow ? 'items-start' : 'items-center'">
       <AppCheckbox
         class="flex-shrink-0"

@@ -29,6 +29,10 @@ import { useReward } from '@/shared/lib/useReward'
 import TodayTaskCard from './TodayTaskCard.vue'
 import QuestPanel from './QuestPanel.vue'
 import ComebackBanner from './ComebackBanner.vue'
+import BrainDumpBar from './BrainDumpBar.vue'
+import FocusNowCard from './FocusNowCard.vue'
+import CategoriesCard from './CategoriesCard.vue'
+import { SoftNote } from '@/shared/ui'
 
 const { t } = useI18n({ useScope: 'global' })
 const { showError } = useErrorToast()
@@ -136,6 +140,21 @@ const doneEntries = computed(() =>
   entries.value.filter((e) => taskMap.value.get(e.taskId)?.status === 'done'),
 )
 
+const nextEntry = computed(() => activeEntries.value[0])
+const nextTask = computed(() =>
+  nextEntry.value ? taskMap.value.get(nextEntry.value.taskId) : undefined,
+)
+
+const categoryCounts = computed(() => {
+  const acc = new Map<string, number>()
+  for (const entry of activeEntries.value) {
+    const category = taskMap.value.get(entry.taskId)?.category
+    if (!category) continue
+    acc.set(category, (acc.get(category) ?? 0) + 1)
+  }
+  return [...acc.entries()].map(([category, count]) => ({ category, count }))
+})
+
 const summaryMsg = computed(() => {
   const left = entries.value.length - doneCount.value
   if (entries.value.length === 0) return t('today.summary.start')
@@ -158,23 +177,31 @@ function focusInput() {
   inputRef.value?.focus()
 }
 
-async function handleAdd() {
-  const title = newTitle.value.trim()
-  if (!title) return
+async function addTask(title: string, category?: (typeof CATEGORIES)[number] | null) {
   isAdding.value = true
   try {
     const task = await createTaskAsync({
       title,
-      ...(newCategory.value ? { category: newCategory.value } : {}),
+      ...(category ? { category } : {}),
     })
     await addEntryAsync(task.id)
+    return true
+  } catch {
+    showError('errors.addFailed')
+    return false
+  } finally {
+    isAdding.value = false
+  }
+}
+
+async function handleAdd() {
+  const title = newTitle.value.trim()
+  if (!title) return
+  const added = await addTask(title, newCategory.value)
+  if (added) {
     newTitle.value = ''
     newCategory.value = null
     nextTick(() => inputRef.value?.focus())
-  } catch {
-    showError('errors.addFailed')
-  } finally {
-    isAdding.value = false
   }
 }
 
@@ -218,127 +245,148 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
       </div>
     </Transition>
 
-    <main class="mx-auto max-w-xl px-4 pt-14 pb-4">
-      <!-- Greeting -->
-      <div class="mb-5">
-        <h1 class="font-display text-ink text-2xl leading-tight font-extrabold">
-          {{ greetingFull }}
-        </h1>
-        <p class="font-body text-ink-soft mt-0.5 text-sm">{{ t('greeting.subtitle') }}</p>
-      </div>
+    <main class="mx-auto max-w-xl px-4 pt-14 pb-4 md:max-w-3xl md:px-8 lg:max-w-5xl lg:pt-8">
+      <div class="lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-[22px]">
+        <div class="min-w-0">
+          <!-- Greeting -->
+          <div class="mb-5">
+            <h1 class="font-display text-ink text-2xl leading-tight font-extrabold md:text-[2rem]">
+              {{ greetingFull }}
+            </h1>
+            <p class="font-body text-ink-soft mt-0.5 text-sm">{{ t('greeting.subtitle') }}</p>
+          </div>
 
-      <!-- Comeback (anti-shame) banner -->
-      <ComebackBanner v-if="isComeback" />
+          <!-- Comeback (anti-shame) banner -->
+          <ComebackBanner v-if="isComeback" />
 
-      <!-- Summary card -->
-      <div class="surface-card mb-6 flex items-center gap-4 rounded-2xl p-4 shadow-md">
-        <AppProgressRing
-          :done="doneCount"
-          :total="entries.length || 1"
-          :aria-label="t('today.progressAria', { done: doneCount, total: entries.length })"
-        />
-        <div class="min-w-0 flex-1">
-          <p class="font-body text-ink text-sm leading-snug font-semibold">{{ summaryMsg }}</p>
+          <!-- Inline brain dump (tablet/desktop) -->
+          <BrainDumpBar class="mb-5 hidden md:flex" :disabled="isAdding" @submit="addTask" />
+
+          <!-- Summary card -->
+          <div class="surface-card mb-6 flex items-center gap-4 rounded-2xl p-4 shadow-md">
+            <AppProgressRing
+              :done="doneCount"
+              :total="entries.length || 1"
+              :aria-label="t('today.progressAria', { done: doneCount, total: entries.length })"
+            />
+            <div class="min-w-0 flex-1">
+              <p class="font-body text-ink text-sm leading-snug font-semibold">{{ summaryMsg }}</p>
+              <div
+                v-if="streak > 0 || entries.length > 0 || level > 1"
+                class="mt-2 flex flex-wrap gap-1.5"
+              >
+                <StreakFlame
+                  v-if="streak > 0"
+                  :streak="streak"
+                  :shields="shields"
+                  :shield-used-recently="shieldUsedRecently"
+                />
+                <div
+                  v-if="entries.length > 0"
+                  class="bg-sage/10 inline-flex items-center gap-1 rounded-full px-2.5 py-1"
+                >
+                  <AppIcon name="zap" :size="13" class="text-sage-deep" />
+                  <span class="text-sage-deep text-xs font-bold">{{
+                    t('today.mitCounter', { count: mitCount })
+                  }}</span>
+                </div>
+                <div
+                  v-if="level > 1"
+                  data-test="level-chip"
+                  class="bg-cat-mauve/15 inline-flex items-center rounded-full px-2.5 py-1"
+                >
+                  <span class="text-cat-mauve text-xs font-bold">{{
+                    t('today.level', { n: level })
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity heatmap (compact) -->
           <div
-            v-if="streak > 0 || entries.length > 0 || level > 1"
-            class="mt-2 flex flex-wrap gap-1.5"
+            v-if="heatmap && heatmap.max > 0"
+            class="surface-card mb-6 rounded-2xl p-4 shadow-sm"
           >
-            <StreakFlame
-              v-if="streak > 0"
-              :streak="streak"
-              :shields="shields"
-              :shield-used-recently="shieldUsedRecently"
-            />
-            <div
-              v-if="entries.length > 0"
-              class="bg-sage/10 inline-flex items-center gap-1 rounded-full px-2.5 py-1"
-            >
-              <AppIcon name="zap" :size="13" class="text-sage-deep" />
-              <span class="text-sage-deep text-xs font-bold">{{
-                t('today.mitCounter', { count: mitCount })
-              }}</span>
+            <div class="mb-3 flex items-center gap-1.5">
+              <AppIcon name="flame" :size="14" class="text-apricot-deep" />
+              <p class="font-display text-ink text-xs font-extrabold">
+                {{ t('rewards.heatmap.title') }}
+              </p>
             </div>
-            <div
-              v-if="level > 1"
-              data-test="level-chip"
-              class="bg-cat-mauve/15 inline-flex items-center rounded-full px-2.5 py-1"
-            >
-              <span class="text-cat-mauve text-xs font-bold">{{
-                t('today.level', { n: level })
-              }}</span>
-            </div>
+            <ActivityHeatmap :days="heatmap.days" :max="heatmap.max" :show-labels="false" />
+          </div>
+
+          <!-- Loading -->
+          <div v-if="isPending" class="text-ink-soft font-body py-12 text-center text-sm">
+            {{ t('today.loading') }}
+          </div>
+
+          <!-- Empty state -->
+          <div
+            v-else-if="entries.length === 0"
+            class="text-ink-soft font-body py-12 text-center text-sm"
+          >
+            {{ t('today.emptyState') }}
+          </div>
+
+          <template v-else>
+            <!-- Active section -->
+            <template v-if="activeEntries.length > 0">
+              <p class="font-body text-ink-soft mb-2 text-xs font-bold tracking-widest uppercase">
+                {{ t('today.sections.active') }}
+              </p>
+              <div
+                class="mb-5 flex flex-col gap-2.5 md:grid md:grid-cols-2 md:items-start md:gap-3 lg:flex lg:flex-col"
+              >
+                <TodayTaskCard
+                  v-for="entry in activeEntries"
+                  :key="entry.id"
+                  :entry="entry"
+                  :task="taskMap.get(entry.taskId)"
+                  :child-done="childProgress.get(entry.taskId)?.done"
+                  :child-total="childProgress.get(entry.taskId)?.total"
+                  @toggle-done="handleToggleDone"
+                  @toggle-mit="handleToggleMIT"
+                  @move-tomorrow="handleMoveTomorrow"
+                />
+              </div>
+            </template>
+
+            <!-- Done section -->
+            <template v-if="doneEntries.length > 0">
+              <p class="font-body text-ink-soft mb-2 text-xs font-bold tracking-widest uppercase">
+                {{ t('today.sections.done') }}
+              </p>
+              <div
+                class="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:items-start md:gap-3 lg:flex lg:flex-col"
+              >
+                <TodayTaskCard
+                  v-for="entry in doneEntries"
+                  :key="entry.id"
+                  :entry="entry"
+                  :task="taskMap.get(entry.taskId)"
+                  :child-done="childProgress.get(entry.taskId)?.done"
+                  :child-total="childProgress.get(entry.taskId)?.total"
+                  @toggle-done="handleToggleDone"
+                  @toggle-mit="handleToggleMIT"
+                />
+              </div>
+            </template>
+          </template>
+
+          <!-- Daily quests -->
+          <div class="mt-5">
+            <QuestPanel />
           </div>
         </div>
-      </div>
 
-      <!-- Activity heatmap (compact) -->
-      <div v-if="heatmap && heatmap.max > 0" class="surface-card mb-6 rounded-2xl p-4 shadow-sm">
-        <div class="mb-3 flex items-center gap-1.5">
-          <AppIcon name="flame" :size="14" class="text-apricot-deep" />
-          <p class="font-display text-ink text-xs font-extrabold">
-            {{ t('rewards.heatmap.title') }}
-          </p>
-        </div>
-        <ActivityHeatmap :days="heatmap.days" :max="heatmap.max" :show-labels="false" />
-      </div>
-
-      <!-- Loading -->
-      <div v-if="isPending" class="text-ink-soft font-body py-12 text-center text-sm">
-        {{ t('today.loading') }}
-      </div>
-
-      <!-- Empty state -->
-      <div
-        v-else-if="entries.length === 0"
-        class="text-ink-soft font-body py-12 text-center text-sm"
-      >
-        {{ t('today.emptyState') }}
-      </div>
-
-      <template v-else>
-        <!-- Active section -->
-        <template v-if="activeEntries.length > 0">
-          <p class="font-body text-ink-soft mb-2 text-xs font-bold tracking-widest uppercase">
-            {{ t('today.sections.active') }}
-          </p>
-          <div class="mb-5 flex flex-col">
-            <TodayTaskCard
-              v-for="entry in activeEntries"
-              :key="entry.id"
-              :entry="entry"
-              :task="taskMap.get(entry.taskId)"
-              :child-done="childProgress.get(entry.taskId)?.done"
-              :child-total="childProgress.get(entry.taskId)?.total"
-              @toggle-done="handleToggleDone"
-              @toggle-mit="handleToggleMIT"
-              @move-tomorrow="handleMoveTomorrow"
-            />
-          </div>
-        </template>
-
-        <!-- Done section -->
-        <template v-if="doneEntries.length > 0">
-          <p class="font-body text-ink-soft mb-2 text-xs font-bold tracking-widest uppercase">
-            {{ t('today.sections.done') }}
-          </p>
-          <div class="flex flex-col">
-            <TodayTaskCard
-              v-for="entry in doneEntries"
-              :key="entry.id"
-              :entry="entry"
-              :task="taskMap.get(entry.taskId)"
-              :child-done="childProgress.get(entry.taskId)?.done"
-              :child-total="childProgress.get(entry.taskId)?.total"
-              @toggle-done="handleToggleDone"
-              @toggle-mit="handleToggleMIT"
-            />
-          </div>
-        </template>
-      </template>
-
-      <!-- Daily quests -->
-      <div class="mt-5">
-        <QuestPanel />
+        <!-- Desktop right rail -->
+        <aside class="hidden lg:sticky lg:top-8 lg:flex lg:flex-col lg:gap-4">
+          <FocusNowCard :title="nextTask?.title" :task-id="nextTask?.id" />
+          <CategoriesCard :counts="categoryCounts" />
+          <SoftNote>{{ t('today.softNote') }}</SoftNote>
+        </aside>
       </div>
     </main>
 
@@ -346,7 +394,7 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
     <Teleport to="body">
       <button
         type="button"
-        class="bg-sage fixed z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full shadow-lg transition-transform active:scale-95"
+        class="bg-sage fixed z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full shadow-lg transition-transform active:scale-95 lg:hidden"
         style="bottom: calc(5rem + env(safe-area-inset-bottom) + 0.75rem); right: 1.25rem"
         :aria-label="t('today.add.title')"
         @click="openSheet"

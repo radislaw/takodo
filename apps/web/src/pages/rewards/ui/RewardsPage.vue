@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppIcon, ActivityHeatmap } from '@/shared/ui'
+import { AppIcon, ActivityHeatmap, SoftNote } from '@/shared/ui'
 import { useRewards, useHeatmap } from '@/shared/api'
 
 const BADGE_ICONS: Record<string, string> = {
@@ -156,12 +156,7 @@ const weekdayLabel = computed(() => {
         </div>
 
         <!-- Gentle note -->
-        <div class="bg-sage-tint mt-5 flex gap-3 rounded-2xl p-4">
-          <AppIcon name="heart" :size="20" class="text-sage-deep mt-0.5 flex-shrink-0" />
-          <p class="text-sage-deep text-sm leading-relaxed font-semibold">
-            {{ t('rewards.gentleNote') }}
-          </p>
-        </div>
+        <SoftNote class="mt-5">{{ t('rewards.gentleNote') }}</SoftNote>
       </template>
     </div>
   </div>
