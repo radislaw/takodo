@@ -1,4 +1,16 @@
 const CACHE = 'tootoo-shell-v1'
+// The cache name never rotates between deploys, so hashed assets from old
+// builds would accumulate forever — cap the cache and evict oldest-first.
+const MAX_ASSET_ENTRIES = 60
+
+async function putBounded(request, response) {
+  const c = await caches.open(CACHE)
+  await c.put(request, response)
+  const keys = await c.keys()
+  for (let i = 0; i < keys.length - MAX_ASSET_ENTRIES; i++) {
+    await c.delete(keys[i])
+  }
+}
 
 self.addEventListener('install', (e) => {
   self.skipWaiting()
@@ -33,7 +45,7 @@ self.addEventListener('fetch', (e) => {
         fetch(e.request).then((res) => {
           if (res.ok) {
             const clone = res.clone()
-            caches.open(CACHE).then((c) => c.put(e.request, clone))
+            e.waitUntil(putBounded(e.request, clone))
           }
           return res
         }),

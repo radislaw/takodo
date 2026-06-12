@@ -20,8 +20,16 @@ async function getUserId(): Promise<string> {
   return cachedUserId
 }
 
-buildScheduler(prisma)
+const scheduler = buildScheduler(prisma)
 const app = buildApp({ logger: true, prisma, getUserId })
+
+async function shutdown(): Promise<void> {
+  scheduler.stop()
+  await app.close()
+  process.exit(0)
+}
+process.once('SIGINT', () => void shutdown())
+process.once('SIGTERM', () => void shutdown())
 
 try {
   const address = await app.listen({ port: PORT, host: HOST })

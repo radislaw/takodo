@@ -101,6 +101,19 @@ describe('sw.js', () => {
     // clone() must be called on a local variable, not passed directly to caches.put
     expect(sw).toMatch(/const \w+ = res\.clone\(\)/)
   })
+
+  it('bounds the runtime cache so old hashed assets are evicted', () => {
+    sw = readFileSync(`${PUBLIC}/sw.js`, 'utf-8')
+    // The cache name never rotates between deploys, so without an entry cap
+    // every deploy's hashed assets accumulate in CacheStorage forever.
+    expect(sw).toContain('MAX_ASSET_ENTRIES')
+    expect(sw).toMatch(/\.delete\(/)
+  })
+
+  it('extends the fetch event lifetime for cache writes', () => {
+    sw = readFileSync(`${PUBLIC}/sw.js`, 'utf-8')
+    expect(sw).toMatch(/e\.waitUntil\(/)
+  })
 })
 
 describe('index.html', () => {

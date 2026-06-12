@@ -10,26 +10,38 @@ const MORNING_CRON = '0 9 * * *'
 // 8:00 PM UTC every day
 const EVENING_CRON = '0 20 * * *'
 
-export function buildScheduler(prisma: PrismaClient): void {
+export interface SchedulerHandle {
+  /** Cancels the cron jobs — for graceful shutdown and to keep re-registration safe. */
+  stop: () => void
+}
+
+export function buildScheduler(prisma: PrismaClient): SchedulerHandle {
   initVapid(VAPID_SUBJECT)
 
-  schedule.scheduleJob(MORNING_CRON, () =>
-    sendToOptedIn(
-      prisma,
-      'notifMorning',
-      'Что сегодня в фокусе? Выгрузи мысли и выбери главное.',
-      'morning',
+  const jobs = [
+    schedule.scheduleJob(MORNING_CRON, () =>
+      sendToOptedIn(
+        prisma,
+        'notifMorning',
+        'Что сегодня в фокусе? Выгрузи мысли и выбери главное.',
+        'morning',
+      ),
     ),
-  )
+    schedule.scheduleJob(EVENING_CRON, () =>
+      sendToOptedIn(
+        prisma,
+        'notifEvening',
+        'Как прошёл день? Отметь сделанное и запланируй завтра.',
+        'evening',
+      ),
+    ),
+  ]
 
-  schedule.scheduleJob(EVENING_CRON, () =>
-    sendToOptedIn(
-      prisma,
-      'notifEvening',
-      'Как прошёл день? Отметь сделанное и запланируй завтра.',
-      'evening',
-    ),
-  )
+  return {
+    stop: () => {
+      for (const job of jobs) job.cancel()
+    },
+  }
 }
 
 /** Never throws: an unhandled rejection inside a cron job would crash the process. */

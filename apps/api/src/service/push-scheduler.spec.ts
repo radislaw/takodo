@@ -62,6 +62,19 @@ describe('buildScheduler', () => {
     expect(schedule.scheduleJob).toHaveBeenCalledTimes(2)
   })
 
+  it('returns a handle whose stop() cancels both jobs', async () => {
+    const schedule = (await import('node-schedule')).default
+    const handle = buildScheduler(prisma)
+    handle.stop()
+    const jobs = (schedule.scheduleJob as ReturnType<typeof vi.fn>).mock.results.map(
+      (r) => r.value as { cancel: ReturnType<typeof vi.fn> },
+    )
+    expect(jobs).toHaveLength(2)
+    for (const job of jobs) {
+      expect(job.cancel).toHaveBeenCalled()
+    }
+  })
+
   it('sends morning push to users with notifMorning=true', async () => {
     const schedule = (await import('node-schedule')).default
     const webpush = (await import('web-push')).default
