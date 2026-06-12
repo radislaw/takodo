@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { useMutation } from '@pinia/colada'
 import { apiClient } from '@/api/client'
+import { useErrorToast } from '@/shared/lib/useErrorToast'
 
 type PermissionState = 'default' | 'granted' | 'denied' | 'unsupported'
 
@@ -42,23 +43,28 @@ export function useNotifications() {
   const isSupported = computed(() => permissionState.value !== 'unsupported')
   const isBlocked = computed(() => permissionState.value === 'denied')
   const isRequesting = ref(false)
+  const { showError } = useErrorToast()
 
-  const { mutate: mutateSubscribe } = useMutation({
+  // openapi-fetch never throws on 4xx/5xx — the {error} field must be checked,
+  // otherwise a rejected subscription would still look "subscribed" in the UI.
+  const { mutateAsync: mutateSubscribe } = useMutation({
     mutation: async (sub: PushSubscriptionJSON) => {
       if (!sub.endpoint || !sub.keys?.p256dh || !sub.keys.auth) throw new Error('invalid sub')
-      await apiClient.POST('/push/subscribe', {
+      const { error } = await apiClient.POST('/push/subscribe', {
         body: {
           endpoint: sub.endpoint,
           p256dh: sub.keys.p256dh,
           auth: sub.keys.auth,
         },
       })
+      if (error) throw new Error(error.message)
     },
   })
 
-  const { mutate: mutateUnsubscribe } = useMutation({
+  const { mutateAsync: mutateUnsubscribe } = useMutation({
     mutation: async (endpoint: string) => {
-      await apiClient.DELETE('/push/subscribe', { body: { endpoint } })
+      const { error } = await apiClient.DELETE('/push/subscribe', { body: { endpoint } })
+      if (error) throw new Error(error.message)
     },
   })
 
@@ -71,7 +77,10 @@ export function useNotifications() {
       if (permission !== 'granted') return
 
       const publicKey = await getVapidPublicKey()
-      if (!publicKey) return
+      if (!publicKey) {
+        showError('errors.saveFailed')
+        return
+      }
 
       let registration = await navigator.serviceWorker.getRegistration('/')
       if (!registration) {
@@ -85,8 +94,10 @@ export function useNotifications() {
         applicationServerKey,
       })
 
-      mutateSubscribe(subscription.toJSON())
+      await mutateSubscribe(subscription.toJSON())
       isSubscribed.value = true
+    } catch {
+      showError('errors.saveFailed')
     } finally {
       isRequesting.value = false
     }
@@ -96,11 +107,22 @@ export function useNotifications() {
     const registration = await navigator.serviceWorker.getRegistration('/')
     if (!registration) return
     const subscription = await registration.pushManager.getSubscription()
-    if (!subscription) return
+    if (!subscription) {
+      isSubscribed.value = false
+      return
+    }
     const endpoint = subscription.endpoint
-    await subscription.unsubscribe()
-    mutateUnsubscribe(endpoint)
+    try {
+      await subscription.unsubscribe()
+    } catch {
+      // Browser still holds the subscription — state unchanged.
+      showError('errors.saveFailed')
+      return
+    }
     isSubscribed.value = false
+    // Server cleanup is best-effort: a missed delete self-heals when the
+    // push service answers 410 and the server drops the stale row.
+    await mutateUnsubscribe(endpoint).catch(() => undefined)
   }
 
   return {
