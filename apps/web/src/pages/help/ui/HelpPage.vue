@@ -79,8 +79,8 @@ function tips(key: string): string[] {
               class="text-ink-soft flex-shrink-0 transition-transform duration-200"
               :style="
                 openSection === section.key
-                  ? 'transform: rotate(90deg)'
-                  : 'transform: rotate(-90deg)'
+                  ? 'transform: rotate(-90deg)'
+                  : 'transform: rotate(90deg)'
               "
             />
           </button>
