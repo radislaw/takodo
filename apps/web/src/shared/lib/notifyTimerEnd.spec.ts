@@ -1,5 +1,48 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 
+describe('requestNotificationPermission', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.resetModules()
+  })
+
+  it('does nothing when Notification is unsupported', async () => {
+    const { requestNotificationPermission } = await import('./notifyTimerEnd')
+    await expect(requestNotificationPermission()).resolves.toBeUndefined()
+  })
+
+  it('does nothing when permission already granted', async () => {
+    const requestPermission = vi.fn()
+    vi.stubGlobal('Notification', { permission: 'granted', requestPermission })
+    const { requestNotificationPermission } = await import('./notifyTimerEnd')
+    await requestNotificationPermission()
+    expect(requestPermission).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when permission already denied', async () => {
+    const requestPermission = vi.fn()
+    vi.stubGlobal('Notification', { permission: 'denied', requestPermission })
+    const { requestNotificationPermission } = await import('./notifyTimerEnd')
+    await requestNotificationPermission()
+    expect(requestPermission).not.toHaveBeenCalled()
+  })
+
+  it('calls requestPermission when permission is default', async () => {
+    const requestPermission = vi.fn().mockResolvedValue('granted')
+    vi.stubGlobal('Notification', { permission: 'default', requestPermission })
+    const { requestNotificationPermission } = await import('./notifyTimerEnd')
+    await requestNotificationPermission()
+    expect(requestPermission).toHaveBeenCalledOnce()
+  })
+
+  it('swallows errors from requestPermission', async () => {
+    const requestPermission = vi.fn().mockRejectedValue(new Error('boom'))
+    vi.stubGlobal('Notification', { permission: 'default', requestPermission })
+    const { requestNotificationPermission } = await import('./notifyTimerEnd')
+    await expect(requestNotificationPermission()).resolves.toBeUndefined()
+  })
+})
+
 describe('notifyTimerEnd', () => {
   afterEach(() => {
     vi.unstubAllGlobals()

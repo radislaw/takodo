@@ -6,7 +6,7 @@ import { useRecordFocus } from '@/shared/api'
 import { usePomodoro } from '@/shared/lib/usePomodoro'
 import { formatFocusDuration } from '@/shared/lib/formatFocus'
 import { playChime } from '@/shared/lib/chime'
-import { notifyTimerEnd } from '@/shared/lib/notifyTimerEnd'
+import { notifyTimerEnd, requestNotificationPermission } from '@/shared/lib/notifyTimerEnd'
 
 const props = defineProps<{
   taskId: string
@@ -67,6 +67,7 @@ function toggleStartPause() {
   if (status.value === 'running') {
     pause()
   } else {
+    void requestNotificationPermission()
     start()
   }
 }
