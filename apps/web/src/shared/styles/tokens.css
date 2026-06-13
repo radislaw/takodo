@@ -129,11 +129,12 @@
 }
 
 /* ============================================================
-   DARK THEME — "вечерний шалфей"
-   Warm dark pine, never pure black. Opt in with
-   <element data-theme="dark"> (cascades to all descendants).
+   FOREST THEME — "вечерний шалфей"
+   Warm dark pine, never pure black. Formerly the default dark
+   theme; renamed when liquid-glass dark took the "dark" slot.
+   Opt in with <element data-theme="forest">.
    ============================================================ */
-[data-theme='dark'] {
+[data-theme='forest'] {
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
@@ -442,6 +443,75 @@
   /* Focus — thick double ring (white halo + amber), unmissable */
   --ring: 0 0 0 3px #ffffff, 0 0 0 6px #0b5fd4;
   --ring-apr: 0 0 0 3px #ffffff, 0 0 0 6px #b85000;
+}
+
+/* ============================================================
+   HIGH-CONTRAST DARK THEME — "высокий контраст · тёмная"
+   Built for low vision, inverted: pure white ink on black,
+   bright saturated accents that pass WCAG AAA on black, white
+   card outlines (via shadow tokens) and a thick double focus
+   ring. Opt in with <element data-theme="high-contrast-dark">.
+   ============================================================ */
+[data-theme='high-contrast-dark'] {
+  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  /* Surfaces — pure black, dark recess */
+  --cream: #000000;
+  --cream-deep: #1a1a1a;
+  --card: #000000;
+
+  /* Ink — pure white, light greys that still pass AA */
+  --ink: #ffffff;
+  --ink-soft: #d9d9d9;
+  --ink-faint: #ababab;
+
+  /* Accent — bright blue (AAA on black) */
+  --sage: #6db1ff;
+  --sage-press: #8fc2ff;
+  --sage-deep: #a8cfff;
+  --sage-tint: #0a2a52;
+  --sage-tint-2: #10406e;
+
+  /* Reward — bright orange (AAA on black) */
+  --apricot: #ff9d4d;
+  --apricot-press: #ffb070;
+  --apricot-deep: #ffbe7d;
+  --apricot-tint: #3a2000;
+
+  /* Semantic — fully saturated, high contrast on black */
+  --done: #4dd47f;
+  --done-tint: #03301a;
+  --gentle: #ffd24d;
+  --gentle-tint: #332a00;
+  --softrose: #ff7d92;
+  --softrose-tint: #38000d;
+
+  /* Category dots — saturated, distinguishable on black */
+  --cat-sage: #6db1ff;
+  --cat-apricot: #ff9d4d;
+  --cat-blue: #4dc3ff;
+  --cat-clay: #ff8f66;
+  --cat-gold: #ffd24d;
+  --cat-mauve: #d18fff;
+
+  /* Lines & edges — visible, never faint */
+  --line: #8f8f8f;
+  --line-card: #6b6b6b;
+  --line-strong: #ffffff;
+
+  /* Nav — solid black, no frosted glass */
+  --nav-bg: #000000;
+  --nav-inactive: #d9d9d9;
+
+  /* Elevation — solid white outlines so cards are clearly bounded */
+  --shadow-sm: 0 0 0 1.5px #ffffff;
+  --shadow-md: 0 0 0 2px #ffffff;
+  --shadow-lg: 0 0 0 2.5px #ffffff, 0 8px 22px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 0 0 3px #ffffff, 0 16px 44px rgba(0, 0, 0, 0.8);
+  /* Focus — thick double ring (black halo + bright accent), unmissable */
+  --ring: 0 0 0 3px #000000, 0 0 0 6px #6db1ff;
+  --ring-apr: 0 0 0 3px #000000, 0 0 0 6px #ff9d4d;
 }
 
 /* ============================================================
@@ -842,15 +912,15 @@
 }
 
 /* ============================================================
-   LIQUID GLASS THEME — "жидкое стекло" (iOS-style)
-   Soft aurora gradient behind translucent frosted panels.
-   Cards are semi-transparent white with backdrop blur (set via
-   --glass-blur, consumed by surface utilities) and a specular
-   top highlight baked into the shadow tokens. Calm iOS blue
-   accent, warm peach reward.
-   Opt in with <element data-theme="liquid-glass">.
+   LIGHT THEME — "жидкое стекло" (iOS-style liquid glass)
+   The default light theme. Soft aurora gradient behind
+   translucent frosted panels. Cards are semi-transparent white
+   with backdrop blur (set via --glass-blur, consumed by surface
+   utilities) and a specular top highlight baked into the shadow
+   tokens. Calm iOS blue accent, warm peach reward.
+   Opt in with <element data-theme="light">.
    ============================================================ */
-[data-theme='liquid-glass'] {
+[data-theme='light'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
@@ -920,6 +990,86 @@
     0 16px 56px rgba(40, 60, 110, 0.2);
   --ring: 0 0 0 3px rgba(79, 143, 221, 0.35);
   --ring-apr: 0 0 0 3px rgba(232, 154, 110, 0.38);
+}
+
+/* ============================================================
+   DARK THEME — "тёмное стекло" (liquid glass, dark)
+   The default dark theme — dark counterpart of LIGHT. Deep
+   night aurora behind translucent slate panels with backdrop
+   blur (--glass-blur) and a faint specular top edge in the
+   shadow tokens. Lifted glass blue accent, warm peach reward.
+   Opt in with <element data-theme="dark">.
+   ============================================================ */
+[data-theme='dark'] {
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+
+  /* Surfaces — night aurora behind the glass */
+  --cream: linear-gradient(165deg, #131a2e 0%, #1d1733 28%, #261632 55%, #122230 82%, #141c32 100%);
+  --cream-deep: rgba(8, 12, 26, 0.45); /* recessed wells — deeper glass */
+  --card: rgba(34, 42, 68, 0.5); /* frosted slate panel */
+
+  /* Glass blur — picked up by surface-card / surface-deep / surface-nav */
+  --glass-blur: blur(24px) saturate(150%);
+
+  /* Ink — cool off-white, calm slate greys */
+  --ink: #e9eef9;
+  --ink-soft: #9fadc9;
+  --ink-faint: #62718f;
+
+  /* Accent — glass blue, lifted for contrast on dark */
+  --sage: #6da3e8;
+  --sage-press: #5a90d8;
+  --sage-deep: #9ec4f2; /* accent text on dark glass */
+  --sage-tint: rgba(109, 163, 232, 0.18); /* selected wash */
+  --sage-tint-2: rgba(109, 163, 232, 0.32); /* progress track */
+
+  /* Reward — warm peach, lifted */
+  --apricot: #eba87c;
+  --apricot-press: #dd9468;
+  --apricot-deep: #f4c39c; /* reward text on dark glass */
+  --apricot-tint: rgba(235, 168, 124, 0.18);
+
+  /* Soft semantic — translucent washes over dark glass */
+  --done: #6fbf9a;
+  --done-tint: rgba(111, 191, 154, 0.18);
+  --gentle: #d9b266;
+  --gentle-tint: rgba(217, 178, 102, 0.16);
+  --softrose: #d898ac;
+  --softrose-tint: rgba(216, 152, 172, 0.18);
+
+  /* Category dots — lifted pastels that read on dark frost */
+  --cat-sage: #6da3e8;
+  --cat-apricot: #eba87c;
+  --cat-blue: #62b4e0;
+  --cat-clay: #cf9a82;
+  --cat-gold: #d9b266;
+  --cat-mauve: #ab90dd;
+
+  /* Lines & edges — faint glass seams */
+  --line: rgba(255, 255, 255, 0.16);
+  --line-card: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.3);
+
+  /* Nav — frosted dark pane, blur comes from surface-nav itself */
+  --nav-bg: rgba(26, 32, 54, 0.55);
+  --nav-inactive: #9fadc9;
+
+  /* Elevation — faint specular top edge + deep drop shadow */
+  --shadow-sm:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.4), 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-lg:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 8px 28px rgba(0, 0, 0, 0.45), 0 16px 48px rgba(0, 0, 0, 0.35);
+  --shadow-pop:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 16px 56px rgba(0, 0, 0, 0.6);
+  --ring: 0 0 0 3px rgba(109, 163, 232, 0.45);
+  --ring-apr: 0 0 0 3px rgba(235, 168, 124, 0.45);
 }
 
 /* ============================================================

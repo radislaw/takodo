@@ -25,13 +25,13 @@ type ThemeId =
   | 'ocean'
   | 'silent'
   | 'dark'
+  | 'forest'
   | 'lavender-dark'
   | 'cyberpunk'
   | 'amber'
   | 'amoled'
-  | 'liquid-glass'
 
-type A11yThemeId = 'high-contrast'
+type A11yThemeId = 'high-contrast' | 'high-contrast-dark'
 
 interface ThemeMeta {
   id: ThemeId | A11yThemeId
@@ -42,27 +42,33 @@ interface ThemeMeta {
 }
 
 const THEMES: ThemeMeta[] = [
-  { id: 'light', bg: '#F5F3F0', accent: '#7C9A92', reward: '#E0A87E' },
+  {
+    id: 'light',
+    bg: 'linear-gradient(135deg, #DCEAFF 0%, #F3E3F7 55%, #DFF0F4 100%)',
+    accent: '#4F8FDD',
+    reward: '#E89A6E',
+  },
   { id: 'lavender', bg: '#F4F1F8', accent: '#8E84B8', reward: '#E0A87E' },
   { id: 'cloud', bg: '#F0EEE9', accent: '#B08968', reward: '#C8A07E' },
   { id: 'eco', bg: '#F0F1E9', accent: '#6B8A56', reward: '#C57043' },
   { id: 'ocean', bg: '#EBF1F5', accent: '#4A7A9B', reward: '#D4A96A' },
   { id: 'silent', bg: '#F2F1EF', accent: '#8E9090', reward: '#C4A78A' },
-  { id: 'dark', bg: '#1A211D', accent: '#8FAEA5', reward: '#E6B088' },
+  {
+    id: 'dark',
+    bg: 'linear-gradient(135deg, #131A2E 0%, #261632 55%, #122230 100%)',
+    accent: '#6DA3E8',
+    reward: '#EBA87C',
+  },
+  { id: 'forest', bg: '#1A211D', accent: '#8FAEA5', reward: '#E6B088' },
   { id: 'lavender-dark', bg: '#1D1A28', accent: '#A49AD4', reward: '#E6B088' },
   { id: 'cyberpunk', bg: '#0A0820', accent: '#2F6BFF', reward: '#9D3DFF' },
   { id: 'amber', bg: '#1C1610', accent: '#C89018', reward: '#C85A28' },
   { id: 'amoled', bg: '#000000', accent: '#5AB4A0', reward: '#E09A64' },
-  {
-    id: 'liquid-glass',
-    bg: 'linear-gradient(135deg, #DCEAFF 0%, #F3E3F7 55%, #DFF0F4 100%)',
-    accent: '#4F8FDD',
-    reward: '#E89A6E',
-  },
 ]
 
 const A11Y_THEMES: ThemeMeta[] = [
   { id: 'high-contrast', bg: '#FFFFFF', accent: '#0B5FD4', reward: '#B85000', border: '#000' },
+  { id: 'high-contrast-dark', bg: '#000000', accent: '#6DB1FF', reward: '#FF9D4D' },
 ]
 
 function selectTheme(id: string) {

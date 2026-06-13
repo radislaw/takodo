@@ -33,12 +33,13 @@ enum Theme {
   ocean,
   silent,
   highContrast: "high-contrast",
+  highContrastDark: "high-contrast-dark",
   dark,
+  forest,
   lavenderDark: "lavender-dark",
   cyberpunk,
   amber,
   amoled,
-  liquidGlass: "liquid-glass",
 }
 
 // ─── Errors ─────────────────────────────────────────────────────

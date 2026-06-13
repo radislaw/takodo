@@ -1,12 +1,14 @@
 /**
  * Level required to select each theme.
- * Accessibility themes (high-contrast) must stay at level 1 — never lock them.
+ * Accessibility themes (high-contrast, high-contrast-dark) must stay at level 1 — never lock them.
  */
 export const THEME_UNLOCK_LEVELS: Record<string, number> = {
   light: 1,
   dark: 1,
+  forest: 1,
   silent: 1,
   'high-contrast': 1,
+  'high-contrast-dark': 1,
   lavender: 2,
   cloud: 2,
   eco: 3,
@@ -15,7 +17,6 @@ export const THEME_UNLOCK_LEVELS: Record<string, number> = {
   amber: 4,
   cyberpunk: 5,
   amoled: 5,
-  'liquid-glass': 5,
 }
 
 export function themeUnlockLevel(theme: string): number {

@@ -1149,12 +1149,13 @@ components:
         - ocean
         - silent
         - high-contrast
+        - high-contrast-dark
         - dark
+        - forest
         - lavender-dark
         - cyberpunk
         - amber
         - amoled
-        - liquid-glass
       description: Matches data-theme attribute values in tokens.css.
     VapidPublicKey:
       type: object

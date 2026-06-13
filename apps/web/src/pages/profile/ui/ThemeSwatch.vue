@@ -65,7 +65,7 @@ function ariaLabel(): string {
       </span>
     </div>
     <span
-      class="text-center text-[11px] font-bold whitespace-nowrap"
+      class="text-center text-[11px] leading-tight font-bold"
       :class="active ? 'text-ink' : 'text-ink-soft'"
     >
       {{ locked ? t('profile.theme.lockedLevel', { n: lockedLevel }) : t(`profile.themes.${id}`) }}

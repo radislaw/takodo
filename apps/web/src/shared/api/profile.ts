@@ -9,12 +9,13 @@ type Theme =
   | 'ocean'
   | 'silent'
   | 'high-contrast'
+  | 'high-contrast-dark'
   | 'dark'
+  | 'forest'
   | 'lavender-dark'
   | 'cyberpunk'
   | 'amber'
   | 'amoled'
-  | 'liquid-glass'
 
 export function useProfile() {
   return useQuery({
