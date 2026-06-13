@@ -138,8 +138,15 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  /* Surfaces — warm dark green-charcoal */
-  --cream: #1a211d; /* app background */
+  /* Surfaces — warm dark pine gradient */
+  --cream: linear-gradient(
+    165deg,
+    #121a14 0%,
+    #1c2618 28%,
+    #1e2414 55%,
+    #141c14 82%,
+    #172018 100%
+  ); /* app background */
   --cream-deep: #131915; /* recessed wells, pressed bg */
   --card: #242e29; /* cards & sheets */
 
@@ -199,8 +206,15 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  /* Surfaces — soft lavender-tinted off-white */
-  --cream: #f4f1f8; /* app background */
+  /* Surfaces — soft lavender gradient */
+  --cream: linear-gradient(
+    165deg,
+    #e8e0f4 0%,
+    #efe8fc 28%,
+    #f8e4f4 55%,
+    #e6e2f8 82%,
+    #eeeaff 100%
+  ); /* app background */
   --cream-deep: #ece7f2; /* recessed wells, pressed bg */
   --card: #ffffff; /* cards & sheets */
 
@@ -259,8 +273,15 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  /* Surfaces — deep warm purple-plum, never pure black */
-  --cream: #1d1a28; /* app background */
+  /* Surfaces — deep plum gradient */
+  --cream: linear-gradient(
+    165deg,
+    #141220 0%,
+    #1e1a2e 28%,
+    #261534 55%,
+    #181428 82%,
+    #1c1830 100%
+  ); /* app background */
   --cream-deep: #161320; /* recessed wells, pressed bg */
   --card: #27233a; /* cards & sheets */
 
@@ -524,8 +545,15 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  /* Surfaces — pale sky mist */
-  --cream: #eef2f6; /* soft cloud white */
+  /* Surfaces — sky mist gradient */
+  --cream: linear-gradient(
+    165deg,
+    #d8e8f2 0%,
+    #eaf3fa 28%,
+    #f0eef8 55%,
+    #d6e8f4 82%,
+    #e4eef8 100%
+  ); /* soft cloud white */
   --cream-deep: #e0e8f0; /* blue-grey well */
   --card: #f7fafd; /* lifted cloud white */
 
@@ -589,8 +617,15 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  /* Surfaces — pale seafoam */
-  --cream: #e8f3f5; /* soft coastal mist */
+  /* Surfaces — coastal seafoam gradient */
+  --cream: linear-gradient(
+    165deg,
+    #c8e8f0 0%,
+    #e4f3f8 28%,
+    #eaf8f5 55%,
+    #d0e8ee 82%,
+    #daf0f8 100%
+  ); /* soft coastal mist */
   --cream-deep: #d6e8ec; /* deeper tide pool */
   --card: #f3fafb; /* lifted sea-white */
 
@@ -654,8 +689,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  /* Surfaces — soft botanical paper */
-  --cream: #f0f1e9;
+  /* Surfaces — botanical paper gradient */
+  --cream: linear-gradient(165deg, #dde8d2 0%, #eff0e6 28%, #f5f2e4 55%, #e2edd6 82%, #ebeedc 100%);
   --cream-deep: #e3e6da;
   --card: #fafbf5;
 
@@ -721,8 +756,8 @@
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
-  /* Surfaces — warm off-white, barely perceptible warmth */
-  --cream: #f2f1ef;
+  /* Surfaces — near-monochrome gradient, barely perceptible warmth */
+  --cream: linear-gradient(165deg, #eae9e6 0%, #f4f2ef 28%, #f2f0ed 55%, #e8e7e4 82%, #f0edea 100%);
   --cream-deep: #e8e7e3;
   --card: #f9f8f6;
 
@@ -787,8 +822,8 @@
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
-  /* Surfaces — very dark warm brown-black */
-  --cream: #1c1610;
+  /* Surfaces — dark amber gradient */
+  --cream: linear-gradient(165deg, #161008 0%, #201808 28%, #281600 55%, #1a1006 82%, #201808 100%);
   --cream-deep: #140f0a;
   --card: #241c14;
 
