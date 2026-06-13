@@ -1,13 +1,15 @@
 /**
  * Level required to select each theme. Mirrors apps/api/src/domain/unlocks.ts —
  * the server is the source of truth (PATCH /me rejects locked themes with 403).
- * Accessibility themes (high-contrast) must stay at level 1 — never lock them.
+ * Accessibility themes (high-contrast, high-contrast-dark) must stay at level 1 — never lock them.
  */
 export const THEME_UNLOCK_LEVELS: Record<string, number> = {
   light: 1,
   dark: 1,
+  forest: 1,
   silent: 1,
   'high-contrast': 1,
+  'high-contrast-dark': 1,
   lavender: 2,
   cloud: 2,
   eco: 3,

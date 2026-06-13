@@ -9,11 +9,14 @@ const pangram = computed(() => t('design.tokens.pangram'))
 
 const themes = [
   { id: '', label: 'Sage' },
-  { id: 'dark', label: 'Dark' },
+  { id: 'light', label: 'Light Glass' },
+  { id: 'dark', label: 'Dark Glass' },
+  { id: 'forest', label: 'Forest' },
   { id: 'lavender', label: 'Lavender' },
   { id: 'lavender-dark', label: 'Lavender Dark' },
   { id: 'cyberpunk', label: 'Cyberpunk' },
   { id: 'high-contrast', label: 'High Contrast' },
+  { id: 'high-contrast-dark', label: 'High Contrast Dark' },
   { id: 'cloud', label: 'Cloud' },
   { id: 'ocean', label: 'Ocean' },
   { id: 'eco', label: 'Eco' },

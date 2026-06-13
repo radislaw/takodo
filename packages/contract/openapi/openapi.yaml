@@ -1149,7 +1149,9 @@ components:
         - ocean
         - silent
         - high-contrast
+        - high-contrast-dark
         - dark
+        - forest
         - lavender-dark
         - cyberpunk
         - amber

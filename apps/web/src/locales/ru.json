@@ -216,14 +216,16 @@
       "aria": "Уровень {level}, {xp} XP"
     },
     "themes": {
-      "light": "Сливки",
+      "light": "Светлая",
       "lavender": "Лаванда",
       "cloud": "Облака",
       "eco": "Эко",
       "ocean": "Океан",
       "silent": "Тихий",
       "high-contrast": "Контраст",
+      "high-contrast-dark": "Тёмный контраст",
       "dark": "Тёмная",
+      "forest": "Хвоя",
       "lavender-dark": "Ночь",
       "cyberpunk": "Киберпанк",
       "amber": "Янтарь",

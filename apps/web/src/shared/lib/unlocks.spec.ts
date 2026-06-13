@@ -2,12 +2,13 @@ import { describe, it, expect } from 'vitest'
 import { THEME_UNLOCK_LEVELS, themeUnlockLevel, isThemeUnlocked } from './unlocks'
 
 describe('THEME_UNLOCK_LEVELS', () => {
-  it('covers all 12 themes', () => {
-    expect(Object.keys(THEME_UNLOCK_LEVELS)).toHaveLength(12)
+  it('covers all 14 themes', () => {
+    expect(Object.keys(THEME_UNLOCK_LEVELS)).toHaveLength(14)
   })
 
-  it('keeps accessibility theme at level 1', () => {
+  it('keeps accessibility themes at level 1', () => {
     expect(THEME_UNLOCK_LEVELS['high-contrast']).toBe(1)
+    expect(THEME_UNLOCK_LEVELS['high-contrast-dark']).toBe(1)
   })
 })
 
@@ -15,8 +16,10 @@ describe('themeUnlockLevel', () => {
   it('returns 1 for base themes', () => {
     expect(themeUnlockLevel('light')).toBe(1)
     expect(themeUnlockLevel('dark')).toBe(1)
+    expect(themeUnlockLevel('forest')).toBe(1)
     expect(themeUnlockLevel('silent')).toBe(1)
     expect(themeUnlockLevel('high-contrast')).toBe(1)
+    expect(themeUnlockLevel('high-contrast-dark')).toBe(1)
   })
 
   it('returns 2 for lavender and cloud', () => {
