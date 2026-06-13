@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppIcon, AppButton, PomodoroTimer, AppCheckbox } from '@/shared/ui'
-import { useDailyToday, useTasks, useCompleteTask, useReopenTask, useTaskTree } from '@/shared/api'
+import { AppIcon, AppButton, PomodoroTimer, AppCheckbox, AppInput } from '@/shared/ui'
+import {
+  useDailyToday,
+  useTasks,
+  useCompleteTask,
+  useReopenTask,
+  useTaskTree,
+  useCreateTask,
+  useDeleteTask,
+} from '@/shared/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -16,6 +24,12 @@ const { data: taskList } = useTasks()
 const { mutateAsync: completeTaskAsync } = useCompleteTask()
 const { mutate: reopenTask } = useReopenTask()
 const { mutate: completeSubtask } = useCompleteTask()
+const { mutateAsync: createSubtask } = useCreateTask()
+const { mutate: deleteSubtask } = useDeleteTask()
+
+const addingSubtask = ref(false)
+const newSubtaskTitle = ref('')
+const subtaskInputRef = ref<{ focus: () => void } | null>(null)
 
 const skippedIds = ref<string[]>([])
 const completingIds = ref<string[]>([])
@@ -83,6 +97,31 @@ function toggleSubtask(id: string, status: string) {
   else completeSubtask(id)
 }
 
+async function startAddingSubtask() {
+  addingSubtask.value = true
+  await nextTick()
+  subtaskInputRef.value?.focus()
+}
+
+async function handleAddSubtask() {
+  const title = newSubtaskTitle.value.trim()
+  if (!title) {
+    addingSubtask.value = false
+    return
+  }
+  await createSubtask({ title, parentId: currentTaskId.value })
+  newSubtaskTitle.value = ''
+  addingSubtask.value = false
+}
+
+function handleSubtaskKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter') handleAddSubtask()
+  if (e.key === 'Escape') {
+    addingSubtask.value = false
+    newSubtaskTitle.value = ''
+  }
+}
+
 async function handleDone() {
   const id = current.value?.taskId
   if (!id) return
@@ -132,11 +171,7 @@ function goBack() {
     </div>
 
     <!-- Current task -->
-    <main
-      v-else-if="current"
-      class="mx-auto flex w-full flex-1 flex-col px-6"
-      :class="subtasks.length ? 'max-w-4xl' : 'max-w-xl'"
-    >
+    <main v-else-if="current" class="mx-auto flex w-full max-w-4xl flex-1 flex-col px-6">
       <div class="flex flex-1 flex-col gap-8 md:flex-row md:items-center">
         <!-- Focus area -->
         <div class="flex flex-1 flex-col items-center justify-center text-center">
@@ -167,7 +202,7 @@ function goBack() {
         </div>
 
         <!-- Subtasks panel -->
-        <div v-if="subtasks.length" class="md:w-72 md:self-center">
+        <div v-if="subtasks.length || currentTaskId" class="md:w-72 md:self-center">
           <p class="font-body text-ink-soft mb-3 text-xs font-semibold tracking-wide uppercase">
             {{ t('do.subtasks') }}
           </p>
@@ -175,7 +210,7 @@ function goBack() {
             <div
               v-for="child in subtasks"
               :key="child.id"
-              class="surface-card flex cursor-pointer items-center gap-3 rounded-2xl border-[1.5px] border-transparent px-3 py-2.5 shadow-sm transition-colors"
+              class="surface-card group flex cursor-pointer items-center gap-3 rounded-2xl border-[1.5px] border-transparent px-3 py-2.5 shadow-sm transition-colors"
               :class="{ 'opacity-60': child.status === 'done' }"
               @click="toggleSubtask(child.id, child.status)"
             >
@@ -190,7 +225,34 @@ function goBack() {
               >
                 {{ child.title }}
               </span>
+              <button
+                type="button"
+                class="text-ink-faint hover:text-softrose flex-shrink-0 opacity-0 transition-colors group-hover:opacity-100"
+                :aria-label="t('do.deleteSubtask')"
+                @click.stop="deleteSubtask(child.id)"
+              >
+                <AppIcon name="x" :size="14" />
+              </button>
             </div>
+
+            <!-- Add subtask -->
+            <div v-if="addingSubtask" class="px-1">
+              <AppInput
+                ref="subtaskInputRef"
+                v-model="newSubtaskTitle"
+                :placeholder="t('do.addSubtaskPlaceholder')"
+                @keydown="handleSubtaskKeydown"
+                @blur="handleAddSubtask"
+              />
+            </div>
+            <button
+              v-else
+              type="button"
+              class="text-ink-faint hover:text-sage font-body w-full cursor-pointer px-1 py-1 text-left text-xs font-semibold transition-colors"
+              @click="startAddingSubtask"
+            >
+              {{ t('do.addSubtask') }}
+            </button>
           </div>
         </div>
       </div>

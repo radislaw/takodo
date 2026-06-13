@@ -493,6 +493,9 @@
     "close": "Закрыть",
     "loading": "Загрузка...",
     "subtasks": "Подзадачи",
+    "addSubtask": "+ добавить шаг",
+    "addSubtaskPlaceholder": "Новый шаг...",
+    "deleteSubtask": "Удалить подзадачу",
     "pomodoro": {
       "start": "Старт",
       "pause": "Пауза",
