@@ -138,32 +138,30 @@ defineExpose({ flushAndReset: handleReset })
     </div>
 
     <!-- Accumulated stats -->
-    <p
+    <div
       v-if="hasStats"
-      class="font-body text-ink-soft flex items-center gap-1.5 text-xs font-semibold"
+      class="font-body text-ink-soft flex items-center gap-3 text-sm font-semibold"
     >
       <span
         v-if="pomodoros > 0"
         role="img"
         :aria-label="t('do.pomodoro.count', pomodoros)"
-        class="flex items-center gap-0.5"
+        class="text-apricot-deep flex items-center gap-1"
       >
         <AppIcon
           v-for="i in visibleTomatoes"
           :key="i"
           name="tomato"
-          :size="20"
-          fill="var(--apricot)"
-          color="none"
+          :size="22"
           aria-hidden="true"
         />
         <span v-if="tomatoOverflow > 0" aria-hidden="true">{{ overflowText }}</span>
       </span>
-      <template v-if="focusTimeText">
-        <AppIcon name="timer" :size="13" class="flex-shrink-0" />
+      <span v-if="focusTimeText" class="flex items-center gap-1">
+        <AppIcon name="timer" :size="22" class="flex-shrink-0" />
         {{ focusTimeText }}
-      </template>
-    </p>
+      </span>
+    </div>
   </div>
 </template>
 
