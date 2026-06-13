@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppIcon, LevelRing } from '@/shared/ui'
+import { AppIcon } from '@/shared/ui'
 import { useProfile, useUpdateProfile, useRewards, useNotifications } from '@/shared/api'
 import { isThemeUnlocked, themeUnlockLevel } from '@/shared/lib/unlocks'
 import ThemeSwatch from './ThemeSwatch.vue'
@@ -187,19 +187,58 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
               <option value="en">{{ t('profile.settings.languages.en') }}</option>
             </select>
           </label>
-        </div>
-      </div>
 
-      <!-- Level card -->
-      <div class="surface-card mt-5 flex items-center gap-5 rounded-2xl p-5 shadow-md">
-        <LevelRing :level="rewards?.level ?? 1" :xp="rewards?.xp ?? 0" />
-        <div>
-          <div class="text-ink text-sm font-bold">
-            {{ t('profile.levelRing.label') }} {{ rewards?.level ?? 1 }}
-          </div>
-          <div class="text-ink-soft text-xs">
-            {{ t('profile.levelRing.xp', { xp: rewards?.xp ?? 0 }) }}
-          </div>
+          <!-- Timezone -->
+          <label class="flex flex-col gap-1.5">
+            <span class="text-ink text-xs font-semibold">{{ t('profile.survey.timezone') }}</span>
+            <input
+              data-test="settings-timezone"
+              type="text"
+              list="tz-list-settings"
+              maxlength="100"
+              :placeholder="t('profile.survey.timezonePlaceholder')"
+              class="border-line surface-app text-ink rounded-xl border px-3 py-2.5 text-sm"
+              :value="profile?.timezone ?? ''"
+              @change="
+                (e) => {
+                  const v = (e.target as HTMLInputElement).value.trim()
+                  if (v) updateProfile({ timezone: v })
+                }
+              "
+            />
+            <datalist id="tz-list-settings">
+              <option value="Europe/Moscow" />
+              <option value="Europe/Samara" />
+              <option value="Asia/Yekaterinburg" />
+              <option value="Asia/Omsk" />
+              <option value="Asia/Krasnoyarsk" />
+              <option value="Asia/Irkutsk" />
+              <option value="Asia/Yakutsk" />
+              <option value="Asia/Vladivostok" />
+              <option value="Asia/Magadan" />
+              <option value="Asia/Kamchatka" />
+              <option value="Europe/Kaliningrad" />
+              <option value="Europe/Minsk" />
+              <option value="Europe/Kiev" />
+              <option value="Asia/Tbilisi" />
+              <option value="Asia/Yerevan" />
+              <option value="Asia/Baku" />
+              <option value="Asia/Tashkent" />
+              <option value="Asia/Almaty" />
+              <option value="UTC" />
+              <option value="Europe/London" />
+              <option value="Europe/Berlin" />
+              <option value="Europe/Paris" />
+              <option value="America/New_York" />
+              <option value="America/Chicago" />
+              <option value="America/Los_Angeles" />
+              <option value="Asia/Dubai" />
+              <option value="Asia/Kolkata" />
+              <option value="Asia/Shanghai" />
+              <option value="Asia/Tokyo" />
+              <option value="Australia/Sydney" />
+            </datalist>
+          </label>
         </div>
       </div>
 
@@ -375,14 +414,6 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
         <span class="flex-1 text-sm font-semibold">{{ t('help.title') }}</span>
         <AppIcon name="chevronR" :size="16" class="text-ink-faint" />
       </RouterLink>
-
-      <!-- Gentle note -->
-      <div class="bg-sage-tint mt-5 flex gap-3 rounded-2xl p-4">
-        <AppIcon name="heart" :size="20" class="text-sage-deep mt-0.5 flex-shrink-0" />
-        <p class="text-sage-deep text-sm leading-relaxed font-semibold">
-          {{ t('rewards.gentleNote') }}
-        </p>
-      </div>
     </div>
   </div>
 </template>

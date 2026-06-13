@@ -30,7 +30,6 @@ describe('ProfileSurvey', () => {
     const w = mountSurvey()
     expect(w.find('[data-test="survey-gender"]').exists()).toBe(true)
     expect(w.find('[data-test="survey-birth-date"]').exists()).toBe(true)
-    expect(w.find('[data-test="survey-timezone"]').exists()).toBe(true)
     expect(w.find('[data-test="survey-adhd"]').exists()).toBe(true)
   })
 
@@ -44,14 +43,6 @@ describe('ProfileSurvey', () => {
     const w = mountSurvey()
     await w.find('[data-test="survey-adhd"]').setValue('diagnosed')
     expect(mockUpdateProfile).toHaveBeenCalledWith({ adhdStatus: 'diagnosed' })
-  })
-
-  it('saves timezone on change', async () => {
-    const w = mountSurvey()
-    const input = w.find('[data-test="survey-timezone"]')
-    await input.setValue('Europe/Moscow')
-    await input.trigger('change')
-    expect(mockUpdateProfile).toHaveBeenCalledWith({ timezone: 'Europe/Moscow' })
   })
 
   it('saves a valid birth date', async () => {
@@ -71,11 +62,11 @@ describe('ProfileSurvey', () => {
   })
 
   it('prefills from existing profile values', () => {
-    profileData.value = { ...profileData.value, gender: 'male', timezone: 'Europe/Moscow' }
+    profileData.value = { ...profileData.value, gender: 'male', birthDate: '1990-05-20' }
     const w = mountSurvey()
     expect((w.find('[data-test="survey-gender"]').element as HTMLSelectElement).value).toBe('male')
-    expect((w.find('[data-test="survey-timezone"]').element as HTMLInputElement).value).toBe(
-      'Europe/Moscow',
+    expect((w.find('[data-test="survey-birth-date"]').element as HTMLInputElement).value).toBe(
+      '1990-05-20',
     )
   })
 

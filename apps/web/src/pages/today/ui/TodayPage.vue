@@ -379,6 +379,9 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
           <div class="mt-5">
             <QuestPanel />
           </div>
+
+          <!-- Gentle note (mobile/tablet) -->
+          <SoftNote class="mt-5 lg:hidden">{{ t('rewards.gentleNote') }}</SoftNote>
         </div>
 
         <!-- Desktop right rail -->

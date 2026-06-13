@@ -11,44 +11,7 @@ const { mutate: updateProfile } = useUpdateProfile()
 const GENDERS = ['female', 'male'] as const
 const ADHD = ['diagnosed', 'suspected', 'no', 'na'] as const
 
-const TIMEZONES = [
-  'Europe/Moscow',
-  'Europe/Samara',
-  'Asia/Yekaterinburg',
-  'Asia/Omsk',
-  'Asia/Krasnoyarsk',
-  'Asia/Irkutsk',
-  'Asia/Yakutsk',
-  'Asia/Vladivostok',
-  'Asia/Magadan',
-  'Asia/Kamchatka',
-  'Europe/Kaliningrad',
-  'Europe/Minsk',
-  'Europe/Kiev',
-  'Europe/Chisinau',
-  'Asia/Tbilisi',
-  'Asia/Yerevan',
-  'Asia/Baku',
-  'Asia/Tashkent',
-  'Asia/Almaty',
-  'UTC',
-  'Europe/London',
-  'Europe/Berlin',
-  'Europe/Paris',
-  'Europe/Amsterdam',
-  'America/New_York',
-  'America/Chicago',
-  'America/Denver',
-  'America/Los_Angeles',
-  'Asia/Dubai',
-  'Asia/Kolkata',
-  'Asia/Shanghai',
-  'Asia/Tokyo',
-  'Australia/Sydney',
-]
-
 const gender = computed(() => profile.value?.gender ?? '')
-const timezone = computed(() => profile.value?.timezone ?? '')
 const birthDate = computed(() => profile.value?.birthDate ?? '')
 const adhdStatus = computed(() => profile.value?.adhdStatus ?? '')
 
@@ -57,10 +20,6 @@ function onGender(e: Event) {
 }
 function onAdhd(e: Event) {
   updateProfile({ adhdStatus: (e.target as HTMLSelectElement).value })
-}
-function onTimezone(e: Event) {
-  const val = (e.target as HTMLInputElement).value.trim()
-  if (val) updateProfile({ timezone: val })
 }
 function onBirthDate(e: Event) {
   const val = (e.target as HTMLInputElement).value
@@ -111,24 +70,6 @@ function onBirthDate(e: Event) {
           :value="birthDate"
           @change="onBirthDate"
         />
-      </label>
-
-      <!-- Timezone -->
-      <label class="flex flex-col gap-1.5">
-        <span class="text-ink text-xs font-semibold">{{ t('profile.survey.timezone') }}</span>
-        <input
-          data-test="survey-timezone"
-          type="text"
-          list="tz-list"
-          maxlength="100"
-          :placeholder="t('profile.survey.timezonePlaceholder')"
-          class="border-line surface-app text-ink rounded-xl border px-3 py-2.5 text-sm"
-          :value="timezone"
-          @change="onTimezone"
-        />
-        <datalist id="tz-list">
-          <option v-for="tz in TIMEZONES" :key="tz" :value="tz" />
-        </datalist>
       </label>
 
       <!-- ADHD status -->
