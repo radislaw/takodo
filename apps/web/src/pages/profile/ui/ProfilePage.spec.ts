@@ -18,7 +18,7 @@ const rewardsData = ref({
 
 vi.mock('@/shared/api', () => ({
   useProfile: () => ({
-    data: ref({ name: '', theme: 'light', notifMorning: true, notifEvening: true }),
+    data: ref({ name: '', theme: 'light', notifMorning: true, notifEvening: true, language: 'ru' }),
   }),
   useUpdateProfile: () => ({ mutate: mockUpdateProfile }),
   useRewards: () => ({ data: rewardsData }),

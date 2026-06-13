@@ -29,8 +29,8 @@ describe('ProfileSurvey', () => {
   it('renders all survey fields', () => {
     const w = mountSurvey()
     expect(w.find('[data-test="survey-gender"]').exists()).toBe(true)
-    expect(w.find('[data-test="survey-birth-year"]').exists()).toBe(true)
-    expect(w.find('[data-test="survey-city"]').exists()).toBe(true)
+    expect(w.find('[data-test="survey-birth-date"]').exists()).toBe(true)
+    expect(w.find('[data-test="survey-timezone"]').exists()).toBe(true)
     expect(w.find('[data-test="survey-adhd"]').exists()).toBe(true)
   })
 
@@ -46,34 +46,46 @@ describe('ProfileSurvey', () => {
     expect(mockUpdateProfile).toHaveBeenCalledWith({ adhdStatus: 'diagnosed' })
   })
 
-  it('saves city on change', async () => {
+  it('saves timezone on change', async () => {
     const w = mountSurvey()
-    const input = w.find('[data-test="survey-city"]')
-    await input.setValue('Москва')
+    const input = w.find('[data-test="survey-timezone"]')
+    await input.setValue('Europe/Moscow')
     await input.trigger('change')
-    expect(mockUpdateProfile).toHaveBeenCalledWith({ city: 'Москва' })
+    expect(mockUpdateProfile).toHaveBeenCalledWith({ timezone: 'Europe/Moscow' })
   })
 
-  it('saves a valid birth year', async () => {
+  it('saves a valid birth date', async () => {
     const w = mountSurvey()
-    const input = w.find('[data-test="survey-birth-year"]')
-    await input.setValue('1995')
+    const input = w.find('[data-test="survey-birth-date"]')
+    await input.setValue('1995-06-15')
     await input.trigger('change')
-    expect(mockUpdateProfile).toHaveBeenCalledWith({ birthYear: 1995 })
+    expect(mockUpdateProfile).toHaveBeenCalledWith({ birthDate: '1995-06-15' })
   })
 
-  it('does not save an out-of-range birth year', async () => {
+  it('does not save an empty birth date', async () => {
     const w = mountSurvey()
-    const input = w.find('[data-test="survey-birth-year"]')
-    await input.setValue('1800')
+    const input = w.find('[data-test="survey-birth-date"]')
+    await input.setValue('')
     await input.trigger('change')
     expect(mockUpdateProfile).not.toHaveBeenCalled()
   })
 
   it('prefills from existing profile values', () => {
-    profileData.value = { ...profileData.value, gender: 'male', city: 'Питер' }
+    profileData.value = { ...profileData.value, gender: 'male', timezone: 'Europe/Moscow' }
     const w = mountSurvey()
     expect((w.find('[data-test="survey-gender"]').element as HTMLSelectElement).value).toBe('male')
-    expect((w.find('[data-test="survey-city"]').element as HTMLInputElement).value).toBe('Питер')
+    expect((w.find('[data-test="survey-timezone"]').element as HTMLInputElement).value).toBe(
+      'Europe/Moscow',
+    )
+  })
+
+  it('gender options only contain female and male', () => {
+    const w = mountSurvey()
+    const select = w.find('[data-test="survey-gender"]')
+    const options = select.findAll('option').map((o) => o.attributes('value'))
+    expect(options).toContain('female')
+    expect(options).toContain('male')
+    expect(options).not.toContain('other')
+    expect(options).not.toContain('na')
   })
 })

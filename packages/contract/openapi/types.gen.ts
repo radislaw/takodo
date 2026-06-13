@@ -492,16 +492,16 @@ export interface components {
             notifMorning: boolean;
             /** @description Opt-in evening reminder (~8 PM). */
             notifEvening: boolean;
-            /** @description Voluntary self-report: "female" | "male" | "other" | "na". */
+            /** @description Voluntary self-report: "female" | "male". */
             gender?: string;
-            /**
-             * Format: int32
-             * @description Voluntary self-report birth year (age derived for display).
-             */
-            birthYear?: number;
-            city?: string;
+            /** @description Voluntary self-report birth date, ISO format "YYYY-MM-DD". */
+            birthDate?: string;
+            /** @description IANA timezone identifier, e.g. "Europe/Moscow". */
+            timezone?: string;
             /** @description Voluntary self-report: "diagnosed" | "suspected" | "no" | "na". */
             adhdStatus?: string;
+            /** @description UI language preference: "ru" | "en". */
+            language?: string;
         };
         ProfileUpdate: {
             name?: string;
@@ -509,11 +509,15 @@ export interface components {
             theme?: components["schemas"]["Theme"];
             notifMorning?: boolean;
             notifEvening?: boolean;
+            /** @description "female" | "male". */
             gender?: string;
-            /** Format: int32 */
-            birthYear?: number;
-            city?: string;
+            /** @description ISO date "YYYY-MM-DD". */
+            birthDate?: string;
+            /** @description IANA timezone identifier. */
+            timezone?: string;
             adhdStatus?: string;
+            /** @description "ru" | "en". */
+            language?: string;
         };
         PushSubscribeBody: {
             endpoint: string;

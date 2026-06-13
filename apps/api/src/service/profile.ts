@@ -16,9 +16,10 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         notifMorning: user?.notifMorning ?? true,
         notifEvening: user?.notifEvening ?? true,
         ...(user?.gender != null ? { gender: user.gender } : {}),
-        ...(user?.birthYear != null ? { birthYear: user.birthYear } : {}),
-        ...(user?.city != null ? { city: user.city } : {}),
+        ...(user?.birthDate != null ? { birthDate: user.birthDate } : {}),
+        ...(user?.timezone != null ? { timezone: user.timezone } : {}),
         ...(user?.adhdStatus != null ? { adhdStatus: user.adhdStatus } : {}),
+        ...(user?.language != null ? { language: user.language } : {}),
       }
     },
 
@@ -30,9 +31,10 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         notifMorning?: boolean
         notifEvening?: boolean
         gender?: string
-        birthYear?: number
-        city?: string
+        birthDate?: string
+        timezone?: string
         adhdStatus?: string
+        language?: string
       }
 
       // Level-1 themes skip the level computation entirely.
@@ -54,9 +56,10 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
           ...(body.notifMorning !== undefined ? { notifMorning: body.notifMorning } : {}),
           ...(body.notifEvening !== undefined ? { notifEvening: body.notifEvening } : {}),
           ...(body.gender !== undefined ? { gender: body.gender } : {}),
-          ...(body.birthYear !== undefined ? { birthYear: body.birthYear } : {}),
-          ...(body.city !== undefined ? { city: body.city } : {}),
+          ...(body.birthDate !== undefined ? { birthDate: body.birthDate } : {}),
+          ...(body.timezone !== undefined ? { timezone: body.timezone } : {}),
           ...(body.adhdStatus !== undefined ? { adhdStatus: body.adhdStatus } : {}),
+          ...(body.language !== undefined ? { language: body.language } : {}),
         },
       })
       return {
@@ -65,9 +68,10 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         notifMorning: user.notifMorning,
         notifEvening: user.notifEvening,
         ...(user.gender != null ? { gender: user.gender } : {}),
-        ...(user.birthYear != null ? { birthYear: user.birthYear } : {}),
-        ...(user.city != null ? { city: user.city } : {}),
+        ...(user.birthDate != null ? { birthDate: user.birthDate } : {}),
+        ...(user.timezone != null ? { timezone: user.timezone } : {}),
         ...(user.adhdStatus != null ? { adhdStatus: user.adhdStatus } : {}),
+        ...(user.language != null ? { language: user.language } : {}),
       }
     },
   }

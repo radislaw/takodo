@@ -145,6 +145,51 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
       </h1>
       <p class="font-body text-ink-soft mt-1 text-sm">{{ t('profile.subtitle') }}</p>
 
+      <!-- Settings card: name + language -->
+      <div class="surface-card mt-5 rounded-2xl p-5 shadow-md" data-test="settings-section">
+        <div class="mb-4 flex items-center gap-3">
+          <div
+            class="bg-sage-tint text-sage-deep flex h-10 w-10 items-center justify-center rounded-[11px]"
+          >
+            <AppIcon name="settings" :size="20" />
+          </div>
+          <div>
+            <div class="text-ink text-sm font-bold">{{ t('profile.settings.label') }}</div>
+            <div class="text-ink-soft text-xs">{{ t('profile.settings.sub') }}</div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <!-- Name -->
+          <label class="flex flex-col gap-1.5">
+            <span class="text-ink text-xs font-semibold">{{ t('profile.settings.name') }}</span>
+            <input
+              data-test="settings-name"
+              type="text"
+              maxlength="100"
+              :placeholder="t('profile.settings.namePlaceholder')"
+              class="border-line surface-app text-ink rounded-xl border px-3 py-2.5 text-sm"
+              :value="profile?.name ?? ''"
+              @change="(e) => updateProfile({ name: (e.target as HTMLInputElement).value })"
+            />
+          </label>
+
+          <!-- Language -->
+          <label class="flex flex-col gap-1.5">
+            <span class="text-ink text-xs font-semibold">{{ t('profile.settings.language') }}</span>
+            <select
+              data-test="settings-language"
+              class="border-line surface-app text-ink rounded-xl border px-3 py-2.5 text-sm"
+              :value="profile?.language ?? 'ru'"
+              @change="(e) => updateProfile({ language: (e.target as HTMLSelectElement).value })"
+            >
+              <option value="ru">{{ t('profile.settings.languages.ru') }}</option>
+              <option value="en">{{ t('profile.settings.languages.en') }}</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
       <!-- Level card -->
       <div class="surface-card mt-5 flex items-center gap-5 rounded-2xl p-5 shadow-md">
         <LevelRing :level="rewards?.level ?? 1" :xp="rewards?.xp ?? 0" />

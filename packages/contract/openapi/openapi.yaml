@@ -928,17 +928,21 @@ components:
           description: Opt-in evening reminder (~8 PM).
         gender:
           type: string
-          description: 'Voluntary self-report: "female" | "male" | "other" | "na".'
-        birthYear:
-          type: integer
-          format: int32
-          description: Voluntary self-report birth year (age derived for display).
-        city:
+          description: 'Voluntary self-report: "female" | "male".'
+        birthDate:
+          type: string
+          maxLength: 10
+          description: Voluntary self-report birth date, ISO format "YYYY-MM-DD".
+        timezone:
           type: string
           maxLength: 100
+          description: IANA timezone identifier, e.g. "Europe/Moscow".
         adhdStatus:
           type: string
           description: 'Voluntary self-report: "diagnosed" | "suspected" | "no" | "na".'
+        language:
+          type: string
+          description: 'UI language preference: "ru" | "en".'
     ProfileUpdate:
       type: object
       properties:
@@ -955,16 +959,20 @@ components:
           type: boolean
         gender:
           type: string
-        birthYear:
-          type: integer
-          format: int32
-          minimum: 1900
-          maximum: 2025
-        city:
+          description: '"female" | "male".'
+        birthDate:
+          type: string
+          maxLength: 10
+          description: ISO date "YYYY-MM-DD".
+        timezone:
           type: string
           maxLength: 100
+          description: IANA timezone identifier.
         adhdStatus:
           type: string
+        language:
+          type: string
+          description: '"ru" | "en".'
     PushSubscribeBody:
       type: object
       required:

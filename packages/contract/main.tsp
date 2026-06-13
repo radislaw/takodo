@@ -235,17 +235,22 @@ model Profile {
   /** Opt-in evening reminder (~8 PM). */
   notifEvening: boolean;
 
-  /** Voluntary self-report: "female" | "male" | "other" | "na". */
+  /** Voluntary self-report: "female" | "male". */
   gender?: string;
 
-  /** Voluntary self-report birth year (age derived for display). */
-  birthYear?: int32;
+  /** Voluntary self-report birth date, ISO format "YYYY-MM-DD". */
+  @maxLength(10)
+  birthDate?: string;
 
+  /** IANA timezone identifier, e.g. "Europe/Moscow". */
   @maxLength(100)
-  city?: string;
+  timezone?: string;
 
   /** Voluntary self-report: "diagnosed" | "suspected" | "no" | "na". */
   adhdStatus?: string;
+
+  /** UI language preference: "ru" | "en". */
+  language?: string;
 }
 
 model ProfileUpdate {
@@ -258,16 +263,21 @@ model ProfileUpdate {
   notifMorning?: boolean;
   notifEvening?: boolean;
 
+  /** "female" | "male". */
   gender?: string;
 
-  @minValue(1900)
-  @maxValue(2025)
-  birthYear?: int32;
+  /** ISO date "YYYY-MM-DD". */
+  @maxLength(10)
+  birthDate?: string;
 
+  /** IANA timezone identifier. */
   @maxLength(100)
-  city?: string;
+  timezone?: string;
 
   adhdStatus?: string;
+
+  /** "ru" | "en". */
+  language?: string;
 }
 
 @route("/me")
