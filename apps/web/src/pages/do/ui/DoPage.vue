@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppIcon, AppButton, PomodoroTimer, AppCheckbox } from '@/shared/ui'
-import { useDailyToday, useTasks, useCompleteTask, useTaskTree } from '@/shared/api'
+import { useDailyToday, useTasks, useCompleteTask, useReopenTask, useTaskTree } from '@/shared/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,6 +14,8 @@ const startId = typeof route.query.task === 'string' ? route.query.task : undefi
 const { data: daily, isPending } = useDailyToday()
 const { data: taskList } = useTasks()
 const { mutateAsync: completeTaskAsync } = useCompleteTask()
+const { mutate: reopenTask } = useReopenTask()
+const { mutate: completeSubtask } = useCompleteTask()
 
 const skippedIds = ref<string[]>([])
 const completingIds = ref<string[]>([])
@@ -74,6 +76,13 @@ const catColor = computed(() => {
 const currentTaskId = computed(() => current.value?.taskId || '')
 const { data: taskTree } = useTaskTree(currentTaskId)
 
+const subtasks = computed(() => taskTree.value?.children ?? [])
+
+function toggleSubtask(id: string, status: string) {
+  if (status === 'done') reopenTask(id)
+  else completeSubtask(id)
+}
+
 async function handleDone() {
   const id = current.value?.taskId
   if (!id) return
@@ -100,7 +109,7 @@ function goBack() {
   <div class="surface-app flex min-h-full flex-col">
     <!-- Header -->
     <header
-      class="mx-auto flex w-full max-w-3xl items-center justify-between px-5 pb-2"
+      class="mx-auto flex w-full max-w-4xl items-center justify-between px-5 pb-2"
       style="padding-top: calc(1rem + env(safe-area-inset-top))"
     >
       <p v-if="queue.length > 0" class="font-body text-ink-soft text-sm font-semibold">
@@ -123,53 +132,61 @@ function goBack() {
     </div>
 
     <!-- Current task -->
-    <main v-else-if="current" class="mx-auto flex w-full max-w-xl flex-1 flex-col px-6">
-      <div class="flex flex-1 flex-col items-center justify-center text-center">
-        <p class="font-body text-ink-soft mb-3 text-sm">{{ t('do.subtitle') }}</p>
-        <div
-          v-if="current.isMIT"
-          class="bg-sage/10 mb-4 inline-flex items-center gap-1 rounded-full px-3 py-1.5"
-        >
-          <AppIcon name="zap" :size="14" class="text-sage-deep" />
-          <span class="text-sage-deep text-xs font-bold">{{ t('today.mitLabel') }}</span>
+    <main
+      v-else-if="current"
+      class="mx-auto flex w-full flex-1 flex-col px-6"
+      :class="subtasks.length ? 'max-w-4xl' : 'max-w-xl'"
+    >
+      <div class="flex flex-1 flex-col gap-8 md:flex-row md:items-center">
+        <!-- Focus area -->
+        <div class="flex flex-1 flex-col items-center justify-center text-center">
+          <p class="font-body text-ink-soft mb-3 text-sm">{{ t('do.subtitle') }}</p>
+          <div
+            v-if="current.isMIT"
+            class="bg-sage/10 mb-4 inline-flex items-center gap-1 rounded-full px-3 py-1.5"
+          >
+            <AppIcon name="zap" :size="14" class="text-sage-deep" />
+            <span class="text-sage-deep text-xs font-bold">{{ t('today.mitLabel') }}</span>
+          </div>
+          <h1 class="font-display text-ink text-3xl leading-tight font-extrabold break-words">
+            <span
+              v-if="catColor"
+              class="mr-2 inline-block h-3 w-3 rounded-full align-middle"
+              :style="{ background: catColor }"
+            />{{ currentTask?.title }}
+          </h1>
+
+          <PomodoroTimer
+            v-if="currentTask"
+            :key="currentTask.id"
+            :task-id="currentTask.id"
+            :focus-seconds="currentTask.focusSeconds ?? 0"
+            :pomodoros="currentTask.pomodoros ?? 0"
+            class="mt-8"
+          />
         </div>
-        <h1 class="font-display text-ink text-3xl leading-tight font-extrabold break-words">
-          <span
-            v-if="catColor"
-            class="mr-2 inline-block h-3 w-3 rounded-full align-middle"
-            :style="{ background: catColor }"
-          />{{ currentTask?.title }}
-        </h1>
 
-        <PomodoroTimer
-          v-if="currentTask"
-          :key="currentTask.id"
-          :task-id="currentTask.id"
-          :focus-seconds="currentTask.focusSeconds ?? 0"
-          :pomodoros="currentTask.pomodoros ?? 0"
-          class="mt-8"
-        />
-
-        <!-- Subtasks checklist -->
-        <div v-if="taskTree?.children.length" class="mt-8 w-full max-w-sm">
+        <!-- Subtasks panel -->
+        <div v-if="subtasks.length" class="md:w-72 md:self-center">
           <p class="font-body text-ink-soft mb-3 text-xs font-semibold tracking-wide uppercase">
             {{ t('do.subtasks') }}
           </p>
           <div class="space-y-2">
             <div
-              v-for="child in taskTree.children"
+              v-for="child in subtasks"
               :key="child.id"
-              class="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors"
-              :class="child.status === 'done' ? 'bg-sage/10' : 'hover:bg-surface-hover'"
+              class="surface-card flex cursor-pointer items-center gap-3 rounded-2xl border-[1.5px] border-transparent px-3 py-2.5 shadow-sm transition-colors"
+              :class="{ 'opacity-60': child.status === 'done' }"
+              @click="toggleSubtask(child.id, child.status)"
             >
               <AppCheckbox
-                :checked="child.status === 'done'"
-                :disabled="true"
-                class="pointer-events-none"
+                class="pointer-events-none flex-shrink-0"
+                :model-value="child.status === 'done'"
+                :aria-label="child.title"
               />
               <span
-                class="font-body flex-1 text-sm break-words"
-                :class="child.status === 'done' ? 'text-ink-soft line-through' : 'text-ink'"
+                class="font-body text-ink min-w-0 flex-1 truncate text-sm font-semibold"
+                :class="{ 'line-through opacity-50': child.status === 'done' }"
               >
                 {{ child.title }}
               </span>

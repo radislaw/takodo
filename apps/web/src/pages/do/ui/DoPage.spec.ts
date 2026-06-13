@@ -22,7 +22,8 @@ const tasksData = ref<{ id: string; parentId: string | null; title: string; stat
 vi.mock('@/shared/api', () => ({
   useDailyToday: () => ({ data: dailyData, isPending: ref(false) }),
   useTasks: () => ({ data: tasksData }),
-  useCompleteTask: () => ({ mutateAsync: mockCompleteTask }),
+  useCompleteTask: () => ({ mutateAsync: mockCompleteTask, mutate: vi.fn() }),
+  useReopenTask: () => ({ mutate: vi.fn() }),
   useRecordFocus: () => ({ mutate: vi.fn() }),
   useTaskTree: () => ({ data: ref(undefined) }),
 }))
