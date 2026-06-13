@@ -29,6 +29,7 @@ type ThemeId =
   | 'cyberpunk'
   | 'amber'
   | 'amoled'
+  | 'liquid-glass'
 
 type A11yThemeId = 'high-contrast'
 
@@ -52,6 +53,12 @@ const THEMES: ThemeMeta[] = [
   { id: 'cyberpunk', bg: '#0A0820', accent: '#2F6BFF', reward: '#9D3DFF' },
   { id: 'amber', bg: '#1C1610', accent: '#C89018', reward: '#C85A28' },
   { id: 'amoled', bg: '#000000', accent: '#5AB4A0', reward: '#E09A64' },
+  {
+    id: 'liquid-glass',
+    bg: 'linear-gradient(135deg, #DCEAFF 0%, #F3E3F7 55%, #DFF0F4 100%)',
+    accent: '#4F8FDD',
+    reward: '#E89A6E',
+  },
 ]
 
 const A11Y_THEMES: ThemeMeta[] = [

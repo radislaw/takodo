@@ -14,6 +14,7 @@ type Theme =
   | 'cyberpunk'
   | 'amber'
   | 'amoled'
+  | 'liquid-glass'
 
 export function useProfile() {
   return useQuery({

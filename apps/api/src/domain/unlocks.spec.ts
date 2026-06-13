@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { THEME_UNLOCK_LEVELS, themeUnlockLevel, isThemeUnlocked } from './unlocks.js'
 
 describe('THEME_UNLOCK_LEVELS', () => {
-  it('covers all 12 themes', () => {
-    expect(Object.keys(THEME_UNLOCK_LEVELS)).toHaveLength(12)
+  it('covers all 13 themes', () => {
+    expect(Object.keys(THEME_UNLOCK_LEVELS)).toHaveLength(13)
   })
 
   it('keeps accessibility theme at level 1', () => {
@@ -34,9 +34,10 @@ describe('themeUnlockLevel', () => {
     expect(themeUnlockLevel('amber')).toBe(4)
   })
 
-  it('returns 5 for cyberpunk and amoled', () => {
+  it('returns 5 for cyberpunk, amoled and liquid-glass', () => {
     expect(themeUnlockLevel('cyberpunk')).toBe(5)
     expect(themeUnlockLevel('amoled')).toBe(5)
+    expect(themeUnlockLevel('liquid-glass')).toBe(5)
   })
 
   it('treats unknown theme as locked', () => {

@@ -31,6 +31,7 @@ const themes = [
   { id: 'silent', label: 'Silent' },
   { id: 'amber', label: 'Amber' },
   { id: 'amoled', label: 'AMOLED' },
+  { id: 'liquid-glass', label: 'Liquid Glass' },
 ]
 
 const activeTheme = ref('')

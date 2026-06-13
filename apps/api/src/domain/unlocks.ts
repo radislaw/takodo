@@ -15,6 +15,7 @@ export const THEME_UNLOCK_LEVELS: Record<string, number> = {
   amber: 4,
   cyberpunk: 5,
   amoled: 5,
+  'liquid-glass': 5,
 }
 
 export function themeUnlockLevel(theme: string): number {

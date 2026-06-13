@@ -1154,6 +1154,7 @@ components:
         - cyberpunk
         - amber
         - amoled
+        - liquid-glass
       description: Matches data-theme attribute values in tokens.css.
     VapidPublicKey:
       type: object

@@ -227,7 +227,8 @@
       "lavender-dark": "Ночь",
       "cyberpunk": "Киберпанк",
       "amber": "Янтарь",
-      "amoled": "AMOLED"
+      "amoled": "AMOLED",
+      "liquid-glass": "Стекло"
     },
     "notifications": {
       "label": "Уведомления",

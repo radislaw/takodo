@@ -38,6 +38,7 @@ enum Theme {
   cyberpunk,
   amber,
   amoled,
+  liquidGlass: "liquid-glass",
 }
 
 // ─── Errors ─────────────────────────────────────────────────────

@@ -842,6 +842,87 @@
 }
 
 /* ============================================================
+   LIQUID GLASS THEME — "жидкое стекло" (iOS-style)
+   Soft aurora gradient behind translucent frosted panels.
+   Cards are semi-transparent white with backdrop blur (set via
+   --glass-blur, consumed by surface utilities) and a specular
+   top highlight baked into the shadow tokens. Calm iOS blue
+   accent, warm peach reward.
+   Opt in with <element data-theme="liquid-glass">.
+   ============================================================ */
+[data-theme='liquid-glass'] {
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+
+  /* Surfaces — aurora wash behind the glass */
+  --cream: linear-gradient(165deg, #dceaff 0%, #e8e2fb 28%, #fbe3ef 55%, #dff0f4 82%, #e3ecfd 100%);
+  --cream-deep: rgba(255, 255, 255, 0.38); /* recessed wells — clearer glass */
+  --card: rgba(255, 255, 255, 0.55); /* frosted panel */
+
+  /* Glass blur — picked up by surface-card / surface-deep / surface-nav */
+  --glass-blur: blur(24px) saturate(170%);
+
+  /* Ink — deep cool slate, readable through the frost */
+  --ink: #20304a;
+  --ink-soft: #5c7191;
+  --ink-faint: #93a5c0;
+
+  /* Accent — iOS sky blue, kept calm */
+  --sage: #4f8fdd;
+  --sage-press: #3d7bc8;
+  --sage-deep: #2a62a8; /* accent text on glass */
+  --sage-tint: rgba(79, 143, 221, 0.16); /* selected wash */
+  --sage-tint-2: rgba(79, 143, 221, 0.28); /* progress track */
+
+  /* Reward — warm peach, glows softly on the cool glass */
+  --apricot: #e89a6e;
+  --apricot-press: #d8865a;
+  --apricot-deep: #b56a40;
+  --apricot-tint: rgba(232, 154, 110, 0.18);
+
+  /* Soft semantic — translucent washes over glass */
+  --done: #58a884;
+  --done-tint: rgba(88, 168, 132, 0.16);
+  --gentle: #cfa14e;
+  --gentle-tint: rgba(207, 161, 78, 0.16);
+  --softrose: #cb8a9e;
+  --softrose-tint: rgba(203, 138, 158, 0.18);
+
+  /* Category dots — clear pastels that read on frost */
+  --cat-sage: #4f8fdd;
+  --cat-apricot: #e89a6e;
+  --cat-blue: #56a6d8;
+  --cat-clay: #c98f78;
+  --cat-gold: #cfa14e;
+  --cat-mauve: #a48ad0;
+
+  /* Lines & edges — bright glass seams, not grey hairlines */
+  --line: rgba(255, 255, 255, 0.65);
+  --line-card: rgba(255, 255, 255, 0.5);
+  --line-strong: rgba(120, 144, 184, 0.45);
+
+  /* Nav — frosted pane, blur comes from surface-nav itself */
+  --nav-bg: rgba(255, 255, 255, 0.5);
+  --nav-inactive: #51678a;
+
+  /* Elevation — specular top edge + soft cool drop shadow */
+  --shadow-sm:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 2px 8px rgba(40, 60, 110, 0.08);
+  --shadow-md:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 4px 16px rgba(40, 60, 110, 0.1), 0 8px 32px rgba(40, 60, 110, 0.08);
+  --shadow-lg:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 8px 28px rgba(40, 60, 110, 0.12), 0 16px 48px rgba(40, 60, 110, 0.1);
+  --shadow-pop:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 16px 56px rgba(40, 60, 110, 0.2);
+  --ring: 0 0 0 3px rgba(79, 143, 221, 0.35);
+  --ring-apr: 0 0 0 3px rgba(232, 154, 110, 0.38);
+}
+
+/* ============================================================
    SEMANTIC TYPE CLASSES
    ============================================================ */
 .ad-display {

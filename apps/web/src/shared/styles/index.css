@@ -63,6 +63,9 @@
 }
 @utility surface-card {
   background: var(--card);
+  /* liquid-glass sets --glass-blur; every other theme falls back to none */
+  backdrop-filter: var(--glass-blur, none);
+  -webkit-backdrop-filter: var(--glass-blur, none);
 }
 @utility fill-accent {
   background: var(--accent-fill);
