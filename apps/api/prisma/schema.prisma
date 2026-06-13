@@ -16,10 +16,30 @@ model User {
   notifMorning      Boolean            @default(true)
   notifEvening      Boolean            @default(true)
   createdAt         DateTime           @default(now())
+  // Voluntary self-report survey (all optional)
+  gender            String?
+  birthYear         Int?
+  city              String?
+  adhdStatus        String?
   tasks             Task[]
   dailyLists        DailyList[]
   questClaims       QuestClaim[]
   pushSubscriptions PushSubscription[]
+  feedback          Feedback[]
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String
+  message   String
+  rating    Int?
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
 }
 
 model PushSubscription {

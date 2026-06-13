@@ -30,6 +30,10 @@ vi.mock('@/shared/api', () => ({
     requestAndSubscribe: vi.fn(),
     unsubscribe: vi.fn(),
   }),
+  useSubmitFeedback: () => ({
+    mutateAsync: vi.fn().mockResolvedValue(undefined),
+    isLoading: ref(false),
+  }),
 }))
 
 function mountPage() {

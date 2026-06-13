@@ -224,6 +224,10 @@ describe('Daily routes', () => {
         gentleMoves: 1,
         notifMorning: true,
         notifEvening: true,
+        gender: null,
+        birthYear: null,
+        city: null,
+        adhdStatus: null,
       })
 
       const res = await app.inject({
@@ -254,6 +258,10 @@ describe('Daily routes', () => {
         gentleMoves: 1,
         notifMorning: true,
         notifEvening: true,
+        gender: null,
+        birthYear: null,
+        city: null,
+        adhdStatus: null,
       })
 
       await app.inject({
@@ -281,6 +289,10 @@ describe('Daily routes', () => {
         gentleMoves: 1,
         notifMorning: true,
         notifEvening: true,
+        gender: null,
+        birthYear: null,
+        city: null,
+        adhdStatus: null,
       })
 
       await app.inject({

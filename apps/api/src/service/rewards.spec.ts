@@ -77,6 +77,10 @@ describe('Rewards routes', () => {
         gentleMoves: 3,
         notifMorning: true,
         notifEvening: true,
+        gender: null,
+        birthYear: null,
+        city: null,
+        adhdStatus: null,
       })
       const res = await app.inject({ method: 'GET', url: '/rewards' })
       const body = res.json() as { badges: { id: string; earned: boolean }[] }

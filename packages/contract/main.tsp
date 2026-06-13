@@ -234,6 +234,18 @@ model Profile {
 
   /** Opt-in evening reminder (~8 PM). */
   notifEvening: boolean;
+
+  /** Voluntary self-report: "female" | "male" | "other" | "na". */
+  gender?: string;
+
+  /** Voluntary self-report birth year (age derived for display). */
+  birthYear?: int32;
+
+  @maxLength(100)
+  city?: string;
+
+  /** Voluntary self-report: "diagnosed" | "suspected" | "no" | "na". */
+  adhdStatus?: string;
 }
 
 model ProfileUpdate {
@@ -245,6 +257,17 @@ model ProfileUpdate {
 
   notifMorning?: boolean;
   notifEvening?: boolean;
+
+  gender?: string;
+
+  @minValue(1900)
+  @maxValue(2025)
+  birthYear?: int32;
+
+  @maxLength(100)
+  city?: string;
+
+  adhdStatus?: string;
 }
 
 @route("/me")
@@ -252,6 +275,44 @@ model ProfileUpdate {
 interface Me {
   @get get(): Profile;
   @patch update(@body body: ProfileUpdate): Profile | ApiError;
+}
+
+// ─── Feedback ───────────────────────────────────────────────────
+
+model FeedbackCreate {
+  /** "review" | "wish" | "support". */
+  kind: string;
+
+  @maxLength(5000)
+  message: string;
+
+  /** Optional 1–5 rating (reviews). */
+  @minValue(1)
+  @maxValue(5)
+  rating?: int32;
+}
+
+/** Feedback (read shape). Status is server-managed for the future admin triage view. */
+model Feedback {
+  id: string;
+  kind: string;
+
+  @maxLength(5000)
+  message: string;
+
+  rating?: int32;
+
+  /** "new" | "read" | "resolved". */
+  status: string;
+
+  createdAt: utcDateTime;
+}
+
+@route("/feedback")
+@tag("Feedback")
+interface FeedbackApi {
+  /** Submit feedback from the current user (review / wish / support). */
+  @post create(@body body: FeedbackCreate): Feedback | ApiError;
 }
 
 // ─── Rewards ────────────────────────────────────────────────────

@@ -86,6 +86,24 @@ Product: Todo app for people with ADHD. Core loop: **brain dump → recursive sp
 
 ## Future / Deferred
 
+### Admin panel & analytics
+
+- **Requires auth + multi-user — blocked until auth ships.** An admin view that manages _other_ users
+  is meaningless single-user.
+- Role gating (`User.role`), Admin nav tab visible only to admins.
+- User stats dashboard: total / active (windowed) / premium / new users; per-user breakdown table
+  (streak, tasks, XP, level, last activity).
+- Access management: premium grant/revoke (`User.plan` + `premiumSince`), block/unblock
+  (`User.status`), per-user feature flags (unlock specific features without premium).
+- Charts: registrations-over-time, premium-activations-over-time, demographics breakdown
+  (gender / age / city / ADHD).
+- Feedback admin view: read/triage submitted feedback (`status`: new → read → resolved).
+- Attribution ("after which activity users came") — needs a signup flow with UTM/referrer capture
+  (no signup exists today); `AnalyticsEvent` model is the future home.
+- **Data collection already shipped** (profile survey + feedback submission, Phase 0.9.3): the survey
+  fields on `User` (`gender`, `birthYear`, `city`, `adhdStatus`) and the `Feedback` model already
+  persist real data, so the future admin view has something to display from day one.
+
 ### R9 `feat/welcome-calendar`
 
 - Onboarding calendar: user marks active days for streak seed

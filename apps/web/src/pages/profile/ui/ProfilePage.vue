@@ -5,6 +5,8 @@ import { AppIcon, LevelRing } from '@/shared/ui'
 import { useProfile, useUpdateProfile, useRewards, useNotifications } from '@/shared/api'
 import { isThemeUnlocked, themeUnlockLevel } from '@/shared/lib/unlocks'
 import ThemeSwatch from './ThemeSwatch.vue'
+import ProfileSurvey from './ProfileSurvey.vue'
+import ProfileFeedback from './ProfileFeedback.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const { data: profile } = useProfile()
@@ -312,6 +314,12 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
           </template>
         </template>
       </div>
+
+      <!-- Voluntary survey -->
+      <ProfileSurvey />
+
+      <!-- Feedback & support -->
+      <ProfileFeedback />
 
       <!-- Help link -->
       <RouterLink

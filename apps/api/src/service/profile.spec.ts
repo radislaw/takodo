@@ -17,6 +17,10 @@ function makeUser(overrides: Partial<User> = {}): User {
     notifMorning: true,
     notifEvening: true,
     createdAt: new Date('2024-01-01T00:00:00Z'),
+    gender: null,
+    birthYear: null,
+    city: null,
+    adhdStatus: null,
     ...overrides,
   }
 }
@@ -166,6 +170,73 @@ describe('Profile routes', () => {
       })
       expect(res.statusCode).toBe(200)
       expect(prisma.task.aggregate).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('GET /me survey fields', () => {
+    it('returns survey fields when set', async () => {
+      prisma.user.findUnique.mockResolvedValue(
+        makeUser({ gender: 'female', birthYear: 1995, city: 'Москва', adhdStatus: 'diagnosed' }),
+      )
+      const res = await app.inject({ method: 'GET', url: '/me' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as {
+        gender: string
+        birthYear: number
+        city: string
+        adhdStatus: string
+      }
+      expect(body.gender).toBe('female')
+      expect(body.birthYear).toBe(1995)
+      expect(body.city).toBe('Москва')
+      expect(body.adhdStatus).toBe('diagnosed')
+    })
+
+    it('omits survey fields when null', async () => {
+      prisma.user.findUnique.mockResolvedValue(makeUser())
+      const res = await app.inject({ method: 'GET', url: '/me' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as Record<string, unknown>
+      expect(body).not.toHaveProperty('gender')
+      expect(body).not.toHaveProperty('birthYear')
+    })
+  })
+
+  describe('PATCH /me survey fields', () => {
+    it('round-trips survey fields', async () => {
+      prisma.user.update.mockResolvedValue(
+        makeUser({ gender: 'male', birthYear: 1990, city: 'Питер', adhdStatus: 'suspected' }),
+      )
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { gender: 'male', birthYear: 1990, city: 'Питер', adhdStatus: 'suspected' },
+      })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as { gender: string; birthYear: number; city: string }
+      expect(body.gender).toBe('male')
+      expect(body.birthYear).toBe(1990)
+      expect(body.city).toBe('Питер')
+    })
+
+    it('rejects birthYear below 1900 (ajv)', async () => {
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { birthYear: 1800 },
+      })
+      expect(res.statusCode).toBe(400)
+      expect(prisma.user.update).not.toHaveBeenCalled()
+    })
+
+    it('rejects birthYear above 2025 (ajv)', async () => {
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { birthYear: 2099 },
+      })
+      expect(res.statusCode).toBe(400)
+      expect(prisma.user.update).not.toHaveBeenCalled()
     })
   })
 

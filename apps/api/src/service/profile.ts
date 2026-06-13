@@ -15,6 +15,10 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         theme: user?.theme ?? 'light',
         notifMorning: user?.notifMorning ?? true,
         notifEvening: user?.notifEvening ?? true,
+        ...(user?.gender != null ? { gender: user.gender } : {}),
+        ...(user?.birthYear != null ? { birthYear: user.birthYear } : {}),
+        ...(user?.city != null ? { city: user.city } : {}),
+        ...(user?.adhdStatus != null ? { adhdStatus: user.adhdStatus } : {}),
       }
     },
 
@@ -25,6 +29,10 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         theme?: string
         notifMorning?: boolean
         notifEvening?: boolean
+        gender?: string
+        birthYear?: number
+        city?: string
+        adhdStatus?: string
       }
 
       // Level-1 themes skip the level computation entirely.
@@ -45,6 +53,10 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
           ...(body.theme !== undefined ? { theme: body.theme } : {}),
           ...(body.notifMorning !== undefined ? { notifMorning: body.notifMorning } : {}),
           ...(body.notifEvening !== undefined ? { notifEvening: body.notifEvening } : {}),
+          ...(body.gender !== undefined ? { gender: body.gender } : {}),
+          ...(body.birthYear !== undefined ? { birthYear: body.birthYear } : {}),
+          ...(body.city !== undefined ? { city: body.city } : {}),
+          ...(body.adhdStatus !== undefined ? { adhdStatus: body.adhdStatus } : {}),
         },
       })
       return {
@@ -52,6 +64,10 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         theme: user.theme,
         notifMorning: user.notifMorning,
         notifEvening: user.notifEvening,
+        ...(user.gender != null ? { gender: user.gender } : {}),
+        ...(user.birthYear != null ? { birthYear: user.birthYear } : {}),
+        ...(user.city != null ? { city: user.city } : {}),
+        ...(user.adhdStatus != null ? { adhdStatus: user.adhdStatus } : {}),
       }
     },
   }

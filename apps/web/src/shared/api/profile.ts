@@ -37,6 +37,10 @@ export function useUpdateProfile() {
       theme?: Theme
       notifMorning?: boolean
       notifEvening?: boolean
+      gender?: string
+      birthYear?: number
+      city?: string
+      adhdStatus?: string
     }) => {
       const { data } = await apiClient.PATCH('/me', { body })
       if (!data) throw new Error('Failed to update profile')
