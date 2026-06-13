@@ -155,7 +155,7 @@ defineExpose({ flushAndReset: handleReset })
           :size="22"
           aria-hidden="true"
         />
-        <span v-if="tomatoOverflow > 0" class="leading-none" aria-hidden="true">{{
+        <span v-if="tomatoOverflow > 0" class="mt-0.5 leading-none" aria-hidden="true">{{
           overflowText
         }}</span>
       </span>
