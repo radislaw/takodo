@@ -146,13 +146,15 @@ defineExpose({ flushAndReset: handleReset })
         v-if="pomodoros > 0"
         role="img"
         :aria-label="t('do.pomodoro.count', pomodoros)"
-        class="text-apricot-deep flex items-center gap-0.5"
+        class="flex items-center gap-0.5"
       >
         <AppIcon
           v-for="i in visibleTomatoes"
           :key="i"
           name="tomato"
-          :size="14"
+          :size="20"
+          fill="var(--apricot)"
+          color="none"
           aria-hidden="true"
         />
         <span v-if="tomatoOverflow > 0" aria-hidden="true">{{ overflowText }}</span>
