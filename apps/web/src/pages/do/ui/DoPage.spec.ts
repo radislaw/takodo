@@ -26,6 +26,8 @@ vi.mock('@/shared/api', () => ({
   useReopenTask: () => ({ mutate: vi.fn() }),
   useRecordFocus: () => ({ mutate: vi.fn() }),
   useTaskTree: () => ({ data: ref(undefined) }),
+  useCreateTask: () => ({ mutateAsync: vi.fn().mockResolvedValue({}) }),
+  useDeleteTask: () => ({ mutate: vi.fn() }),
 }))
 
 vi.mock('vue-router', () => ({
