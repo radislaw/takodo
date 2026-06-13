@@ -159,7 +159,7 @@ defineExpose({ flushAndReset: handleReset })
       </span>
       <span v-if="focusTimeText" class="flex items-center gap-1">
         <AppIcon name="timer" :size="22" class="flex-shrink-0" />
-        <span class="leading-none">{{ focusTimeText }}</span>
+        <span class="mt-0.5 leading-none">{{ focusTimeText }}</span>
       </span>
     </div>
   </div>
