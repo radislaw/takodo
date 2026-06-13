@@ -255,6 +255,26 @@ describe('Profile routes', () => {
       expect(res.statusCode).toBe(400)
       expect(prisma.user.update).not.toHaveBeenCalled()
     })
+
+    it('rejects language exceeding maxLength 5 (ajv)', async () => {
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { language: 'russian' },
+      })
+      expect(res.statusCode).toBe(400)
+      expect(prisma.user.update).not.toHaveBeenCalled()
+    })
+
+    it('rejects gender exceeding maxLength 20 (ajv)', async () => {
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { gender: 'x'.repeat(21) },
+      })
+      expect(res.statusCode).toBe(400)
+      expect(prisma.user.update).not.toHaveBeenCalled()
+    })
   })
 
   describe('PATCH /me notification prefs', () => {

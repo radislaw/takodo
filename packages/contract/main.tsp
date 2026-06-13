@@ -236,6 +236,7 @@ model Profile {
   notifEvening: boolean;
 
   /** Voluntary self-report: "female" | "male". */
+  @maxLength(20)
   gender?: string;
 
   /** Voluntary self-report birth date, ISO format "YYYY-MM-DD". */
@@ -247,9 +248,11 @@ model Profile {
   timezone?: string;
 
   /** Voluntary self-report: "diagnosed" | "suspected" | "no" | "na". */
+  @maxLength(20)
   adhdStatus?: string;
 
   /** UI language preference: "ru" | "en". */
+  @maxLength(5)
   language?: string;
 }
 
@@ -264,6 +267,7 @@ model ProfileUpdate {
   notifEvening?: boolean;
 
   /** "female" | "male". */
+  @maxLength(20)
   gender?: string;
 
   /** ISO date "YYYY-MM-DD". */
@@ -274,9 +278,11 @@ model ProfileUpdate {
   @maxLength(100)
   timezone?: string;
 
+  @maxLength(20)
   adhdStatus?: string;
 
   /** "ru" | "en". */
+  @maxLength(5)
   language?: string;
 }
 
