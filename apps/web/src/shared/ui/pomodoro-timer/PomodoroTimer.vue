@@ -6,6 +6,7 @@ import { useRecordFocus } from '@/shared/api'
 import { usePomodoro } from '@/shared/lib/usePomodoro'
 import { formatFocusDuration } from '@/shared/lib/formatFocus'
 import { playChime } from '@/shared/lib/chime'
+import { notifyTimerEnd, requestNotificationPermission } from '@/shared/lib/notifyTimerEnd'
 
 const props = defineProps<{
   taskId: string
@@ -26,6 +27,7 @@ function handleFlush(seconds: number, pomodoro?: boolean) {
 function handleComplete() {
   playChime()
   navigator.vibrate?.([200, 100, 200])
+  void notifyTimerEnd(t('do.pomodoro.notifyTitle'), t('do.pomodoro.notifyBody'))
 
   if (!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
     rippling.value = true
@@ -65,6 +67,7 @@ function toggleStartPause() {
   if (status.value === 'running') {
     pause()
   } else {
+    void requestNotificationPermission()
     start()
   }
 }
@@ -135,30 +138,30 @@ defineExpose({ flushAndReset: handleReset })
     </div>
 
     <!-- Accumulated stats -->
-    <p
+    <div
       v-if="hasStats"
-      class="font-body text-ink-soft flex items-center gap-1.5 text-xs font-semibold"
+      class="font-body text-ink-soft flex items-center gap-3 text-sm font-semibold"
     >
       <span
         v-if="pomodoros > 0"
         role="img"
         :aria-label="t('do.pomodoro.count', pomodoros)"
-        class="text-apricot-deep flex items-center gap-0.5"
+        class="text-apricot-deep flex items-center gap-1"
       >
         <AppIcon
           v-for="i in visibleTomatoes"
           :key="i"
           name="tomato"
-          :size="14"
+          :size="22"
           aria-hidden="true"
         />
         <span v-if="tomatoOverflow > 0" aria-hidden="true">{{ overflowText }}</span>
       </span>
-      <template v-if="focusTimeText">
-        <AppIcon name="timer" :size="13" class="flex-shrink-0" />
-        {{ focusTimeText }}
-      </template>
-    </p>
+      <span v-if="focusTimeText" class="flex items-center gap-1">
+        <AppIcon name="timer" :size="22" class="flex-shrink-0" />
+        <span class="mt-0.5 leading-none">{{ focusTimeText }}</span>
+      </span>
+    </div>
   </div>
 </template>
 

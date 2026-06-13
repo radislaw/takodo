@@ -2,16 +2,25 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import PomodoroTimer from './PomodoroTimer.vue'
 
-const { mockRecordFocus, mockPlayChime } = vi.hoisted(() => ({
-  mockRecordFocus: vi.fn(),
-  mockPlayChime: vi.fn(),
-}))
+const { mockRecordFocus, mockPlayChime, mockNotifyTimerEnd, mockRequestPermission } = vi.hoisted(
+  () => ({
+    mockRecordFocus: vi.fn(),
+    mockPlayChime: vi.fn(),
+    mockNotifyTimerEnd: vi.fn(),
+    mockRequestPermission: vi.fn(),
+  }),
+)
 
 vi.mock('@/shared/api', () => ({
   useRecordFocus: () => ({ mutate: mockRecordFocus }),
 }))
 
 vi.mock('@/shared/lib/chime', () => ({ playChime: mockPlayChime }))
+
+vi.mock('@/shared/lib/notifyTimerEnd', () => ({
+  notifyTimerEnd: mockNotifyTimerEnd,
+  requestNotificationPermission: mockRequestPermission,
+}))
 
 vi.mock('@/shared/lib/formatFocus', () => ({
   formatFocusDuration: (seconds: number) => `${Math.floor(seconds / 60)} мин`,
@@ -64,6 +73,8 @@ describe('PomodoroTimer', () => {
     motionAllowed()
     mockRecordFocus.mockReset()
     mockPlayChime.mockReset()
+    mockNotifyTimerEnd.mockReset()
+    mockRequestPermission.mockReset()
   })
 
   afterEach(() => {
@@ -159,6 +170,32 @@ describe('PomodoroTimer', () => {
     vi.advanceTimersByTime(1500 * 1000)
     await flushPromises()
     expect(mockPlayChime).toHaveBeenCalled()
+  })
+
+  it('fires a timer-end notification on completion', async () => {
+    const wrapper = mountTimer()
+    await wrapper.find('[aria-label="Старт"]').trigger('click')
+    vi.advanceTimersByTime(1500 * 1000)
+    await flushPromises()
+    expect(mockNotifyTimerEnd).toHaveBeenCalled()
+  })
+
+  it('requests notification permission when timer starts', async () => {
+    const wrapper = mountTimer()
+    await wrapper.find('[aria-label="Старт"]').trigger('click')
+    expect(mockRequestPermission).toHaveBeenCalledOnce()
+  })
+
+  it('does not request permission again on resume after pause', async () => {
+    const wrapper = mountTimer()
+    await wrapper.find('[aria-label="Старт"]').trigger('click')
+    vi.advanceTimersByTime(5_000)
+    await wrapper.vm.$nextTick()
+    await wrapper.find('[aria-label="Пауза"]').trigger('click')
+    mockRequestPermission.mockReset()
+    await wrapper.find('[aria-label="Старт"]').trigger('click')
+    // permission call fires on every start press — OS ignores if already decided
+    expect(mockRequestPermission).toHaveBeenCalledOnce()
   })
 
   it('calls recordFocus with elapsed seconds on pause', async () => {

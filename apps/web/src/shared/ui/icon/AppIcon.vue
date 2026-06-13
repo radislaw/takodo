@@ -7,12 +7,14 @@ const props = withDefaults(
     name: IconName
     size?: number
     color?: string
+    fill?: string
     strokeWidth?: number
     title?: string
   }>(),
   {
     size: 20,
     color: 'currentColor',
+    fill: 'none',
     strokeWidth: 2,
     title: undefined,
   },
@@ -32,7 +34,7 @@ const isDecorative = computed(() => !props.title)
     :width="size"
     :height="size"
     viewBox="0 0 24 24"
-    fill="none"
+    :fill="fill"
     :stroke="color"
     :stroke-width="strokeWidth"
     stroke-linecap="round"
