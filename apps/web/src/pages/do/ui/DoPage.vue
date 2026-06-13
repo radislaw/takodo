@@ -2,8 +2,8 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppIcon, AppButton, PomodoroTimer } from '@/shared/ui'
-import { useDailyToday, useTasks, useCompleteTask } from '@/shared/api'
+import { AppIcon, AppButton, PomodoroTimer, AppCheckbox } from '@/shared/ui'
+import { useDailyToday, useTasks, useCompleteTask, useTaskTree } from '@/shared/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -70,6 +70,9 @@ const catColor = computed(() => {
   const cat = currentTask.value?.category
   return cat ? CAT_COLORS[cat] : undefined
 })
+
+const currentTaskId = computed(() => current.value?.taskId || '')
+const { data: taskTree } = useTaskTree(currentTaskId)
 
 async function handleDone() {
   const id = current.value?.taskId
@@ -146,6 +149,33 @@ function goBack() {
           :pomodoros="currentTask.pomodoros ?? 0"
           class="mt-8"
         />
+
+        <!-- Subtasks checklist -->
+        <div v-if="taskTree?.children.length" class="mt-8 w-full max-w-sm">
+          <p class="font-body text-ink-soft mb-3 text-xs font-semibold tracking-wide uppercase">
+            {{ t('do.subtasks') }}
+          </p>
+          <div class="space-y-2">
+            <div
+              v-for="child in taskTree.children"
+              :key="child.id"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors"
+              :class="child.status === 'done' ? 'bg-sage/10' : 'hover:bg-surface-hover'"
+            >
+              <AppCheckbox
+                :checked="child.status === 'done'"
+                :disabled="true"
+                class="pointer-events-none"
+              />
+              <span
+                class="font-body flex-1 text-sm break-words"
+                :class="child.status === 'done' ? 'text-ink-soft line-through' : 'text-ink'"
+              >
+                {{ child.title }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
