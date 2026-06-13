@@ -17,6 +17,11 @@ function makeUser(overrides: Partial<User> = {}): User {
     notifMorning: true,
     notifEvening: true,
     createdAt: new Date('2024-01-01T00:00:00Z'),
+    gender: null,
+    birthDate: null,
+    timezone: null,
+    adhdStatus: null,
+    language: null,
     ...overrides,
   }
 }
@@ -166,6 +171,109 @@ describe('Profile routes', () => {
       })
       expect(res.statusCode).toBe(200)
       expect(prisma.task.aggregate).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('GET /me survey fields', () => {
+    it('returns survey fields when set', async () => {
+      prisma.user.findUnique.mockResolvedValue(
+        makeUser({
+          gender: 'female',
+          birthDate: '1995-06-15',
+          timezone: 'Europe/Moscow',
+          adhdStatus: 'diagnosed',
+          language: 'ru',
+        }),
+      )
+      const res = await app.inject({ method: 'GET', url: '/me' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as {
+        gender: string
+        birthDate: string
+        timezone: string
+        adhdStatus: string
+        language: string
+      }
+      expect(body.gender).toBe('female')
+      expect(body.birthDate).toBe('1995-06-15')
+      expect(body.timezone).toBe('Europe/Moscow')
+      expect(body.adhdStatus).toBe('diagnosed')
+      expect(body.language).toBe('ru')
+    })
+
+    it('omits survey fields when null', async () => {
+      prisma.user.findUnique.mockResolvedValue(makeUser())
+      const res = await app.inject({ method: 'GET', url: '/me' })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as Record<string, unknown>
+      expect(body).not.toHaveProperty('gender')
+      expect(body).not.toHaveProperty('birthDate')
+    })
+  })
+
+  describe('PATCH /me survey fields', () => {
+    it('round-trips survey fields', async () => {
+      prisma.user.update.mockResolvedValue(
+        makeUser({
+          gender: 'male',
+          birthDate: '1990-03-22',
+          timezone: 'Asia/Yekaterinburg',
+          adhdStatus: 'suspected',
+          language: 'en',
+        }),
+      )
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: {
+          gender: 'male',
+          birthDate: '1990-03-22',
+          timezone: 'Asia/Yekaterinburg',
+          adhdStatus: 'suspected',
+          language: 'en',
+        },
+      })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as {
+        gender: string
+        birthDate: string
+        timezone: string
+        language: string
+      }
+      expect(body.gender).toBe('male')
+      expect(body.birthDate).toBe('1990-03-22')
+      expect(body.timezone).toBe('Asia/Yekaterinburg')
+      expect(body.language).toBe('en')
+    })
+
+    it('rejects birthDate exceeding maxLength 10 (ajv)', async () => {
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { birthDate: '1990-01-01-extra' },
+      })
+      expect(res.statusCode).toBe(400)
+      expect(prisma.user.update).not.toHaveBeenCalled()
+    })
+
+    it('rejects language exceeding maxLength 5 (ajv)', async () => {
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { language: 'russian' },
+      })
+      expect(res.statusCode).toBe(400)
+      expect(prisma.user.update).not.toHaveBeenCalled()
+    })
+
+    it('rejects gender exceeding maxLength 20 (ajv)', async () => {
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { gender: 'x'.repeat(21) },
+      })
+      expect(res.statusCode).toBe(400)
+      expect(prisma.user.update).not.toHaveBeenCalled()
     })
   })
 

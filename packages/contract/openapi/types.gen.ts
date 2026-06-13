@@ -86,6 +86,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Submit feedback from the current user (review / wish / support). */
+        post: operations["FeedbackApi_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/frequent": {
         parameters: {
             query?: never;
@@ -405,6 +422,28 @@ export interface components {
             /** Format: int32 */
             order?: number;
         };
+        /** @description Feedback (read shape). Status is server-managed for the future admin triage view. */
+        Feedback: {
+            id: string;
+            kind: string;
+            message: string;
+            /** Format: int32 */
+            rating?: number;
+            /** @description "new" | "read" | "resolved". */
+            status: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FeedbackCreate: {
+            /** @description "review" | "wish" | "support". */
+            kind: string;
+            message: string;
+            /**
+             * Format: int32
+             * @description Optional 1–5 rating (reviews).
+             */
+            rating?: number;
+        };
         FocusRecord: {
             /**
              * Format: int32
@@ -453,6 +492,16 @@ export interface components {
             notifMorning: boolean;
             /** @description Opt-in evening reminder (~8 PM). */
             notifEvening: boolean;
+            /** @description Voluntary self-report: "female" | "male". */
+            gender?: string;
+            /** @description Voluntary self-report birth date, ISO format "YYYY-MM-DD". */
+            birthDate?: string;
+            /** @description IANA timezone identifier, e.g. "Europe/Moscow". */
+            timezone?: string;
+            /** @description Voluntary self-report: "diagnosed" | "suspected" | "no" | "na". */
+            adhdStatus?: string;
+            /** @description UI language preference: "ru" | "en". */
+            language?: string;
         };
         ProfileUpdate: {
             name?: string;
@@ -460,6 +509,15 @@ export interface components {
             theme?: components["schemas"]["Theme"];
             notifMorning?: boolean;
             notifEvening?: boolean;
+            /** @description "female" | "male". */
+            gender?: string;
+            /** @description ISO date "YYYY-MM-DD". */
+            birthDate?: string;
+            /** @description IANA timezone identifier. */
+            timezone?: string;
+            adhdStatus?: string;
+            /** @description "ru" | "en". */
+            language?: string;
         };
         PushSubscribeBody: {
             endpoint: string;
@@ -800,6 +858,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DailyEntry"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    FeedbackApi_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackCreate"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Feedback"];
                 };
             };
             /** @description An unexpected error response. */

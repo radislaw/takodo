@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppIcon, ActivityHeatmap, AppStatCard, SoftNote } from '@/shared/ui'
+import { AppIcon, ActivityHeatmap, AppStatCard, SoftNote, LevelRing } from '@/shared/ui'
 import type { IconName } from '@/shared/ui'
 import { useRewards, useHeatmap } from '@/shared/api'
 
@@ -166,10 +166,23 @@ const stats = computed<Stat[]>(() => {
           <SoftNote class="mt-4 hidden lg:flex">{{ t('rewards.gentleNote') }}</SoftNote>
         </aside>
 
-        <!-- Main column: stats + heatmap + badges -->
+        <!-- Main column: level + stats + heatmap + badges -->
         <div class="lg:col-start-1 lg:row-start-1">
+          <!-- Level card -->
+          <div class="surface-card mt-5 flex items-center gap-5 rounded-2xl p-5 shadow-md lg:mt-0">
+            <LevelRing :level="rewards.level" :xp="rewards.xp" />
+            <div>
+              <div class="text-ink text-sm font-bold">
+                {{ t('profile.levelRing.label') }} {{ rewards.level }}
+              </div>
+              <div class="text-ink-soft text-xs">
+                {{ t('profile.levelRing.xp', { xp: rewards.xp }) }}
+              </div>
+            </div>
+          </div>
+
           <!-- Stats grid -->
-          <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:mt-0">
+          <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <AppStatCard
               v-for="stat in stats"
               :key="stat.key"

@@ -234,6 +234,26 @@ model Profile {
 
   /** Opt-in evening reminder (~8 PM). */
   notifEvening: boolean;
+
+  /** Voluntary self-report: "female" | "male". */
+  @maxLength(20)
+  gender?: string;
+
+  /** Voluntary self-report birth date, ISO format "YYYY-MM-DD". */
+  @maxLength(10)
+  birthDate?: string;
+
+  /** IANA timezone identifier, e.g. "Europe/Moscow". */
+  @maxLength(100)
+  timezone?: string;
+
+  /** Voluntary self-report: "diagnosed" | "suspected" | "no" | "na". */
+  @maxLength(20)
+  adhdStatus?: string;
+
+  /** UI language preference: "ru" | "en". */
+  @maxLength(5)
+  language?: string;
 }
 
 model ProfileUpdate {
@@ -245,6 +265,25 @@ model ProfileUpdate {
 
   notifMorning?: boolean;
   notifEvening?: boolean;
+
+  /** "female" | "male". */
+  @maxLength(20)
+  gender?: string;
+
+  /** ISO date "YYYY-MM-DD". */
+  @maxLength(10)
+  birthDate?: string;
+
+  /** IANA timezone identifier. */
+  @maxLength(100)
+  timezone?: string;
+
+  @maxLength(20)
+  adhdStatus?: string;
+
+  /** "ru" | "en". */
+  @maxLength(5)
+  language?: string;
 }
 
 @route("/me")
@@ -252,6 +291,44 @@ model ProfileUpdate {
 interface Me {
   @get get(): Profile;
   @patch update(@body body: ProfileUpdate): Profile | ApiError;
+}
+
+// ─── Feedback ───────────────────────────────────────────────────
+
+model FeedbackCreate {
+  /** "review" | "wish" | "support". */
+  kind: string;
+
+  @maxLength(5000)
+  message: string;
+
+  /** Optional 1–5 rating (reviews). */
+  @minValue(1)
+  @maxValue(5)
+  rating?: int32;
+}
+
+/** Feedback (read shape). Status is server-managed for the future admin triage view. */
+model Feedback {
+  id: string;
+  kind: string;
+
+  @maxLength(5000)
+  message: string;
+
+  rating?: int32;
+
+  /** "new" | "read" | "resolved". */
+  status: string;
+
+  createdAt: utcDateTime;
+}
+
+@route("/feedback")
+@tag("Feedback")
+interface FeedbackApi {
+  /** Submit feedback from the current user (review / wish / support). */
+  @post create(@body body: FeedbackCreate): Feedback | ApiError;
 }
 
 // ─── Rewards ────────────────────────────────────────────────────

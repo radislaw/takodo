@@ -10,6 +10,7 @@ import { buildTasksHandlers } from './service/tasks.js'
 import { buildDailyHandlers } from './service/daily.js'
 import { buildFrequentHandlers } from './service/frequent.js'
 import { buildProfileHandlers } from './service/profile.js'
+import { buildFeedbackHandlers } from './service/feedback.js'
 import { buildRewardsHandlers } from './service/rewards.js'
 import { buildQuestsHandlers } from './service/quests.js'
 import { buildPushHandlers } from './service/push.js'
@@ -49,6 +50,7 @@ export function buildApp(opts: AppOptions = {}) {
           ...buildDailyHandlers(opts.prisma, opts.getUserId),
           ...buildFrequentHandlers(opts.prisma, opts.getUserId),
           ...buildProfileHandlers(opts.prisma, opts.getUserId),
+          ...buildFeedbackHandlers(opts.prisma, opts.getUserId),
           ...buildRewardsHandlers(opts.prisma, opts.getUserId),
           ...buildQuestsHandlers(opts.prisma, opts.getUserId),
           ...buildPushHandlers(opts.prisma, opts.getUserId),

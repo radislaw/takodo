@@ -15,6 +15,11 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         theme: user?.theme ?? 'light',
         notifMorning: user?.notifMorning ?? true,
         notifEvening: user?.notifEvening ?? true,
+        ...(user?.gender != null ? { gender: user.gender } : {}),
+        ...(user?.birthDate != null ? { birthDate: user.birthDate } : {}),
+        ...(user?.timezone != null ? { timezone: user.timezone } : {}),
+        ...(user?.adhdStatus != null ? { adhdStatus: user.adhdStatus } : {}),
+        ...(user?.language != null ? { language: user.language } : {}),
       }
     },
 
@@ -25,6 +30,11 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         theme?: string
         notifMorning?: boolean
         notifEvening?: boolean
+        gender?: string
+        birthDate?: string
+        timezone?: string
+        adhdStatus?: string
+        language?: string
       }
 
       // Level-1 themes skip the level computation entirely.
@@ -45,6 +55,11 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
           ...(body.theme !== undefined ? { theme: body.theme } : {}),
           ...(body.notifMorning !== undefined ? { notifMorning: body.notifMorning } : {}),
           ...(body.notifEvening !== undefined ? { notifEvening: body.notifEvening } : {}),
+          ...(body.gender !== undefined ? { gender: body.gender } : {}),
+          ...(body.birthDate !== undefined ? { birthDate: body.birthDate } : {}),
+          ...(body.timezone !== undefined ? { timezone: body.timezone } : {}),
+          ...(body.adhdStatus !== undefined ? { adhdStatus: body.adhdStatus } : {}),
+          ...(body.language !== undefined ? { language: body.language } : {}),
         },
       })
       return {
@@ -52,6 +67,11 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         theme: user.theme,
         notifMorning: user.notifMorning,
         notifEvening: user.notifEvening,
+        ...(user.gender != null ? { gender: user.gender } : {}),
+        ...(user.birthDate != null ? { birthDate: user.birthDate } : {}),
+        ...(user.timezone != null ? { timezone: user.timezone } : {}),
+        ...(user.adhdStatus != null ? { adhdStatus: user.adhdStatus } : {}),
+        ...(user.language != null ? { language: user.language } : {}),
       }
     },
   }

@@ -23,6 +23,7 @@ export const stubService = {
   Frequent_list: notImplemented,
   Me_get: notImplemented,
   Me_update: notImplemented,
+  FeedbackApi_create: notImplemented,
   Rewards_get: notImplemented,
 }
 

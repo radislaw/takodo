@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppBottomNav, AppSidebar, RewardBurst, AppToast } from '@/shared/ui'
@@ -12,7 +12,7 @@ import { useProfile, useRewards } from '@/shared/api'
 
 const route = useRoute()
 const router = useRouter()
-const { t } = useI18n({ useScope: 'global' })
+const { t, locale } = useI18n({ useScope: 'global' })
 const { isVisible, isEpic, hide } = useReward()
 const { key: errorKey, hideError } = useErrorToast()
 const { key: successKey, hideSuccess } = useSuccessToast()
@@ -21,6 +21,14 @@ const { data: profile } = useProfile()
 const { data: rewards } = useRewards()
 
 const theme = computed(() => profile.value?.theme ?? 'amoled')
+
+watch(
+  () => profile.value?.language,
+  (lang) => {
+    if (lang === 'en' || lang === 'ru') locale.value = lang
+  },
+  { immediate: true },
+)
 
 const navItems = computed<{ id: string; icon: IconName; label: string }[]>(() => [
   { id: 'today', icon: 'home', label: t('nav.today') },

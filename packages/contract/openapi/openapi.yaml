@@ -10,6 +10,7 @@ tags:
   - name: Tasks
   - name: Daily
   - name: Profile
+  - name: Feedback
   - name: Rewards
   - name: Quests
   - name: Push
@@ -183,6 +184,32 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       tags:
         - Daily
+  /feedback:
+    post:
+      operationId: FeedbackApi_create
+      description: Submit feedback from the current user (review / wish / support).
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackCreate'
   /frequent:
     get:
       operationId: Frequent_list
@@ -773,6 +800,50 @@ components:
         order:
           type: integer
           format: int32
+    Feedback:
+      type: object
+      required:
+        - id
+        - kind
+        - message
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        message:
+          type: string
+          maxLength: 5000
+        rating:
+          type: integer
+          format: int32
+        status:
+          type: string
+          description: '"new" | "read" | "resolved".'
+        createdAt:
+          type: string
+          format: date-time
+      description: Feedback (read shape). Status is server-managed for the future admin triage view.
+    FeedbackCreate:
+      type: object
+      required:
+        - kind
+        - message
+      properties:
+        kind:
+          type: string
+          description: '"review" | "wish" | "support".'
+        message:
+          type: string
+          maxLength: 5000
+        rating:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Optional 1–5 rating (reviews).
     FocusRecord:
       type: object
       required:
@@ -855,6 +926,26 @@ components:
         notifEvening:
           type: boolean
           description: Opt-in evening reminder (~8 PM).
+        gender:
+          type: string
+          maxLength: 20
+          description: 'Voluntary self-report: "female" | "male".'
+        birthDate:
+          type: string
+          maxLength: 10
+          description: Voluntary self-report birth date, ISO format "YYYY-MM-DD".
+        timezone:
+          type: string
+          maxLength: 100
+          description: IANA timezone identifier, e.g. "Europe/Moscow".
+        adhdStatus:
+          type: string
+          maxLength: 20
+          description: 'Voluntary self-report: "diagnosed" | "suspected" | "no" | "na".'
+        language:
+          type: string
+          maxLength: 5
+          description: 'UI language preference: "ru" | "en".'
     ProfileUpdate:
       type: object
       properties:
@@ -869,6 +960,25 @@ components:
           type: boolean
         notifEvening:
           type: boolean
+        gender:
+          type: string
+          maxLength: 20
+          description: '"female" | "male".'
+        birthDate:
+          type: string
+          maxLength: 10
+          description: ISO date "YYYY-MM-DD".
+        timezone:
+          type: string
+          maxLength: 100
+          description: IANA timezone identifier.
+        adhdStatus:
+          type: string
+          maxLength: 20
+        language:
+          type: string
+          maxLength: 5
+          description: '"ru" | "en".'
     PushSubscribeBody:
       type: object
       required:

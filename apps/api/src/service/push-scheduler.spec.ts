@@ -31,6 +31,11 @@ function makeUser(overrides: Partial<User> = {}): User {
     notifMorning: true,
     notifEvening: true,
     createdAt: new Date(),
+    gender: null,
+    birthDate: null,
+    timezone: null,
+    adhdStatus: null,
+    language: null,
     ...overrides,
   }
 }
