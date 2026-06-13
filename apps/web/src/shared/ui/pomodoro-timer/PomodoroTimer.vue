@@ -155,7 +155,9 @@ defineExpose({ flushAndReset: handleReset })
           :size="22"
           aria-hidden="true"
         />
-        <span v-if="tomatoOverflow > 0" aria-hidden="true">{{ overflowText }}</span>
+        <span v-if="tomatoOverflow > 0" class="leading-none" aria-hidden="true">{{
+          overflowText
+        }}</span>
       </span>
       <span v-if="focusTimeText" class="flex items-center gap-1">
         <AppIcon name="timer" :size="22" class="flex-shrink-0" />
