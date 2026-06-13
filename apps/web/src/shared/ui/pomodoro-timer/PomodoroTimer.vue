@@ -6,6 +6,7 @@ import { useRecordFocus } from '@/shared/api'
 import { usePomodoro } from '@/shared/lib/usePomodoro'
 import { formatFocusDuration } from '@/shared/lib/formatFocus'
 import { playChime } from '@/shared/lib/chime'
+import { notifyTimerEnd } from '@/shared/lib/notifyTimerEnd'
 
 const props = defineProps<{
   taskId: string
@@ -26,6 +27,7 @@ function handleFlush(seconds: number, pomodoro?: boolean) {
 function handleComplete() {
   playChime()
   navigator.vibrate?.([200, 100, 200])
+  void notifyTimerEnd(t('do.pomodoro.notifyTitle'), t('do.pomodoro.notifyBody'))
 
   if (!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
     rippling.value = true

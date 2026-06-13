@@ -2,9 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import PomodoroTimer from './PomodoroTimer.vue'
 
-const { mockRecordFocus, mockPlayChime } = vi.hoisted(() => ({
+const { mockRecordFocus, mockPlayChime, mockNotifyTimerEnd } = vi.hoisted(() => ({
   mockRecordFocus: vi.fn(),
   mockPlayChime: vi.fn(),
+  mockNotifyTimerEnd: vi.fn(),
 }))
 
 vi.mock('@/shared/api', () => ({
@@ -12,6 +13,8 @@ vi.mock('@/shared/api', () => ({
 }))
 
 vi.mock('@/shared/lib/chime', () => ({ playChime: mockPlayChime }))
+
+vi.mock('@/shared/lib/notifyTimerEnd', () => ({ notifyTimerEnd: mockNotifyTimerEnd }))
 
 vi.mock('@/shared/lib/formatFocus', () => ({
   formatFocusDuration: (seconds: number) => `${Math.floor(seconds / 60)} мин`,
@@ -64,6 +67,7 @@ describe('PomodoroTimer', () => {
     motionAllowed()
     mockRecordFocus.mockReset()
     mockPlayChime.mockReset()
+    mockNotifyTimerEnd.mockReset()
   })
 
   afterEach(() => {
@@ -159,6 +163,14 @@ describe('PomodoroTimer', () => {
     vi.advanceTimersByTime(1500 * 1000)
     await flushPromises()
     expect(mockPlayChime).toHaveBeenCalled()
+  })
+
+  it('fires a timer-end notification on completion', async () => {
+    const wrapper = mountTimer()
+    await wrapper.find('[aria-label="Старт"]').trigger('click')
+    vi.advanceTimersByTime(1500 * 1000)
+    await flushPromises()
+    expect(mockNotifyTimerEnd).toHaveBeenCalled()
   })
 
   it('calls recordFocus with elapsed seconds on pause', async () => {
