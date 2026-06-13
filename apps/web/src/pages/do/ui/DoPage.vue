@@ -196,7 +196,7 @@ function goBack() {
       </div>
 
       <div
-        class="flex flex-col gap-3"
+        class="mt-auto flex flex-col gap-3 pt-8"
         style="padding-bottom: calc(2rem + env(safe-area-inset-bottom))"
       >
         <AppButton variant="primary" class="w-full !py-4 !text-base" @click="handleDone">
