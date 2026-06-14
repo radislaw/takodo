@@ -35,13 +35,13 @@
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
-  /* Logo gradient — follows theme accent automatically.
-     Override per [data-theme] if needed.                           */
-  --logo-start: var(--sage-deep); /* body / bottom — darker accent  */
-  --logo-end: var(--sage); /* head / top — lighter accent          */
-  --logo-accent: var(--apricot); /* arc + bar — reward pop          */
-  --logo-secondary: var(--sage-press); /* tail curl — mid accent    */
-  --logo-eye: var(--sage-deep); /* eye dots                         */
+  /* Logo gradient — dark→light using color-mix, auto-adapts per theme.
+     color-mix creates real contrast without per-theme overrides.     */
+  --logo-start: color-mix(in srgb, var(--sage) 70%, black); /* dark end   */
+  --logo-end: color-mix(in srgb, var(--sage) 25%, white); /* light end  */
+  --logo-accent: var(--apricot);
+  --logo-secondary: color-mix(in srgb, var(--sage) 55%, black);
+  --logo-eye: color-mix(in srgb, var(--sage) 65%, black);
 
   /* Nav background — frosted, auto-adapts to each theme via --card */
   --nav-bg: color-mix(in srgb, var(--card) 80%, transparent);
