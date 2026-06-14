@@ -130,6 +130,7 @@ const typeClasses = [
 ]
 </script>
 
+<!-- eslint-disable @intlify/vue-i18n/no-raw-text -->
 <template>
   <div class="page surface-app" :data-theme="activeTheme || undefined">
     <header class="page-header surface-card">
@@ -152,6 +153,67 @@ const typeClasses = [
     </header>
 
     <main class="page-content">
+      <!-- Logo -->
+      <section class="token-section">
+        <h2 class="ad-h4 section-title">Logo mark</h2>
+        <p class="ad-sm section-note">
+          AppLogoMark — inline SVG, тема-адаптивный градиент через <code>--logo-*</code> +
+          <code>color-mix</code>.
+        </p>
+        <div class="logo-backgrounds">
+          <div class="logo-bg-cell" style="background: var(--card); border: 1px solid var(--line)">
+            <AppLogoMark :size="120" />
+            <code class="swatch-label">--card</code>
+          </div>
+          <div
+            class="logo-bg-cell"
+            style="background: var(--cream-deep); border: 1px solid var(--line)"
+          >
+            <AppLogoMark :size="120" />
+            <code class="swatch-label">--cream-deep</code>
+          </div>
+          <div class="logo-bg-cell" style="background: var(--sage-deep)">
+            <AppLogoMark :size="120" :light="true" />
+            <code class="swatch-label" style="color: rgba(255, 255, 255, 0.6)"
+              >--sage-deep (light)</code
+            >
+          </div>
+          <div class="logo-bg-cell" style="background: #1a1a1a">
+            <AppLogoMark :size="120" :light="true" />
+            <code class="swatch-label" style="color: rgba(255, 255, 255, 0.5)"
+              >#1a1a1a (light)</code
+            >
+          </div>
+        </div>
+        <div class="logo-sizes">
+          <div v-for="sz in [16, 20, 24, 28, 32, 48, 64, 96]" :key="sz" class="logo-size-cell">
+            <AppLogoMark :size="sz" />
+            <code class="swatch-label">{{ sz }}px</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- App Icons -->
+      <section class="token-section">
+        <h2 class="ad-h4 section-title">App icons</h2>
+        <p class="ad-sm section-note">
+          <code>public/logo.svg</code> — 1024×1024, rx=200, используется для favicon и иконок
+          приложения.
+        </p>
+        <div class="icon-grid">
+          <div v-for="sz in [16, 32, 48, 64, 128, 256, 512]" :key="sz" class="icon-cell">
+            <img src="/logo.svg" :width="sz" :height="sz" alt="TakoDo icon" class="icon-img" />
+            <code class="swatch-label">{{ sz }}×{{ sz }}</code>
+          </div>
+        </div>
+        <div class="favicon-row">
+          <div class="icon-cell">
+            <img src="/favicon.ico" width="32" height="32" alt="favicon" class="icon-img" />
+            <code class="swatch-label">favicon.ico</code>
+          </div>
+        </div>
+      </section>
+
       <!-- Surfaces -->
       <section class="token-section">
         <h2 class="ad-h4 section-title">{{ t('design.tokens.section.surfaces') }}</h2>
@@ -479,5 +541,73 @@ const typeClasses = [
   color: var(--ink-soft);
   min-width: 120px;
   flex-shrink: 0;
+}
+
+/* Logo */
+.logo-backgrounds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+}
+
+.logo-bg-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-6);
+  border-radius: var(--r-lg);
+  min-width: 180px;
+}
+
+.logo-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-5);
+  padding: var(--s-4);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.logo-size-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+/* App Icons */
+.icon-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-5);
+  padding: var(--s-4);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.icon-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.icon-img {
+  border-radius: 22%;
+  display: block;
+}
+
+.favicon-row {
+  display: flex;
+  gap: var(--s-4);
+  padding: var(--s-4);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
 }
 </style>
