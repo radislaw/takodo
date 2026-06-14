@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TokenSwatch from './TokenSwatch.vue'
+import AppLogoMark from '@/shared/ui/logo-mark/AppLogoMark.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -9,8 +10,8 @@ const pangram = computed(() => t('design.tokens.pangram'))
 
 const themes = [
   { id: '', label: 'Sage' },
-  { id: 'light', label: 'Light Glass' },
-  { id: 'dark', label: 'Dark Glass' },
+  { id: 'light', label: 'Light' },
+  { id: 'dark', label: 'Dark' },
   { id: 'forest', label: 'Forest' },
   { id: 'lavender', label: 'Lavender' },
   { id: 'lavender-dark', label: 'Lavender Dark' },
@@ -132,7 +133,10 @@ const typeClasses = [
 <template>
   <div class="page surface-app" :data-theme="activeTheme || undefined">
     <header class="page-header surface-card">
-      <h1 class="ad-h2">{{ t('design.tokens.pageTitle') }}</h1>
+      <div class="header-title">
+        <AppLogoMark :size="40" />
+        <h1 class="ad-h2">{{ t('design.tokens.pageTitle') }}</h1>
+      </div>
       <div class="theme-switcher">
         <button
           v-for="thm in themes"
@@ -338,6 +342,12 @@ const typeClasses = [
   align-items: center;
   gap: var(--s-6);
   flex-wrap: wrap;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
 }
 
 .theme-switcher {
