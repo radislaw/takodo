@@ -253,7 +253,8 @@
       "languages": {
         "ru": "Русский",
         "en": "English"
-      }
+      },
+      "timezone": "Часовой пояс"
     },
     "survey": {
       "label": "О тебе",
@@ -265,8 +266,6 @@
         "male": "Мужской"
       },
       "birthDate": "Дата рождения",
-      "timezone": "Часовой пояс",
-      "timezonePlaceholder": "Например, Europe/Moscow",
       "adhd": "СДВГ",
       "adhdOptions": {
         "diagnosed": "Есть диагноз",
@@ -286,6 +285,7 @@
       },
       "ratingStar": "Оценка {n} из 5",
       "messagePlaceholder": "Напиши, что думаешь...",
+      "charCount": "{n} / 5000",
       "submit": "Отправить",
       "success": "Спасибо! Мы получили твоё сообщение"
     }
