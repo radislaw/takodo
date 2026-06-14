@@ -200,9 +200,23 @@ const typeClasses = [
           <code>public/logo.svg</code> — 1024×1024, rx=200, используется для favicon и иконок
           приложения.
         </p>
+        <h3 class="ad-sm icon-variant-title">Light</h3>
         <div class="icon-grid">
           <div v-for="sz in [16, 32, 48, 64, 128, 256, 512]" :key="sz" class="icon-cell">
             <img src="/logo.svg" :width="sz" :height="sz" alt="TakoDo icon" class="icon-img" />
+            <code class="swatch-label">{{ sz }}×{{ sz }}</code>
+          </div>
+        </div>
+        <h3 class="ad-sm icon-variant-title">Dark (prefers-color-scheme: dark)</h3>
+        <div class="icon-grid">
+          <div v-for="sz in [16, 32, 48, 64, 128, 256, 512]" :key="`d-${sz}`" class="icon-cell">
+            <img
+              src="/logo-dark.svg"
+              :width="sz"
+              :height="sz"
+              alt="TakoDo icon dark"
+              class="icon-img"
+            />
             <code class="swatch-label">{{ sz }}×{{ sz }}</code>
           </div>
         </div>
@@ -210,6 +224,16 @@ const typeClasses = [
           <div class="icon-cell">
             <img src="/favicon.ico" width="32" height="32" alt="favicon" class="icon-img" />
             <code class="swatch-label">favicon.ico</code>
+          </div>
+          <div class="icon-cell">
+            <img
+              src="/favicon-dark.ico"
+              width="32"
+              height="32"
+              alt="favicon dark"
+              class="icon-img"
+            />
+            <code class="swatch-label">favicon-dark.ico</code>
           </div>
         </div>
       </section>
@@ -579,6 +603,11 @@ const typeClasses = [
 }
 
 /* App Icons */
+.icon-variant-title {
+  margin: var(--s-4) 0 var(--s-2);
+  color: var(--ink-soft);
+}
+
 .icon-grid {
   display: flex;
   flex-wrap: wrap;
@@ -588,6 +617,11 @@ const typeClasses = [
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
+}
+
+/* dark icon variant always previews on a dark plate */
+.icon-grid:has(img[src='/logo-dark.svg']) {
+  background: #14101f;
 }
 
 .icon-cell {

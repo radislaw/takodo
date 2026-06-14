@@ -352,8 +352,10 @@
    Opt in with <element data-theme="cyberpunk">.
    ============================================================ */
 [data-theme='cyberpunk'] {
-  --logo-start: #2e68ec;
-  --logo-end: #34e2ff;
+  /* logo mirrors --reward-fill (violet → hot red); eyes neon red */
+  --logo-end: #9d3dff; /* offset 0 — top-left */
+  --logo-start: #ff2d5e; /* offset 1 — bottom-right */
+  --logo-eye-override: #ff1f4a;
   --logo-accent: #ff00aa;
   /* Surfaces — deep blue-violet void with a vertical gradient */
   --cream: radial-gradient(120% 90% at 15% -5%, #14082a 0%, #0a0820 45%, #06050f 100%);
