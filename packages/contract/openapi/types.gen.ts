@@ -37,6 +37,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/daily/{date}/done": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Log an already-done task: creates a done task + entry on this day. Counts toward stats. */
+        post: operations["Daily_logDone"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/daily/{date}/entries": {
         parameters: {
             query?: never;
@@ -80,6 +97,23 @@ export interface paths {
         put?: never;
         /** @description Move an entry from this day to tomorrow atomically. Increments the user's gentleMoves counter. */
         post: operations["Daily_moveToTomorrow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/daily/{date}/note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Set the day's journal note. Creates the day if missing. */
+        put: operations["Daily_setNote"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -407,6 +441,12 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             entries: components["schemas"]["DailyEntry"][];
+            /** @description Free-text journal of the day's thoughts and events. */
+            note?: string;
+        };
+        /** @description Set the day's free-text journal note. */
+        DailyNoteUpdate: {
+            note: string;
         };
         /** @description One day cell in the weekly streak strip. */
         DayActivity: {
@@ -483,6 +523,10 @@ export interface components {
              * @description Highest single-day count in the window (for intensity scaling); 0 if empty.
              */
             max: number;
+        };
+        /** @description Log a task that was already done but never added to the list. */
+        LogDoneEntry: {
+            title: string;
         };
         Profile: {
             /** @description Display name used in the greeting. */
@@ -738,6 +782,41 @@ export interface operations {
             };
         };
     };
+    Daily_logDone: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LogDoneEntry"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DailyEntry"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
     Daily_addEntry: {
         parameters: {
             query?: never;
@@ -858,6 +937,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DailyEntry"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Daily_setNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DailyNoteUpdate"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DailyListDetail"];
                 };
             };
             /** @description An unexpected error response. */

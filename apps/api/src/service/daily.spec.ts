@@ -12,6 +12,7 @@ function makeList(overrides: Partial<DailyList> = {}): DailyList {
     id: 'list-1',
     userId: 'user-1',
     date: new Date('2024-01-15T00:00:00.000Z'),
+    note: null,
     createdAt: new Date('2024-01-15T00:00:00.000Z'),
     ...overrides,
   }
@@ -307,6 +308,91 @@ describe('Daily routes', () => {
           data: expect.objectContaining({ gentleMoves: { increment: 1 } }),
         }),
       )
+    })
+  })
+
+  describe('PUT /daily/:date/note', () => {
+    it('upserts the day and stores the note', async () => {
+      const updated = { ...makeList({ note: 'Good day' }), entries: [] }
+      prisma.dailyList.upsert.mockResolvedValue(
+        updated as Parameters<typeof prisma.dailyList.upsert.mockResolvedValue>[0],
+      )
+      const res = await app.inject({
+        method: 'PUT',
+        url: '/daily/2024-01-15/note',
+        payload: { note: 'Good day' },
+      })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as { note: string; entries: unknown[] }
+      expect(body.note).toBe('Good day')
+      expect(prisma.dailyList.upsert).toHaveBeenCalled()
+    })
+
+    it('rejects a note over 5000 chars (contract maxLength)', async () => {
+      const res = await app.inject({
+        method: 'PUT',
+        url: '/daily/2024-01-15/note',
+        payload: { note: 'x'.repeat(5001) },
+      })
+      expect(res.statusCode).toBe(400)
+    })
+  })
+
+  describe('POST /daily/:date/done', () => {
+    it('creates a done task + entry on the day', async () => {
+      prisma.dailyList.upsert.mockResolvedValue(makeList())
+      prisma.dailyEntry.findFirst.mockResolvedValue(null)
+      const doneTask = makeTask({ id: 'task-9', status: 'done', completedAt: new Date() })
+      prisma.task.create.mockResolvedValue(doneTask)
+      prisma.dailyEntry.create.mockResolvedValue(makeEntry({ id: 'entry-9', taskId: 'task-9' }))
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/done',
+        payload: { title: 'Washed the dishes' },
+      })
+      expect(res.statusCode).toBe(200)
+      const body = res.json() as { id: string; taskId: string }
+      expect(body.taskId).toBe('task-9')
+      // task persisted as already-done so it counts toward heatmap/XP
+      expect(prisma.task.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: 'done', completedAt: expect.any(Date) }),
+        }),
+      )
+    })
+
+    it('uses $transaction', async () => {
+      prisma.dailyList.upsert.mockResolvedValue(makeList())
+      prisma.dailyEntry.findFirst.mockResolvedValue(null)
+      prisma.task.create.mockResolvedValue(
+        makeTask({ id: 'task-9', status: 'done', completedAt: new Date() }),
+      )
+      prisma.dailyEntry.create.mockResolvedValue(makeEntry({ id: 'entry-9', taskId: 'task-9' }))
+      await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/done',
+        payload: { title: 'Washed the dishes' },
+      })
+      expect(prisma.$transaction).toHaveBeenCalledOnce()
+    })
+
+    it('rejects a title over 500 chars (contract maxLength)', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/done',
+        payload: { title: 'x'.repeat(501) },
+      })
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('rejects an empty title', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/done',
+        payload: {},
+      })
+      expect(res.statusCode).toBe(400)
     })
   })
 })

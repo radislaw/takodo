@@ -4,6 +4,8 @@ export {
   useMoveToTomorrow,
   useUpdateDailyEntry,
   useRemoveDailyEntry,
+  useUpdateDailyNote,
+  useLogDoneTask,
   todayDate,
   fetchDailyByDate,
 } from './daily'

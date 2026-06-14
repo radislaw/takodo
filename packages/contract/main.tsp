@@ -174,6 +174,9 @@ model DailyList {
 model DailyListDetail {
   ...DailyList;
   entries: DailyEntry[];
+
+  /** Free-text journal of the day's thoughts and events. */
+  note?: string;
 }
 
 model DailyListCreate {
@@ -187,6 +190,16 @@ model AddEntry {
 model EntryUpdate {
   isMIT?: boolean;
   order?: int32;
+}
+
+/** Set the day's free-text journal note. */
+model DailyNoteUpdate {
+  @maxLength(5000) note: string;
+}
+
+/** Log a task that was already done but never added to the list. */
+model LogDoneEntry {
+  @maxLength(500) title: string;
 }
 
 @route("/daily")
@@ -217,6 +230,18 @@ interface Daily {
   @route("/{date}/entries/{entryId}/move-to-tomorrow") @post moveToTomorrow(
     @path date: plainDate,
     @path entryId: string,
+  ): DailyEntry | ApiError;
+
+  /** Set the day's journal note. Creates the day if missing. */
+  @route("/{date}/note") @put setNote(
+    @path date: plainDate,
+    @body body: DailyNoteUpdate,
+  ): DailyListDetail | ApiError;
+
+  /** Log an already-done task: creates a done task + entry on this day. Counts toward stats. */
+  @route("/{date}/done") @post logDone(
+    @path date: plainDate,
+    @body body: LogDoneEntry,
   ): DailyEntry | ApiError;
 }
 

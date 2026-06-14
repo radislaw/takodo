@@ -32,6 +32,7 @@ import ComebackBanner from './ComebackBanner.vue'
 import BrainDumpBar from './BrainDumpBar.vue'
 import FocusNowCard from './FocusNowCard.vue'
 import CategoriesCard from './CategoriesCard.vue'
+import EveningJournal from './EveningJournal.vue'
 import { SoftNote } from '@/shared/ui'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -379,6 +380,9 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
           <div class="mt-5">
             <QuestPanel />
           </div>
+
+          <!-- Evening journal: log already-done tasks + thoughts of the day -->
+          <EveningJournal />
 
           <!-- Gentle note (mobile/tablet) -->
           <SoftNote class="mt-5 lg:hidden">{{ t('rewards.gentleNote') }}</SoftNote>

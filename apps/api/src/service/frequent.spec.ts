@@ -31,6 +31,7 @@ function makeList(id: string, entries: DailyEntry[]): DailyList & { entries: Dai
     id,
     userId: 'user-1',
     date: new Date(`2024-01-0${id.slice(-1)}T00:00:00Z`),
+    note: null,
     createdAt: new Date('2024-01-01T00:00:00Z'),
     entries,
   }

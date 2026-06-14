@@ -61,6 +61,38 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       tags:
         - Daily
+  /daily/{date}/done:
+    post:
+      operationId: Daily_logDone
+      description: 'Log an already-done task: creates a done task + entry on this day. Counts toward stats.'
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyEntry'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogDoneEntry'
   /daily/{date}/entries:
     post:
       operationId: Daily_addEntry
@@ -184,6 +216,38 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       tags:
         - Daily
+  /daily/{date}/note:
+    put:
+      operationId: Daily_setNote
+      description: Set the day's journal note. Creates the day if missing.
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyListDetail'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DailyNoteUpdate'
   /feedback:
     post:
       operationId: FeedbackApi_create
@@ -776,6 +840,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DailyEntry'
+        note:
+          type: string
+          description: Free-text journal of the day's thoughts and events.
+    DailyNoteUpdate:
+      type: object
+      required:
+        - note
+      properties:
+        note:
+          type: string
+          maxLength: 5000
+      description: Set the day's free-text journal note.
     DayActivity:
       type: object
       required:
@@ -906,6 +982,15 @@ components:
           format: int32
           description: Highest single-day count in the window (for intensity scaling); 0 if empty.
       description: GitHub-style activity grid, oldest→newest, Monday-aligned.
+    LogDoneEntry:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          maxLength: 500
+      description: Log a task that was already done but never added to the list.
     Profile:
       type: object
       required:
