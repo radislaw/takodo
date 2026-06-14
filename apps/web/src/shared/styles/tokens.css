@@ -37,8 +37,8 @@
 
   /* Logo gradient — vivid explicit pairs per theme; secondary/eye derive from start.
      Default: deep teal → vivid cyan-teal (analogous to original blue gradient). */
-  --logo-start: #1b4d44;
-  --logo-end: #5ec5b8;
+  --logo-start: #2e9d8b;
+  --logo-end: #9af0e2;
   --logo-accent: var(--apricot);
   --logo-secondary: color-mix(in srgb, var(--logo-start) 80%, black);
   --logo-eye: color-mix(in srgb, var(--logo-start) 90%, black);
@@ -146,8 +146,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #0d2a18;
-  --logo-end: #4aaa7a;
+  --logo-start: #239a58;
+  --logo-end: #74e09c;
   /* Surfaces — warm dark pine gradient */
   --cream: linear-gradient(
     165deg,
@@ -216,8 +216,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #2a1565;
-  --logo-end: #9878e8;
+  --logo-start: #6e4ad8;
+  --logo-end: #bea4f8;
   /* Surfaces — soft lavender gradient */
   --cream: linear-gradient(
     165deg,
@@ -285,8 +285,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #180d45;
-  --logo-end: #8060d4;
+  --logo-start: #6244c4;
+  --logo-end: #b298f2;
   /* Surfaces — deep plum gradient */
   --cream: linear-gradient(
     165deg,
@@ -352,8 +352,8 @@
    Opt in with <element data-theme="cyberpunk">.
    ============================================================ */
 [data-theme='cyberpunk'] {
-  --logo-start: #050025;
-  --logo-end: #00d4ff;
+  --logo-start: #2e68ec;
+  --logo-end: #34e2ff;
   --logo-accent: #ff00aa;
   /* Surfaces — deep blue-violet void with a vertical gradient */
   --cream: radial-gradient(120% 90% at 15% -5%, #14082a 0%, #0a0820 45%, #06050f 100%);
@@ -427,8 +427,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #001122;
-  --logo-end: #0055cc;
+  --logo-start: #0a48c8;
+  --logo-end: #3e94fa;
   /* Surfaces — pure white, light recess */
   --cream: #ffffff;
   --cream-deep: #ededed;
@@ -496,8 +496,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #000000;
-  --logo-end: #4488ff;
+  --logo-start: #1c54d4;
+  --logo-end: #70acff;
   /* Surfaces — pure black, dark recess */
   --cream: #000000;
   --cream-deep: #1a1a1a;
@@ -566,8 +566,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #1a3a60;
-  --logo-end: #60b4e8;
+  --logo-start: #2c70bc;
+  --logo-end: #88c8f6;
   /* Surfaces — sky mist gradient */
   --cream: linear-gradient(
     165deg,
@@ -640,8 +640,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #051a5c;
-  --logo-end: #38a0e0;
+  --logo-start: #1c64c4;
+  --logo-end: #5ab8ee;
   /* Surfaces — coastal seafoam gradient */
   --cream: linear-gradient(
     165deg,
@@ -714,8 +714,8 @@
   /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #103820;
-  --logo-end: #50c870;
+  --logo-start: #239a54;
+  --logo-end: #78e098;
   /* Surfaces — botanical paper gradient */
   --cream: linear-gradient(165deg, #dde8d2 0%, #eff0e6 28%, #f5f2e4 55%, #e2edd6 82%, #ebeedc 100%);
   --cream-deep: #e3e6da;
@@ -782,8 +782,8 @@
 [data-theme='silent'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #28283a;
-  --logo-end: #8888a8;
+  --logo-start: #50506e;
+  --logo-end: #aaaace;
 
   /* Surfaces — near-monochrome gradient, barely perceptible warmth */
   --cream: linear-gradient(165deg, #eae9e6 0%, #f4f2ef 28%, #f2f0ed 55%, #e8e7e4 82%, #f0edea 100%);
@@ -850,8 +850,8 @@
 [data-theme='amber'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #4a2200;
-  --logo-end: #e88c18;
+  --logo-start: #c47414;
+  --logo-end: #f6b850;
 
   /* Surfaces — dark amber gradient */
   --cream: linear-gradient(165deg, #161008 0%, #201808 28%, #281600 55%, #1a1006 82%, #201808 100%);
@@ -919,8 +919,8 @@
 [data-theme='amoled'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #000520;
-  --logo-end: #2860ff;
+  --logo-start: #2058ec;
+  --logo-end: #6c9cff;
 
   /* Surfaces — true black + near-black cards */
   --cream: #000000;
@@ -991,8 +991,8 @@
 [data-theme='light'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #1028a0;
-  --logo-end: #60b0f0;
+  --logo-start: #2454d4;
+  --logo-end: #78bcf6;
 
   /* Surfaces — aurora wash behind the glass */
   --cream: linear-gradient(165deg, #dceaff 0%, #e8e2fb 28%, #fbe3ef 55%, #dff0f4 82%, #e3ecfd 100%);
@@ -1073,8 +1073,8 @@
 [data-theme='dark'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
-  --logo-start: #081860;
-  --logo-end: #4090e8;
+  --logo-start: #1c5cc8;
+  --logo-end: #6cb0ee;
 
   /* Surfaces — night aurora behind the glass */
   --cream: linear-gradient(165deg, #131a2e 0%, #1d1733 28%, #261632 55%, #122230 82%, #141c32 100%);
