@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
 import { apiClient } from '@/api/client'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
+import { useReward } from '@/shared/lib/useReward'
 
 export function todayDate(timeZone?: string): string {
   const tz = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -19,6 +20,7 @@ export async function fetchDailyByDate(date: string) {
     return {
       ...created,
       entries: [] as { id: string; taskId: string; isMIT: boolean; order: number }[],
+      note: undefined as string | undefined,
     }
   }
   return data!
@@ -117,6 +119,59 @@ export function useMoveToTomorrow() {
       queryCache.invalidateQueries({ key: ['daily', today], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
       queryCache.invalidateQueries({ key: ['rewards'], exact: false })
+    },
+  })
+}
+
+export function useUpdateDailyNote() {
+  const queryCache = useQueryCache()
+  const { showError } = useErrorToast()
+  const date = todayDate()
+  return useMutation({
+    mutation: async (note: string) => {
+      const { data, error } = await apiClient.PUT('/daily/{date}/note', {
+        params: { path: { date } },
+        body: { note },
+      })
+      if (error) throw new Error(error.message)
+      return data!
+    },
+    onError: () => {
+      showError('errors.saveFailed')
+    },
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: ['daily', date], exact: true })
+    },
+  })
+}
+
+export function useLogDoneTask() {
+  const queryCache = useQueryCache()
+  const { showError } = useErrorToast()
+  const { celebrate } = useReward()
+  const date = todayDate()
+  return useMutation({
+    mutation: async (title: string) => {
+      const { data, error } = await apiClient.POST('/daily/{date}/done', {
+        params: { path: { date } },
+        body: { title },
+      })
+      if (error) throw new Error(error.message)
+      return data!
+    },
+    onSuccess: () => {
+      // Logging an already-done task earns the same dopamine burst as completing one.
+      celebrate()
+    },
+    onError: () => {
+      showError('errors.saveFailed')
+    },
+    onSettled: () => {
+      // A done task counts toward stats — refresh rewards/quests alongside the day.
+      queryCache.invalidateQueries({ key: ['daily', date], exact: true })
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
+      queryCache.invalidateQueries({ key: ['quests'], exact: false })
     },
   })
 }
