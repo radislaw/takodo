@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppIcon } from '@/shared/ui'
 import { useProfile, useUpdateProfile, useRewards, useNotifications } from '@/shared/api'
 import { isThemeUnlocked, themeUnlockLevel } from '@/shared/lib/unlocks'
+import { TIMEZONE_IDS, detectTimezone, formatTimezoneLabel } from '@/shared/lib/timezones'
 import ThemeSwatch from './ThemeSwatch.vue'
 import ProfileSurvey from './ProfileSurvey.vue'
 import ProfileFeedback from './ProfileFeedback.vue'
@@ -14,6 +15,28 @@ const { mutate: updateProfile } = useUpdateProfile()
 const { data: rewards } = useRewards()
 
 const level = computed(() => rewards.value?.level ?? 1)
+
+// Timezone: friendly select; auto-detect and persist once when the user has none.
+const detectedTz = detectTimezone()
+const currentTz = computed(() => profile.value?.timezone ?? detectedTz ?? '')
+const timezoneOptions = computed(() => {
+  const ids = [...TIMEZONE_IDS] as string[]
+  if (currentTz.value && !ids.includes(currentTz.value)) ids.unshift(currentTz.value)
+  return ids.map((id) => ({ id, label: formatTimezoneLabel(id) }))
+})
+
+let autoSetTz = false
+watch(
+  profile,
+  (p) => {
+    if (autoSetTz || !p) return
+    if (!p.timezone && detectedTz) {
+      autoSetTz = true
+      updateProfile({ timezone: detectedTz })
+    }
+  },
+  { immediate: true },
+)
 
 function isLocked(id: string): boolean {
   return !isThemeUnlocked(id, level.value)
@@ -190,54 +213,17 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
 
           <!-- Timezone -->
           <label class="flex flex-col gap-1.5">
-            <span class="text-ink text-xs font-semibold">{{ t('profile.survey.timezone') }}</span>
-            <input
+            <span class="text-ink text-xs font-semibold">{{ t('profile.settings.timezone') }}</span>
+            <select
               data-test="settings-timezone"
-              type="text"
-              list="tz-list-settings"
-              maxlength="100"
-              :placeholder="t('profile.survey.timezonePlaceholder')"
               class="border-line surface-app text-ink rounded-xl border px-3 py-2.5 text-sm"
-              :value="profile?.timezone ?? ''"
-              @change="
-                (e) => {
-                  const v = (e.target as HTMLInputElement).value.trim()
-                  if (v) updateProfile({ timezone: v })
-                }
-              "
-            />
-            <datalist id="tz-list-settings">
-              <option value="Europe/Moscow" />
-              <option value="Europe/Samara" />
-              <option value="Asia/Yekaterinburg" />
-              <option value="Asia/Omsk" />
-              <option value="Asia/Krasnoyarsk" />
-              <option value="Asia/Irkutsk" />
-              <option value="Asia/Yakutsk" />
-              <option value="Asia/Vladivostok" />
-              <option value="Asia/Magadan" />
-              <option value="Asia/Kamchatka" />
-              <option value="Europe/Kaliningrad" />
-              <option value="Europe/Minsk" />
-              <option value="Europe/Kiev" />
-              <option value="Asia/Tbilisi" />
-              <option value="Asia/Yerevan" />
-              <option value="Asia/Baku" />
-              <option value="Asia/Tashkent" />
-              <option value="Asia/Almaty" />
-              <option value="UTC" />
-              <option value="Europe/London" />
-              <option value="Europe/Berlin" />
-              <option value="Europe/Paris" />
-              <option value="America/New_York" />
-              <option value="America/Chicago" />
-              <option value="America/Los_Angeles" />
-              <option value="Asia/Dubai" />
-              <option value="Asia/Kolkata" />
-              <option value="Asia/Shanghai" />
-              <option value="Asia/Tokyo" />
-              <option value="Australia/Sydney" />
-            </datalist>
+              :value="currentTz"
+              @change="(e) => updateProfile({ timezone: (e.target as HTMLSelectElement).value })"
+            >
+              <option v-for="tz in timezoneOptions" :key="tz.id" :value="tz.id">
+                {{ tz.label }}
+              </option>
+            </select>
           </label>
         </div>
       </div>

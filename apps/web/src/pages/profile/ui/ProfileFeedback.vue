@@ -73,7 +73,7 @@ async function submit() {
         :class="star <= rating ? 'text-reward' : 'text-ink-faint'"
         @click="rating = star"
       >
-        <AppIcon name="flame" :size="22" />
+        <AppIcon name="star" :size="22" :fill="star <= rating ? 'currentColor' : 'none'" />
       </button>
     </div>
 
@@ -86,6 +86,9 @@ async function submit() {
       :placeholder="t('profile.feedback.messagePlaceholder')"
       class="border-line surface-app text-ink w-full resize-none rounded-xl border px-3 py-2.5 text-sm"
     />
+    <div class="text-ink-faint mt-1 text-right text-xs" data-test="feedback-char-count">
+      {{ t('profile.feedback.charCount', { n: message.length }) }}
+    </div>
 
     <button
       type="button"
