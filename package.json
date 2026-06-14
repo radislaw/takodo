@@ -11,6 +11,8 @@
     "dev": "pnpm -r --parallel dev",
     "dev:web": "pnpm --filter @tootoo/web dev",
     "dev:api": "pnpm --filter @tootoo/api dev",
+    "desktop:dev": "pnpm --filter @tootoo/web tauri:dev",
+    "desktop:build": "pnpm --filter @tootoo/web tauri:build",
     "contract:build": "pnpm --filter @tootoo/contract build",
     "contract:watch": "pnpm --filter @tootoo/contract watch",
     "contract:gen": "openapi-typescript packages/contract/openapi/openapi.yaml -o packages/contract/openapi/types.gen.ts",
