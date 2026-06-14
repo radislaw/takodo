@@ -75,11 +75,11 @@ pnpm test:e2e          # Playwright smoke test
 Run a single test file:
 
 ```bash
-pnpm --filter @tootoo/web vitest run src/shared/ui/button/AppButton.spec.ts
-pnpm --filter @tootoo/api vitest run src/app.spec.ts
+pnpm --filter @takodo/web vitest run src/shared/ui/button/AppButton.spec.ts
+pnpm --filter @takodo/api vitest run src/app.spec.ts
 ```
 
-Dev DB bring-up: `docker compose up -d` → `pnpm --filter @tootoo/api db:push` → `pnpm --filter @tootoo/api db:seed`.
+Dev DB bring-up: `docker compose up -d` → `pnpm --filter @takodo/api db:push` → `pnpm --filter @takodo/api db:seed`.
 
 ## Single-contract rule
 

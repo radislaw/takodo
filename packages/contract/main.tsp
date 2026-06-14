@@ -3,12 +3,12 @@ import "@typespec/http";
 using Http;
 
 /**
- * tootoo API — the single source of truth contract.
+ * TakoDo API — the single source of truth contract.
  * Scope: Phase 0.4 — single-user, no auth.
  * Changes happen only here → regen OpenAPI/types. Do not edit generated output by hand.
  */
-@service(#{ title: "tootoo API" })
-namespace Tootoo;
+@service(#{ title: "TakoDo API" })
+namespace Takodo;
 
 // ─── Enums ──────────────────────────────────────────────────────
 

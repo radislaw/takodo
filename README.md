@@ -1,4 +1,4 @@
-# tootoo
+# TakoDo
 
 A todo app for people with ADHD: a daily brain dump plus recursive task splitting down to a level
 where the brain stops resisting. CBT mechanics + dopamine feedback.

@@ -1,4 +1,4 @@
-# tootoo — Roadmap
+# TakoDo — Roadmap
 
 Product: Todo app for people with ADHD. Core loop: **brain dump → recursive split → do-mode → reward**.
 

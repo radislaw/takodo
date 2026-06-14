@@ -1,5 +1,5 @@
 {
-  "name": "tootoo",
+  "name": "takodo",
   "version": "0.0.0",
   "private": true,
   "description": "ADHD-friendly todo app — monorepo (apps/web Vue, apps/api Fastify)",
@@ -9,12 +9,12 @@
   },
   "scripts": {
     "dev": "pnpm -r --parallel dev",
-    "dev:web": "pnpm --filter @tootoo/web dev",
-    "dev:api": "pnpm --filter @tootoo/api dev",
-    "desktop:dev": "pnpm --filter @tootoo/web tauri:dev",
-    "desktop:build": "pnpm --filter @tootoo/web tauri:build",
-    "contract:build": "pnpm --filter @tootoo/contract build",
-    "contract:watch": "pnpm --filter @tootoo/contract watch",
+    "dev:web": "pnpm --filter @takodo/web dev",
+    "dev:api": "pnpm --filter @takodo/api dev",
+    "desktop:dev": "pnpm --filter @takodo/web tauri:dev",
+    "desktop:build": "pnpm --filter @takodo/web tauri:build",
+    "contract:build": "pnpm --filter @takodo/contract build",
+    "contract:watch": "pnpm --filter @takodo/contract watch",
     "contract:gen": "openapi-typescript packages/contract/openapi/openapi.yaml -o packages/contract/openapi/types.gen.ts",
     "build": "pnpm -r build",
     "lint": "eslint .",
@@ -23,7 +23,7 @@
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "test:e2e": "pnpm --filter @tootoo/web test:e2e",
+    "test:e2e": "pnpm --filter @takodo/web test:e2e",
     "verify": "pnpm contract:build && pnpm contract:gen && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
   },
   "simple-git-hooks": {

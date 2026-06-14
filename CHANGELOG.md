@@ -1,12 +1,12 @@
 # Changelog
 
-All notable changes to tootoo are documented here.
+All notable changes to TakoDo are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
 - **Evening journal (Today)** — end-of-day "Итоги дня" card to capture what already happened. Log a task you did but never listed: `POST /daily/{date}/done` (`LogDoneEntry.title` `@maxLength(500)`) creates a `Task` as `status: done` + `completedAt: now` and an entry on the day, all in one `$transaction` — so it counts toward heatmap/streak/XP/quests exactly like a normal completion, and fires the same reward burst. Free-text day note: `DailyList.note` (nullable) + `PUT /daily/{date}/note` (`DailyNoteUpdate.note` `@maxLength(5000)`, upserts the day); `DailyListDetail` now carries `note`. Web: `useLogDoneTask` (invalidates daily/tasks/rewards/quests, calls `celebrate()`) and `useUpdateDailyNote`; `EveningJournal.vue` (done-log input + autosaving thoughts textarea with char counter, debounce + save-on-blur) slotted into `TodayPage` below the quests
-- **Tauri 2 desktop (macOS)** — `apps/web/src-tauri` wraps the existing Vue app in a native window via the system WebView (no Chromium bundle); zero UI rewrite, frontend reused as-is. `tauri.conf.json`: identifier `com.tootoo.app`, window 1200×820 (minWidth 380), `devUrl` :5173, `frontendDist ../dist`, `beforeDev/BuildCommand` wired to `pnpm dev`/`pnpm build`. Scripts: `tauri:dev`/`tauri:build` (web pkg), `desktop:dev`/`desktop:build` (root). App still talks to the API at `VITE_API_URL ?? http://localhost:3001` — fine on the dev machine; remote deploy + auth remain the blocker before distribution. Release `.app`/`.dmg` unsigned (Gatekeeper blocks on other Macs until an Apple Developer cert is added)
+- **Tauri 2 desktop (macOS)** — `apps/web/src-tauri` wraps the existing Vue app in a native window via the system WebView (no Chromium bundle); zero UI rewrite, frontend reused as-is. `tauri.conf.json`: identifier `com.takodo.app`, window 1200×820 (minWidth 380), `devUrl` :5173, `frontendDist ../dist`, `beforeDev/BuildCommand` wired to `pnpm dev`/`pnpm build`. Scripts: `tauri:dev`/`tauri:build` (web pkg), `desktop:dev`/`desktop:build` (root). App still talks to the API at `VITE_API_URL ?? http://localhost:3001` — fine on the dev machine; remote deploy + auth remain the blocker before distribution. Release `.app`/`.dmg` unsigned (Gatekeeper blocks on other Macs until an Apple Developer cert is added)
 - **Voluntary self-report survey** (Profile) — `gender` (female/male), `birthDate` (full date), `timezone` (IANA id with datalist), `adhdStatus` (diagnosed/suspected/no/na); all optional, persisted via `PATCH /me`; privacy notice; `Profile`/`ProfileUpdate` contract fields bounded with `@maxLength` (gender/adhdStatus 20, birthDate 10, timezone 100, language 5) so ajv rejects overlong values
 - **Feedback submission** — `Feedback` Prisma model (`kind`/`message`/`rating`/`status`, `@@index` on userId+status, `onDelete: Cascade`); `POST /feedback` (`FeedbackApi_create`, `kind` validated against review/wish/support, `message` `@maxLength(5000)`, optional 1–5 `rating`); `ProfileFeedback.vue` card (kind selector + star rating for reviews + textarea) wired to `useSubmitFeedback` with success/error toasts; `status` server-managed for the future admin triage view
 - **Profile settings card** — name + language selector (ru/en); `en` falls back to `ru` strings (only `ru.json` populated); `AppLayout` syncs `locale` from `profile.language`; timezone field grouped here
@@ -317,8 +317,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Git flow** — `main` / `develop` branches; conventional commits enforced
 - **CLAUDE.md** — project rules for AI agents
 
-[Unreleased]: https://github.com/radislavalilov/tootoo/compare/v0.4.0...HEAD
-[0.4.0]: https://github.com/radislavalilov/tootoo/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/radislavalilov/tootoo/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/radislavalilov/tootoo/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/radislavalilov/tootoo/releases/tag/v0.1.0
+[Unreleased]: https://github.com/radislaw/takodo/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/radislaw/takodo/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/radislaw/takodo/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/radislaw/takodo/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/radislaw/takodo/releases/tag/v0.1.0

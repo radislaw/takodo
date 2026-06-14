@@ -4,7 +4,7 @@ import { buildScheduler } from './service/push-scheduler.js'
 
 const PORT = Number(process.env.PORT ?? 3001)
 const HOST = process.env.HOST ?? '127.0.0.1'
-const SEED_EMAIL = process.env.SEED_USER_EMAIL ?? 'dev@tootoo.local'
+const SEED_EMAIL = process.env.SEED_USER_EMAIL ?? 'dev@takodo.local'
 
 let cachedUserId: string | null = null
 
@@ -13,7 +13,7 @@ async function getUserId(): Promise<string> {
   const user = await prisma.user.findUnique({ where: { email: SEED_EMAIL } })
   if (!user) {
     throw new Error(
-      `Seed user "${SEED_EMAIL}" not found — run \`pnpm --filter @tootoo/api db:seed\``,
+      `Seed user "${SEED_EMAIL}" not found — run \`pnpm --filter @takodo/api db:seed\``,
     )
   }
   cachedUserId = user.id
@@ -33,7 +33,7 @@ process.once('SIGTERM', () => void shutdown())
 
 try {
   const address = await app.listen({ port: PORT, host: HOST })
-  app.log.info(`tootoo API listening at ${address}`)
+  app.log.info(`TakoDo API listening at ${address}`)
 } catch (err) {
   app.log.error(err)
   process.exit(1)

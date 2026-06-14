@@ -17,7 +17,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm --filter @tootoo/web dev',
+    command: 'pnpm --filter @takodo/web dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,

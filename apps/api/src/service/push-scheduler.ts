@@ -3,7 +3,7 @@ import type { PrismaClient } from '@prisma/client'
 import { initVapid } from '../domain/push.js'
 import { sendPushToUser, pushEnabled } from './push.js'
 
-const VAPID_SUBJECT = 'mailto:hello@tootoo.app'
+const VAPID_SUBJECT = 'mailto:hello@takodo.app'
 
 // 9:00 AM UTC every day
 const MORNING_CRON = '0 9 * * *'
@@ -50,7 +50,7 @@ async function sendToOptedIn(
     if (!pushEnabled()) return
     const users = await prisma.user.findMany({ where: { [pref]: true } })
     // sendPushToUser never throws — safe to fan out.
-    await Promise.all(users.map((user) => sendPushToUser(prisma, user.id, 'tootoo', body, tag)))
+    await Promise.all(users.map((user) => sendPushToUser(prisma, user.id, 'TakoDo', body, tag)))
   } catch (error) {
     console.error(`Push cron job (${tag}) failed:`, error)
   }

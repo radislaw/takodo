@@ -1,6 +1,6 @@
 {
-  "name": "tootoo",
-  "short_name": "tootoo",
+  "name": "TakoDo",
+  "short_name": "TakoDo",
   "description": "Приложение задач для людей с ADHD — выгружай мысли, дели до атомарного уровня.",
   "start_url": "/today",
   "display": "standalone",
