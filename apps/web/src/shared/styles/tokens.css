@@ -35,13 +35,13 @@
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
 
-  /* Logo gradient — TakoDo brand blue palette (cyan → deep blue).
-     Themes may override to harmonise with their accent color.      */
-  --logo-start: #033ecd; /* deep blue  — body / bottom            */
-  --logo-end: #01a9ef; /* cyan-blue  — head / top highlight     */
-  --logo-accent: #03bede; /* bright cyan — arc + bar accent       */
-  --logo-secondary: #0342bd; /* mid-blue — tail curl              */
-  --logo-eye: #095db4; /* dark blue  — eye dots                 */
+  /* Logo gradient — follows theme accent automatically.
+     Override per [data-theme] if needed.                           */
+  --logo-start: var(--sage-deep); /* body / bottom — darker accent  */
+  --logo-end: var(--sage); /* head / top — lighter accent          */
+  --logo-accent: var(--apricot); /* arc + bar — reward pop          */
+  --logo-secondary: var(--sage-press); /* tail curl — mid accent    */
+  --logo-eye: var(--sage-deep); /* eye dots                         */
 
   /* Nav background — frosted, auto-adapts to each theme via --card */
   --nav-bg: color-mix(in srgb, var(--card) 80%, transparent);
