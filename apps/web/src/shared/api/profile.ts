@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
 import { apiClient } from '@/api/client'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
+import { hasSession } from '@/shared/lib/authStorage'
 type Theme =
   | 'light'
   | 'lavender'
@@ -22,6 +23,8 @@ type Theme =
 export function useProfile() {
   return useQuery({
     key: () => ['profile'],
+    // Don't hit protected endpoints before login (avoids 401 storms on /login).
+    enabled: () => hasSession(),
     query: async () => {
       const { data } = await apiClient.GET('/me')
       if (!data) throw new Error('Failed to fetch profile')

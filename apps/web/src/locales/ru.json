@@ -1,4 +1,43 @@
 {
+  "auth": {
+    "loginTitle": "С возвращением",
+    "loginSubtitle": "Войди, чтобы продолжить",
+    "signupTitle": "Создать аккаунт",
+    "signupSubtitle": "Пара секунд — и начнём",
+    "emailLabel": "Почта",
+    "emailPlaceholder": "you{'@'}example.com",
+    "passwordLabel": "Пароль",
+    "passwordPlaceholder": "Минимум 8 символов",
+    "nameLabel": "Имя",
+    "namePlaceholder": "Как тебя зовут",
+    "loginButton": "Войти",
+    "signupButton": "Зарегистрироваться",
+    "loggingIn": "Входим…",
+    "signingUp": "Создаём…",
+    "or": "или",
+    "noAccount": "Нет аккаунта?",
+    "haveAccount": "Уже есть аккаунт?",
+    "goSignup": "Зарегистрироваться",
+    "goLogin": "Войти",
+    "logout": "Выйти",
+    "continueWith": "Продолжить с {provider}",
+    "providers": {
+      "google": "Google",
+      "yandex": "Яндекс",
+      "apple": "Apple"
+    },
+    "callbackLoading": "Завершаем вход…",
+    "errors": {
+      "loginFailed": "Неверная почта или пароль",
+      "signupFailed": "Не получилось зарегистрироваться",
+      "oauthFailed": "Не удалось начать вход",
+      "callbackFailed": "Не удалось завершить вход",
+      "emailRequired": "Введи почту",
+      "emailInvalid": "Похоже, почта с опечаткой",
+      "passwordRequired": "Введи пароль",
+      "passwordTooShort": "Пароль — минимум 8 символов"
+    }
+  },
   "reward": {
     "praise": [
       "Супер!",

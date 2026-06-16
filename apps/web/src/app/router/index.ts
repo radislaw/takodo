@@ -1,10 +1,26 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import { hasSession } from '@/shared/lib/authStorage'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     redirect: '/today',
+  },
+  {
+    path: '/login',
+    meta: { chrome: false, public: true },
+    component: () => import('@/pages/login').then((m) => m.LoginPage),
+  },
+  {
+    path: '/signup',
+    meta: { chrome: false, public: true },
+    component: () => import('@/pages/login').then((m) => m.LoginPage),
+  },
+  {
+    path: '/auth/callback',
+    meta: { chrome: false, public: true },
+    component: () => import('@/pages/login').then((m) => m.OAuthCallbackPage),
   },
   {
     path: '/today',
@@ -55,4 +71,18 @@ export const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior: (_to, _from, savedPosition) => savedPosition ?? { top: 0 },
+})
+
+// Auth gate: unauthenticated users are sent to /login (keeping where they
+// were headed); authenticated users skip the auth pages.
+router.beforeEach((to) => {
+  const authed = hasSession()
+  const isPublic = to.meta.public === true
+  if (!authed && !isPublic) {
+    return { path: '/login', query: { redirect: to.fullPath } }
+  }
+  if (authed && (to.path === '/login' || to.path === '/signup')) {
+    return { path: '/today' }
+  }
+  return true
 })
