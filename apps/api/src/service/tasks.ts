@@ -4,8 +4,7 @@ import { normalizeTitle } from '../domain/normalize.js'
 import { assembleTree } from '../domain/tree.js'
 import { bubbleUp, reopenTask, reopenAncestors } from '../domain/task-status.js'
 import type { DomainTask } from '../domain/types.js'
-
-type GetUserId = () => Promise<string>
+import type { GetUserId } from '../auth/guard.js'
 
 function toResponse(task: Task) {
   const { userId: _userId, ...rest } = task
@@ -43,14 +42,14 @@ function findInTree(
 
 export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
-    async Tasks_list(_req: FastifyRequest, _reply: FastifyReply) {
-      const userId = await getUserId()
+    async Tasks_list(req: FastifyRequest, _reply: FastifyReply) {
+      const userId = await getUserId(req)
       const tasks = await prisma.task.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } })
       return tasks.map(toResponse)
     },
 
     async Tasks_create(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const body = req.body as {
         title: string
         note?: string
@@ -103,7 +102,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Tasks_read(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const task = await prisma.task.findUnique({ where: { id } })
       if (!task || task.userId !== userId) {
@@ -113,7 +112,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Tasks_update(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const existing = await prisma.task.findUnique({ where: { id } })
       if (!existing || existing.userId !== userId) {
@@ -139,7 +138,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Tasks_del(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const existing = await prisma.task.findUnique({ where: { id } })
       if (!existing || existing.userId !== userId) {
@@ -150,7 +149,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Tasks_tree(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const allTasks = await prisma.task.findMany({ where: { userId } })
       const roots = assembleTree(allTasks.map(toDomain))
@@ -162,7 +161,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Tasks_complete(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const allTasks = await prisma.task.findMany({ where: { userId } })
       const target = allTasks.find((t) => t.id === id)
@@ -197,7 +196,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Tasks_reopen(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const allTasks = await prisma.task.findMany({ where: { userId } })
       const target = allTasks.find((t) => t.id === id)
@@ -229,7 +228,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Tasks_resolveResistance(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const existing = await prisma.task.findUnique({ where: { id } })
       if (!existing || existing.userId !== userId) {
@@ -240,7 +239,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Tasks_recordFocus(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const body = req.body as { seconds: number; pomodoro?: boolean }
       const existing = await prisma.task.findUnique({ where: { id } })

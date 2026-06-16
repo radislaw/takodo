@@ -28,6 +28,7 @@ vi.mock('@/shared/api', () => ({
     }),
   }),
   useUpdateProfile: () => ({ mutate: mockUpdateProfile }),
+  useLogout: () => ({ mutate: vi.fn() }),
   useRewards: () => ({ data: rewardsData }),
   useNotifications: () => ({
     isSupported: ref(true),

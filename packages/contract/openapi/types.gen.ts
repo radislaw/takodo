@@ -4,6 +4,108 @@
  */
 
 export interface paths {
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Log in with email + password. */
+        post: operations["Auth_login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Revoke the supplied refresh token (and its family). */
+        post: operations["Auth_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Rotate a refresh token → new session. Reuse of a rotated token revokes the family. */
+        post: operations["Auth_refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Register with email + password. Returns a fresh session. */
+        post: operations["Auth_signup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/{provider}/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Complete an OAuth flow; exchanges the code and returns a session. */
+        post: operations["Auth_oauthCallback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/{provider}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Begin an OAuth flow for `provider` (google | yandex | apple). */
+        get: operations["Auth_oauthStart"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/daily": {
         parameters: {
             query?: never;
@@ -401,6 +503,11 @@ export interface components {
             taskId: string;
         };
         ApiError: {
+            /**
+             * @description Stable machine code. Auth values: `invalid_credentials`, `email_taken`,
+             *     `token_expired`, `token_invalid`, `refresh_reuse_detected`, `oauth_state_mismatch`,
+             *     `oauth_exchange_failed`, `provider_unsupported`, `unauthenticated`.
+             */
             code: string;
             message: string;
         };
@@ -528,6 +635,24 @@ export interface components {
         LogDoneEntry: {
             title: string;
         };
+        LoginRequest: {
+            email: string;
+            password: string;
+        };
+        LogoutRequest: {
+            refreshToken: string;
+        };
+        /** @description Callback payload from the provider redirect (code/state, or Apple form_post). */
+        OAuthCallbackRequest: {
+            code: string;
+            state: string;
+        };
+        /** @description Server-built provider authorize URL the client redirects to. */
+        OAuthStartResponse: {
+            authorizeUrl: string;
+            /** @description Opaque CSRF/state value the callback must echo. */
+            state: string;
+        };
         Profile: {
             /** @description Display name used in the greeting. */
             name: string;
@@ -592,6 +717,9 @@ export interface components {
         };
         /** @enum {string} */
         QuestTier: "common" | "rare" | "epic";
+        RefreshRequest: {
+            refreshToken: string;
+        };
         RewardsSummary: {
             /** Format: int32 */
             streak: number;
@@ -622,6 +750,12 @@ export interface components {
              * @description Full missed days before today; present only in comeback state (>= 2).
              */
             comebackDays?: number;
+        };
+        SignupRequest: {
+            email: string;
+            password: string;
+            /** @description Optional display name; defaults from the email local part. */
+            name?: string;
         };
         /** @description Task (read shape). Fields not client-writable are set by the server. */
         Task: {
@@ -715,6 +849,16 @@ export interface components {
          * @enum {string}
          */
         Theme: "light" | "lavender" | "eco" | "ocean" | "silent" | "high-contrast" | "high-contrast-dark" | "dark" | "forest" | "lavender-dark" | "ocean-dark" | "silent-dark" | "amber" | "amber-dark" | "cyberpunk" | "amoled";
+        /** @description Issued session: short-lived access + rotating refresh. */
+        TokenPair: {
+            accessToken: string;
+            refreshToken: string;
+            /**
+             * Format: int32
+             * @description Access-token lifetime, seconds.
+             */
+            expiresIn: number;
+        };
         VapidPublicKey: {
             publicKey: string;
         };
@@ -727,6 +871,202 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    Auth_login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenPair"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Auth_logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LogoutRequest"];
+            };
+        };
+        responses: {
+            /** @description There is no content to send for this request, but the headers may be useful. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Auth_refresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenPair"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Auth_signup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignupRequest"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenPair"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Auth_oauthCallback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OAuthCallbackRequest"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenPair"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Auth_oauthStart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OAuthStartResponse"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
     Daily_create: {
         parameters: {
             query?: never;

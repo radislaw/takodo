@@ -2,8 +2,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
 import { computeRewards, computeHeatmap } from '../domain/rewards.js'
 import { toDateStr, parseDate } from '../domain/date.js'
-
-type GetUserId = () => Promise<string>
+import type { GetUserId } from '../auth/guard.js'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const DEFAULT_WEEKS = 12
@@ -26,8 +25,8 @@ function resolveWeeks(raw: string | number | undefined): number {
 
 export function buildRewardsHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
-    async Rewards_get(_req: FastifyRequest, _reply: FastifyReply) {
-      const userId = await getUserId()
+    async Rewards_get(req: FastifyRequest, _reply: FastifyReply) {
+      const userId = await getUserId(req)
       const [completedTasks, mitCompletions, user, questXpSum] = await Promise.all([
         prisma.task.findMany({
           where: { userId, status: 'done', completedAt: { not: null } },
@@ -53,7 +52,7 @@ export function buildRewardsHandlers(prisma: PrismaClient, getUserId: GetUserId)
     },
 
     async Rewards_heatmap(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const query = req.query as { weeks?: string; date?: string }
       const dateStr = resolveDate(query.date)
       if (!dateStr) {

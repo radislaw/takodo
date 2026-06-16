@@ -10,8 +10,8 @@ import {
 } from '../domain/quests.js'
 import { gapDays, isComeback } from '../domain/comeback.js'
 import { toDateStr, parseDate } from '../domain/date.js'
+import type { GetUserId } from '../auth/guard.js'
 
-type GetUserId = () => Promise<string>
 type Db = PrismaClient | Prisma.TransactionClient
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -85,7 +85,7 @@ type ClaimOutcome =
 export function buildQuestsHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
     async Quests_list(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const today = resolveQuestDate((req.query as { date?: string }).date)
       if (!today) {
         return reply
@@ -106,7 +106,7 @@ export function buildQuestsHandlers(prisma: PrismaClient, getUserId: GetUserId) 
     },
 
     async Quests_claim(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const today = resolveQuestDate((req.query as { date?: string }).date)
       if (!today) {

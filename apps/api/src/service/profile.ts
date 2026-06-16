@@ -7,13 +7,12 @@ import {
   themeUnlockLevel,
 } from '../domain/unlocks.js'
 import { getUserProgress } from './xp.js'
-
-type GetUserId = () => Promise<string>
+import type { GetUserId } from '../auth/guard.js'
 
 export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
-    async Me_get(_req: FastifyRequest, _reply: FastifyReply) {
-      const userId = await getUserId()
+    async Me_get(req: FastifyRequest, _reply: FastifyReply) {
+      const userId = await getUserId(req)
       const user = await prisma.user.findUnique({ where: { id: userId } })
       return {
         name: user?.name ?? '',
@@ -29,7 +28,7 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
     },
 
     async Me_update(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const body = req.body as {
         name?: string
         theme?: string

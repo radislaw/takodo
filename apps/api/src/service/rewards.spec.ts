@@ -77,6 +77,8 @@ describe('Rewards routes', () => {
         gentleMoves: 3,
         notifMorning: true,
         notifEvening: true,
+        passwordHash: null,
+        emailVerified: null,
         gender: null,
         birthDate: null,
         timezone: null,

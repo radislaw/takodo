@@ -2,7 +2,7 @@
 import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppIcon } from '@/shared/ui'
-import { useProfile, useUpdateProfile, useRewards, useNotifications } from '@/shared/api'
+import { useProfile, useUpdateProfile, useRewards, useNotifications, useLogout } from '@/shared/api'
 import { isThemeUnlocked, isFirstTaskTheme, themeUnlockLevel } from '@/shared/lib/unlocks'
 import { TIMEZONE_IDS, detectTimezone, formatTimezoneLabel } from '@/shared/lib/timezones'
 import ThemeSwatch from './ThemeSwatch.vue'
@@ -13,6 +13,7 @@ const { t } = useI18n({ useScope: 'global' })
 const { data: profile } = useProfile()
 const { mutate: updateProfile } = useUpdateProfile()
 const { data: rewards } = useRewards()
+const { mutate: logout } = useLogout()
 
 const level = computed(() => rewards.value?.level ?? 1)
 const firstTaskDone = computed(
@@ -478,6 +479,16 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
         <span class="flex-1 text-sm font-semibold">{{ t('help.title') }}</span>
         <AppIcon name="chevronR" :size="16" class="text-ink-faint" />
       </RouterLink>
+
+      <!-- Sign out -->
+      <button
+        type="button"
+        class="border-line text-softrose hover:bg-softrose-tint mt-3 flex w-full items-center gap-3 rounded-2xl border px-5 py-3.5 transition-colors"
+        @click="logout()"
+      >
+        <AppIcon name="logOut" :size="18" class="flex-shrink-0" />
+        <span class="flex-1 text-left text-sm font-semibold">{{ t('auth.logout') }}</span>
+      </button>
     </div>
   </div>
 </template>

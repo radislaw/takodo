@@ -1,10 +1,12 @@
 import { useQuery } from '@pinia/colada'
 import { apiClient } from '@/api/client'
 import { todayDate } from './daily'
+import { hasSession } from '@/shared/lib/authStorage'
 
 export function useRewards() {
   return useQuery({
     key: () => ['rewards'],
+    enabled: () => hasSession(),
     query: async () => {
       const { data } = await apiClient.GET('/rewards')
       if (!data) throw new Error('Failed to fetch rewards')

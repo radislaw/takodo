@@ -4,10 +4,12 @@ using Http;
 
 /**
  * TakoDo API — the single source of truth contract.
- * Scope: Phase 0.4 — single-user, no auth.
+ * Auth: JWT bearer. Every operation is protected by default (`@useAuth(BearerAuth)`
+ * at the namespace); the `Auth` interface opts out with `@useAuth(NoAuth)`.
  * Changes happen only here → regen OpenAPI/types. Do not edit generated output by hand.
  */
 @service(#{ title: "TakoDo API" })
+@useAuth(BearerAuth)
 namespace Takodo;
 
 // ─── Enums ──────────────────────────────────────────────────────
@@ -48,8 +50,100 @@ enum Theme {
 
 @error
 model ApiError {
+  /**
+   * Stable machine code. Auth values: `invalid_credentials`, `email_taken`,
+   * `token_expired`, `token_invalid`, `refresh_reuse_detected`, `oauth_state_mismatch`,
+   * `oauth_exchange_failed`, `provider_unsupported`, `unauthenticated`.
+   */
   code: string;
+
   message: string;
+}
+
+// ─── Auth ───────────────────────────────────────────────────────
+
+/** Issued session: short-lived access + rotating refresh. */
+model TokenPair {
+  accessToken: string;
+  refreshToken: string;
+
+  /** Access-token lifetime, seconds. */
+  expiresIn: int32;
+}
+
+model SignupRequest {
+  @maxLength(254)
+  email: string;
+
+  @minLength(8)
+  @maxLength(200)
+  password: string;
+
+  /** Optional display name; defaults from the email local part. */
+  @maxLength(100)
+  name?: string;
+}
+
+model LoginRequest {
+  @maxLength(254)
+  email: string;
+
+  @minLength(8)
+  @maxLength(200)
+  password: string;
+}
+
+model RefreshRequest {
+  @maxLength(512)
+  refreshToken: string;
+}
+
+model LogoutRequest {
+  @maxLength(512)
+  refreshToken: string;
+}
+
+/** Server-built provider authorize URL the client redirects to. */
+model OAuthStartResponse {
+  authorizeUrl: string;
+
+  /** Opaque CSRF/state value the callback must echo. */
+  state: string;
+}
+
+/** Callback payload from the provider redirect (code/state, or Apple form_post). */
+model OAuthCallbackRequest {
+  @maxLength(2048)
+  code: string;
+
+  @maxLength(512)
+  state: string;
+}
+
+@route("/auth")
+@tag("Auth")
+@useAuth(NoAuth)
+interface Auth {
+  /** Register with email + password. Returns a fresh session. */
+  @route("/signup") @post signup(@body body: SignupRequest): TokenPair | ApiError;
+
+  /** Log in with email + password. */
+  @route("/login") @post login(@body body: LoginRequest): TokenPair | ApiError;
+
+  /** Rotate a refresh token → new session. Reuse of a rotated token revokes the family. */
+  @route("/refresh") @post refresh(@body body: RefreshRequest): TokenPair | ApiError;
+
+  /** Revoke the supplied refresh token (and its family). */
+  @route("/logout") @post logout(@body body: LogoutRequest): void | ApiError;
+
+  /** Begin an OAuth flow for `provider` (google | yandex | apple). */
+  @route("/{provider}/start") @get oauthStart(@path provider: string): OAuthStartResponse | ApiError;
+
+  /** Complete an OAuth flow; exchanges the code and returns a session. */
+  @route("/{provider}/callback") @post oauthCallback(
+    @path provider: string,
+    @body body: OAuthCallbackRequest,
+  ): TokenPair | ApiError;
 }
 
 // ─── Tasks ──────────────────────────────────────────────────────

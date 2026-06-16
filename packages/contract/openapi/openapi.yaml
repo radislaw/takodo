@@ -3,10 +3,12 @@ info:
   title: TakoDo API
   description: |-
     TakoDo API — the single source of truth contract.
-    Scope: Phase 0.4 — single-user, no auth.
+    Auth: JWT bearer. Every operation is protected by default (`@useAuth(BearerAuth)`
+    at the namespace); the `Auth` interface opts out with `@useAuth(NoAuth)`.
     Changes happen only here → regen OpenAPI/types. Do not edit generated output by hand.
   version: 0.0.0
 tags:
+  - name: Auth
   - name: Tasks
   - name: Daily
   - name: Profile
@@ -16,6 +18,174 @@ tags:
   - name: Push
   - name: Frequent
 paths:
+  /auth/login:
+    post:
+      operationId: Auth_login
+      description: Log in with email + password.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      security:
+        - {}
+  /auth/logout:
+    post:
+      operationId: Auth_logout
+      description: Revoke the supplied refresh token (and its family).
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      security:
+        - {}
+  /auth/refresh:
+    post:
+      operationId: Auth_refresh
+      description: Rotate a refresh token → new session. Reuse of a rotated token revokes the family.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      security:
+        - {}
+  /auth/signup:
+    post:
+      operationId: Auth_signup
+      description: Register with email + password. Returns a fresh session.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      security:
+        - {}
+  /auth/{provider}/callback:
+    post:
+      operationId: Auth_oauthCallback
+      description: Complete an OAuth flow; exchanges the code and returns a session.
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthCallbackRequest'
+      security:
+        - {}
+  /auth/{provider}/start:
+    get:
+      operationId: Auth_oauthStart
+      description: Begin an OAuth flow for `provider` (google | yandex | apple).
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthStartResponse'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      security:
+        - {}
   /daily:
     post:
       operationId: Daily_create
@@ -744,6 +914,8 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       tags:
         - Tasks
+security:
+  - BearerAuth: []
 components:
   schemas:
     AddEntry:
@@ -761,6 +933,10 @@ components:
       properties:
         code:
           type: string
+          description: |-
+            Stable machine code. Auth values: `invalid_credentials`, `email_taken`,
+            `token_expired`, `token_invalid`, `refresh_reuse_detected`, `oauth_state_mismatch`,
+            `oauth_exchange_failed`, `provider_unsupported`, `unauthenticated`.
         message:
           type: string
     Badge:
@@ -991,6 +1167,52 @@ components:
           type: string
           maxLength: 500
       description: Log a task that was already done but never added to the list.
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          maxLength: 254
+        password:
+          type: string
+          minLength: 8
+          maxLength: 200
+    LogoutRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          maxLength: 512
+    OAuthCallbackRequest:
+      type: object
+      required:
+        - code
+        - state
+      properties:
+        code:
+          type: string
+          maxLength: 2048
+        state:
+          type: string
+          maxLength: 512
+      description: Callback payload from the provider redirect (code/state, or Apple form_post).
+    OAuthStartResponse:
+      type: object
+      required:
+        - authorizeUrl
+        - state
+      properties:
+        authorizeUrl:
+          type: string
+        state:
+          type: string
+          description: Opaque CSRF/state value the callback must echo.
+      description: Server-built provider authorize URL the client redirects to.
     Profile:
       type: object
       required:
@@ -1126,6 +1348,14 @@ components:
         - common
         - rare
         - epic
+    RefreshRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          maxLength: 512
     RewardsSummary:
       type: object
       required:
@@ -1172,6 +1402,23 @@ components:
           type: integer
           format: int32
           description: Full missed days before today; present only in comeback state (>= 2).
+    SignupRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          maxLength: 254
+        password:
+          type: string
+          minLength: 8
+          maxLength: 200
+        name:
+          type: string
+          maxLength: 100
+          description: Optional display name; defaults from the email local part.
     Task:
       type: object
       required:
@@ -1354,6 +1601,22 @@ components:
         - cyberpunk
         - amoled
       description: Matches data-theme attribute values in tokens.css.
+    TokenPair:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+        - expiresIn
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int32
+          description: Access-token lifetime, seconds.
+      description: 'Issued session: short-lived access + rotating refresh.'
     VapidPublicKey:
       type: object
       required:
@@ -1361,3 +1624,7 @@ components:
       properties:
         publicKey:
           type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: Bearer

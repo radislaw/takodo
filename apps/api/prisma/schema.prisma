@@ -11,6 +11,10 @@ model User {
   id                String             @id @default(cuid())
   email             String             @unique
   name              String             @default("")
+  // Null for OAuth-only accounts; set for email+password sign-ups.
+  passwordHash      String?
+  // Set once an email is provider- or self-verified.
+  emailVerified     DateTime?
   theme             String             @default("light")
   gentleMoves       Int                @default(0)
   notifMorning      Boolean            @default(true)
@@ -27,6 +31,42 @@ model User {
   questClaims       QuestClaim[]
   pushSubscriptions PushSubscription[]
   feedback          Feedback[]
+  authIdentities    AuthIdentity[]
+  refreshTokens     RefreshToken[]
+}
+
+/** One linked external provider account (google | yandex | apple). */
+model AuthIdentity {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  // Provider-reported email at link time (may be a private relay for Apple).
+  email             String?
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+/** Rotating refresh token (sha256-hashed). A reused token revokes its whole family. */
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  // sha256 of the opaque refresh token — never store the plaintext.
+  tokenHash   String    @unique
+  // Rotation lineage: all tokens derived from one login share a familyId.
+  familyId    String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  // Set when this token was rotated → its successor's id (reuse detection).
+  replacedBy  String?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
 }
 
 model Feedback {
