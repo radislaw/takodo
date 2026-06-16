@@ -8,6 +8,7 @@ import { TIMEZONE_IDS, detectTimezone, formatTimezoneLabel } from '@/shared/lib/
 import ThemeSwatch from './ThemeSwatch.vue'
 import ProfileSurvey from './ProfileSurvey.vue'
 import ProfileFeedback from './ProfileFeedback.vue'
+import ProfileCollapsible from './ProfileCollapsible.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const { data: profile } = useProfile()
@@ -464,11 +465,23 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
         </template>
       </div>
 
-      <!-- Voluntary survey -->
-      <ProfileSurvey />
+      <!-- Voluntary survey (collapsed by default to keep the page short) -->
+      <ProfileCollapsible
+        icon="sparkles"
+        :label="t('profile.survey.label')"
+        :sub="t('profile.survey.sub')"
+      >
+        <ProfileSurvey headless />
+      </ProfileCollapsible>
 
-      <!-- Feedback & support -->
-      <ProfileFeedback />
+      <!-- Feedback & support (collapsed by default) -->
+      <ProfileCollapsible
+        icon="heart"
+        :label="t('profile.feedback.label')"
+        :sub="t('profile.feedback.sub')"
+      >
+        <ProfileFeedback headless />
+      </ProfileCollapsible>
 
       <!-- Help link -->
       <RouterLink

@@ -193,21 +193,25 @@ describe('TaskCard', () => {
     expect(mockCelebrate).toHaveBeenCalled()
   })
 
-  it('+ в сегодня in action sheet calls addDailyEntry and shows success toast', async () => {
+  it('inline "+ в сегодня" icon calls addDailyEntry and shows success toast', async () => {
     mockAddToToday.mockResolvedValueOnce({})
     wrapper = mount(TaskCard, { props: { task: openTask }, attachTo: document.body })
-    await wrapper.find('[aria-label="Действия"]').trigger('click')
-    await wrapper.vm.$nextTick()
 
-    const addBtn = Array.from(document.querySelectorAll('button')).find((b) =>
-      b.textContent?.includes('+ в сегодня'),
-    )
-    expect(addBtn).toBeTruthy()
-    addBtn!.click()
+    await wrapper.find('[aria-label="+ в сегодня"]').trigger('click')
     await wrapper.vm.$nextTick()
     await new Promise((r) => setTimeout(r, 10))
 
     expect(mockAddToToday).toHaveBeenCalledWith('t1')
     expect(mockShowSuccess).toHaveBeenCalledWith('success.addedToToday')
+  })
+
+  it('hides resolve resistance from the action sheet (badge is the only path)', async () => {
+    wrapper = mount(TaskCard, { props: { task: openTask }, attachTo: document.body })
+    await wrapper.find('[aria-label="Действия"]').trigger('click')
+    await wrapper.vm.$nextTick()
+    const resolveBtn = Array.from(document.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Я могу это'),
+    )
+    expect(resolveBtn).toBeUndefined()
   })
 })

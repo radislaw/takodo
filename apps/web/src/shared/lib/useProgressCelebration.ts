@@ -4,7 +4,10 @@ import { GIFT_LEVELS, THEME_UNLOCK_LEVELS, FIRST_TASK_THEMES, nextGiftLevel } fr
 
 /**
  * Progress celebration: a gift modal + confetti fired when the first task is
- * completed (unlocks dark themes + the toggle) and on every level-up.
+ * completed (unlocks dark themes + the toggle) and when a level-up actually
+ * unlocks a theme. A plain level-up with nothing to unlock does NOT open the
+ * modal — the per-completion reward burst already celebrates it, and stacking a
+ * second full-screen interrupt on top is noise.
  *
  * The reward summary has no "level-up" signal, so we detect it client-side by
  * comparing the latest rewards against a localStorage baseline. The baseline is
@@ -54,22 +57,15 @@ export function planCelebrations(
   }
 
   if (next.level > prev.level) {
+    // Only gift levels (theme unlocks) open the modal; plain level-ups are left
+    // to the per-completion reward burst so we never stack two interrupts.
     const giftsCrossed = GIFT_LEVELS.filter((g) => g > prev.level && g <= next.level)
-    if (giftsCrossed.length > 0) {
-      for (const g of giftsCrossed) {
-        events.push({
-          kind: 'level-up',
-          level: g,
-          themes: themesAtLevel(g),
-          nextGift: nextGiftLevel(g),
-        })
-      }
-    } else {
+    for (const g of giftsCrossed) {
       events.push({
         kind: 'level-up',
-        level: next.level,
-        themes: [],
-        nextGift: nextGiftLevel(next.level),
+        level: g,
+        themes: themesAtLevel(g),
+        nextGift: nextGiftLevel(g),
       })
     }
   }

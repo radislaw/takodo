@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppCheckbox, AppIcon, AppActionSheet } from '@/shared/ui'
+import { AppCheckbox, AppIcon, AppActionSheet, ChildProgress } from '@/shared/ui'
 import {
   useCompleteTask,
   useReopenTask,
@@ -77,11 +77,6 @@ function handleEstimateCommit() {
   actionsOpen.value = false
 }
 
-function handleResolve() {
-  resolveResistance(props.task.id)
-  actionsOpen.value = false
-}
-
 function openConfirmDelete() {
   actionsOpen.value = false
   confirmOpen.value = true
@@ -126,16 +121,16 @@ async function handleAddToToday() {
     <button
       v-if="childTotal && childTotal > 0"
       type="button"
-      class="text-ink-soft hover:text-ink flex-shrink-0 cursor-pointer text-xs font-semibold transition-colors"
+      class="text-ink-soft hover:text-ink flex flex-shrink-0 cursor-pointer items-center gap-0.5 transition-colors"
       :aria-expanded="expanded"
       :aria-label="t('tasks.toggleExpand')"
       @click="emit('toggleExpand')"
     >
-      {{ t('tasks.progress', { done: childDone ?? 0, total: childTotal }) }}
+      <ChildProgress :done="childDone ?? 0" :total="childTotal" />
       <AppIcon
         name="chevronR"
         :size="12"
-        class="ml-0.5 inline-block transition-transform"
+        class="inline-block transition-transform"
         :class="{ 'rotate-90': expanded }"
       />
     </button>
@@ -148,6 +143,16 @@ async function handleAddToToday() {
       @click="handleResolveBadge"
     >
       <AppIcon name="flame" :size="18" />
+    </button>
+
+    <button
+      v-if="task.status !== 'done'"
+      type="button"
+      class="text-sage hover:text-sage-deep flex-shrink-0 cursor-pointer transition-colors"
+      :aria-label="t('tasks.actions.addToToday')"
+      @click="handleAddToToday"
+    >
+      <AppIcon name="plus" :size="18" />
     </button>
 
     <button
@@ -195,25 +200,6 @@ async function handleAddToToday() {
             ? `${t('tasks.actions.estimate')}: ${task.estimateMinutes} ${t('tasks.estimateLabel')}`
             : t('tasks.actions.estimate')
         }}
-      </button>
-
-      <button
-        v-if="!task.resistanceResolved"
-        type="button"
-        class="font-body text-ink flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors"
-        @click="handleResolve"
-      >
-        <AppIcon name="flame" :size="16" class="text-apricot" />
-        {{ t('tasks.actions.resolve') }}
-      </button>
-
-      <button
-        type="button"
-        class="font-body text-sage flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors"
-        @click="handleAddToToday"
-      >
-        <AppIcon name="plus" :size="16" class="text-sage" />
-        {{ t('tasks.actions.addToToday') }}
       </button>
 
       <div class="border-line-card my-1 border-t" />

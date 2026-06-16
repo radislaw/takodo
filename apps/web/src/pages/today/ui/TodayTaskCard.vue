@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppCheckbox, AppIcon, AppBadge } from '@/shared/ui'
+import { AppCheckbox, AppIcon, AppBadge, AppActionSheet, ChildProgress } from '@/shared/ui'
 import { formatFocusDuration } from '@/shared/lib/formatFocus'
 
 interface Entry {
@@ -35,12 +35,9 @@ const emit = defineEmits<{
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 
-const isDone = computed(() => props.task?.status === 'done')
+const actionsOpen = ref(false)
 
-const progressPct = computed(() => {
-  if (!props.childTotal) return 0
-  return Math.round(((props.childDone ?? 0) / props.childTotal) * 100)
-})
+const isDone = computed(() => props.task?.status === 'done')
 
 const CAT_COLORS: Record<string, string> = {
   home: 'var(--cat-sage)',
@@ -71,6 +68,12 @@ function handleToggleDone() {
 
 function handleToggleMit() {
   emit('toggleMit', props.entry.id, props.entry.isMIT)
+  actionsOpen.value = false
+}
+
+function handleMoveTomorrow() {
+  emit('moveTomorrow', props.entry.id, props.entry.taskId)
+  actionsOpen.value = false
 }
 </script>
 
@@ -110,17 +113,11 @@ function handleToggleMit() {
             </span>
           </div>
 
-          <div v-if="childTotal && childTotal > 0" class="flex min-w-0 flex-1 items-center gap-2">
-            <div class="bg-line h-1.5 min-w-0 flex-1 overflow-hidden rounded-full">
-              <div
-                class="bg-sage h-full rounded-full transition-all duration-300 motion-reduce:transition-none"
-                :style="{ width: `${progressPct}%` }"
-              />
-            </div>
-            <span class="text-ink-soft flex-shrink-0 text-xs font-semibold">
-              {{ childDone ?? 0 }}/{{ childTotal }}
-            </span>
-          </div>
+          <ChildProgress
+            v-if="childTotal && childTotal > 0"
+            :done="childDone ?? 0"
+            :total="childTotal"
+          />
 
           <div
             v-if="hasFocusTime"
@@ -132,6 +129,21 @@ function handleToggleMit() {
           </div>
         </div>
       </div>
+
+      <!-- MIT status (glanceable, non-interactive — toggle lives in the actions sheet) -->
+      <span
+        v-if="entry.isMIT"
+        class="flex-shrink-0"
+        :class="{ 'mt-0.5': hasBottomRow }"
+        :aria-label="t('today.mitLabel')"
+      >
+        <AppBadge variant="done">
+          <template #icon>
+            <AppIcon name="zap" :size="12" />
+          </template>
+          <span class="hidden sm:inline">{{ t('today.mitLabel') }}</span>
+        </AppBadge>
+      </span>
 
       <!-- Start Do-mode with this task (active tasks only) -->
       <button
@@ -145,33 +157,43 @@ function handleToggleMit() {
         <AppIcon name="play" :size="16" />
       </button>
 
-      <!-- Move to tomorrow (active tasks only) -->
+      <!-- Overflow: MIT toggle + move to tomorrow (active tasks only) -->
       <button
         v-if="!isDone"
         type="button"
         class="text-ink-soft hover:text-ink flex-shrink-0 cursor-pointer transition-colors"
         :class="{ 'mt-0.5': hasBottomRow }"
-        :aria-label="t('today.moveTomorrow')"
-        @click="emit('moveTomorrow', entry.id, entry.taskId)"
+        :aria-label="t('today.actions.title')"
+        @click="actionsOpen = true"
       >
-        <AppIcon name="arrowR" :size="16" />
-      </button>
-
-      <!-- MIT button -->
-      <button
-        class="text-ink-soft hover:text-sage flex-shrink-0 cursor-pointer transition-colors"
-        :class="{ 'mt-0.5': hasBottomRow }"
-        :aria-label="t('today.mitLabel')"
-        @click="handleToggleMit"
-      >
-        <AppBadge v-if="entry.isMIT" variant="done">
-          <template #icon>
-            <AppIcon name="zap" :size="12" />
-          </template>
-          <span class="hidden sm:inline">{{ t('today.mitLabel') }}</span>
-        </AppBadge>
-        <AppIcon v-else name="zap" :size="16" />
+        <AppIcon name="more" :size="20" />
       </button>
     </div>
   </div>
+
+  <AppActionSheet
+    :open="actionsOpen"
+    :title="t('today.actions.title')"
+    @close="actionsOpen = false"
+  >
+    <div class="flex flex-col gap-1 pt-1">
+      <button
+        type="button"
+        class="font-body text-ink flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors"
+        @click="handleToggleMit"
+      >
+        <AppIcon name="zap" :size="16" class="text-sage-deep" />
+        {{ entry.isMIT ? t('today.actions.unmakeMit') : t('today.actions.makeMit') }}
+      </button>
+
+      <button
+        type="button"
+        class="font-body text-ink flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors"
+        @click="handleMoveTomorrow"
+      >
+        <AppIcon name="arrowR" :size="16" class="text-ink-soft" />
+        {{ t('today.actions.moveTomorrow') }}
+      </button>
+    </div>
+  </AppActionSheet>
 </template>

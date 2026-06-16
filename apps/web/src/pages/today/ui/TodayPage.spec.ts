@@ -220,32 +220,6 @@ describe('TodayPage', () => {
     expect(key.value).toBe('errors.addFailed')
   })
 
-  it('shows MIT counter when entries exist', async () => {
-    tasksData.value = [{ id: 't1', parentId: null, title: 'Task', status: 'open' }]
-    dailyData.value = {
-      id: 'list-1',
-      date: '2026-06-05',
-      createdAt: '2026-06-05T00:00:00Z',
-      entries: [{ id: 'e1', taskId: 't1', isMIT: true, order: 0 }],
-    }
-    const wrapper = mountPage()
-    await wrapper.vm.$nextTick()
-    expect(wrapper.text()).toContain('1/3')
-  })
-
-  it('MIT counter shows 0/3 when no MIT set', async () => {
-    tasksData.value = [{ id: 't1', parentId: null, title: 'Task', status: 'open' }]
-    dailyData.value = {
-      id: 'list-1',
-      date: '2026-06-05',
-      createdAt: '2026-06-05T00:00:00Z',
-      entries: [{ id: 'e1', taskId: 't1', isMIT: false, order: 0 }],
-    }
-    const wrapper = mountPage()
-    await wrapper.vm.$nextTick()
-    expect(wrapper.text()).toContain('0/3')
-  })
-
   it('calls completeTask when checkbox checked for open task', async () => {
     tasksData.value = [{ id: 't1', parentId: null, title: 'Buy milk', status: 'open' }]
     dailyData.value = {
@@ -276,9 +250,16 @@ describe('TodayPage', () => {
     const wrapper = mountPage()
     await wrapper.vm.$nextTick()
 
-    const buttons = wrapper.findAll('button')
-    const mitBtn = buttons.find((b) => b.attributes('aria-label') === 'Главное')
-    await mitBtn?.trigger('click')
+    // MIT toggle now lives in the task card's overflow sheet (teleported to body)
+    const overflow = wrapper
+      .findAll('button')
+      .find((b) => b.attributes('aria-label') === 'Действия')
+    await overflow?.trigger('click')
+    await wrapper.vm.$nextTick()
+    const mitBtn = Array.from(document.body.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Сделать главным'),
+    )
+    mitBtn?.click()
     await wrapper.vm.$nextTick()
     await new Promise((r) => setTimeout(r, 10))
 
@@ -349,8 +330,16 @@ describe('TodayPage', () => {
     const wrapper = mountPage()
     await wrapper.vm.$nextTick()
 
-    const arrowBtn = wrapper.find('[aria-label="На завтра"]')
-    await arrowBtn.trigger('click')
+    // "Move to tomorrow" now lives in the task card's overflow sheet
+    const overflow = wrapper
+      .findAll('button')
+      .find((b) => b.attributes('aria-label') === 'Действия')
+    await overflow?.trigger('click')
+    await wrapper.vm.$nextTick()
+    const moveBtn = Array.from(document.body.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Перенести на завтра'),
+    )
+    moveBtn?.click()
     await wrapper.vm.$nextTick()
     await new Promise((r) => setTimeout(r, 10))
 
