@@ -4,9 +4,12 @@ import { buildScheduler } from './service/push-scheduler.js'
 import { loadAuthConfig } from './auth/config.js'
 import { createTokenService } from './auth/tokens.js'
 import { getUserIdFromRequest, makeBearerGuard } from './auth/guard.js'
+import { buildProviderRegistry } from './auth/providers/index.js'
+import { createOAuthStateStore } from './auth/oauth-state.js'
 
 const PORT = Number(process.env.PORT ?? 3001)
 const HOST = process.env.HOST ?? '127.0.0.1'
+const OAUTH_REDIRECT_BASE = process.env.OAUTH_REDIRECT_BASE ?? 'http://localhost:5173'
 
 const tokens = createTokenService(loadAuthConfig(), prisma)
 
@@ -17,6 +20,11 @@ const app = buildApp({
   getUserId: getUserIdFromRequest,
   bearerGuard: makeBearerGuard(tokens),
   tokens,
+  oauth: {
+    registry: buildProviderRegistry(),
+    stateStore: createOAuthStateStore(),
+    redirectUri: `${OAUTH_REDIRECT_BASE}/auth/callback`,
+  },
 })
 
 async function shutdown(): Promise<void> {

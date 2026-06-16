@@ -14,7 +14,7 @@ import { buildFeedbackHandlers } from './service/feedback.js'
 import { buildRewardsHandlers } from './service/rewards.js'
 import { buildQuestsHandlers } from './service/quests.js'
 import { buildPushHandlers } from './service/push.js'
-import { buildAuthHandlers, stubAuthHandlers } from './auth/handlers.js'
+import { buildAuthHandlers, stubAuthHandlers, type OAuthDeps } from './auth/handlers.js'
 import type { GetUserId } from './auth/guard.js'
 import type { TokenService } from './auth/tokens.js'
 
@@ -34,6 +34,8 @@ export interface AppOptions {
   bearerGuard?: BearerGuard
   /** Token service powering /auth handlers. When absent, auth routes are stubbed (501). */
   tokens?: TokenService
+  /** OAuth provider registry + state store. When absent, /auth/{provider}/* are stubbed. */
+  oauth?: OAuthDeps
 }
 
 export function buildApp(opts: AppOptions = {}) {
@@ -66,7 +68,9 @@ export function buildApp(opts: AppOptions = {}) {
           ...buildRewardsHandlers(opts.prisma, opts.getUserId),
           ...buildQuestsHandlers(opts.prisma, opts.getUserId),
           ...buildPushHandlers(opts.prisma, opts.getUserId),
-          ...(opts.tokens ? buildAuthHandlers(opts.prisma, opts.tokens) : stubAuthHandlers),
+          ...(opts.tokens
+            ? buildAuthHandlers(opts.prisma, opts.tokens, opts.oauth)
+            : stubAuthHandlers),
         }
       : stubService
 
