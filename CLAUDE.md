@@ -99,7 +99,16 @@ Derived from the 2026-06 security audit — keep these invariants when touching 
 - **No secrets in code.** Env vars only; `.env` is gitignored. No raw SQL (Prisma query API only).
 - **Explicit `onDelete` on every relation.** Task self-relation is `SetNull` (children become roots) — set the action consciously on new relations, never leave the default implicit.
 
-Known accepted debt (MVP): no auth, no rate limiting — revisit before any non-localhost deployment.
+Auth invariants (added Phase "auth"): protected vs public is expressed in the contract —
+`@useAuth(BearerAuth)` at the namespace, `@useAuth(NoAuth)` on the `Auth` interface — and enforced by
+the glue `BearerAuth` securityHandler (`auth/guard.ts`), never a hand-maintained allowlist. Handlers
+read the user via `getUserId(req)` (the guard sets `req.userId`); never trust a client-supplied user
+id. Passwords are argon2id; refresh tokens are sha256/HMAC-hashed, rotated on every use, and a reused
+token revokes its whole family. OAuth account-linking happens only on a provider-verified email.
+
+Known accepted debt (MVP): no rate limiting on `/auth/*` (add `@fastify/rate-limit` before any
+non-localhost deployment); refresh tokens live in `localStorage` (XSS exposure → add a CSP later);
+in-memory OAuth state store (lost on restart → move to an `OAuthState` table for durability).
 
 ## TDD (mandatory)
 
@@ -132,7 +141,17 @@ All UI strings in `apps/web/src/locales/ru.json`. ESLint enforces `no-raw-text` 
 
 **Shipped screens:** Today (`/today`), Tasks (`/tasks`), Frequent (`/frequent`) — all wired to live API with Pinia Colada composables.
 
-**API:** Single-user MVP, no auth. `server.ts` wires real Prisma singleton + cached `getUserId` (seed user by `SEED_USER_EMAIL`). CORS via `@fastify/cors` (`WEB_ORIGIN ?? http://localhost:5173`).
+**API:** Multi-user with in-house JWT auth (email+password / Google / Yandex / Apple). `server.ts`
+wires the Prisma singleton, the token service, the OAuth provider registry, and the `BearerAuth`
+guard; handlers resolve the caller via `getUserId(req)`. Auth code lives in `apps/api/src/auth/`
+(config, password, tokens, guard, handlers, providers). The seed user logs in with
+`SEED_USER_EMAIL` / `SEED_USER_PASSWORD`. CORS via `@fastify/cors` (`WEB_ORIGIN ?? http://localhost:5173`).
+
+**Web auth:** `/login`, `/signup`, `/auth/callback` (chrome-less, public); a `beforeEach` router
+guard redirects unauthenticated users to `/login`. `api/client.ts` attaches the bearer token and
+does a single-flight refresh-on-401; tokens are held by `shared/lib/authStorage.ts`; composables in
+`shared/api/auth.ts` (`useSession`/`useLogin`/`useSignup`/`useLogout`/`useOAuthStart`/`useOAuthCallback`).
+The Yandex OAuth button shows only for `ru/kk/be/uz` locales.
 
 **Web data layer:** Composables in `shared/api/` — `useDailyToday`, `useTasks`, `useCreateTask`, `useAddDailyEntry`, `useUpdateDailyEntry`, `useRemoveDailyEntry`, `useCompleteTask`, `useReopenTask`, `useFrequent`. Query keys: `['daily', date]`, `['tasks']`, `['frequent']`.
 
