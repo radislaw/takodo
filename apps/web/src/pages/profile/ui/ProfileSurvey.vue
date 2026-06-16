@@ -4,6 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { AppIcon } from '@/shared/ui'
 import { useProfile, useUpdateProfile } from '@/shared/api'
 
+withDefaults(defineProps<{ headless?: boolean }>(), { headless: false })
+
 const { t } = useI18n({ useScope: 'global' })
 const { data: profile } = useProfile()
 const { mutate: updateProfile } = useUpdateProfile()
@@ -28,8 +30,11 @@ function onBirthDate(e: Event) {
 </script>
 
 <template>
-  <div class="surface-card mt-5 rounded-2xl p-5 shadow-md" data-test="survey-section">
-    <div class="mb-4 flex items-center gap-3">
+  <div
+    :class="headless ? '' : 'surface-card mt-5 rounded-2xl p-5 shadow-md'"
+    data-test="survey-section"
+  >
+    <div v-if="!headless" class="mb-4 flex items-center gap-3">
       <div
         class="bg-sage-tint text-sage-deep flex h-10 w-10 items-center justify-center rounded-[11px]"
       >

@@ -52,21 +52,20 @@ describe('planCelebrations', () => {
     })
   })
 
-  it('celebrates a non-gift level-up without themes', () => {
+  it('does not open the modal for a non-gift level-up (burst only)', () => {
     const events = planCelebrations(
       { level: 6, firstTaskDone: true },
       { level: 7, firstTaskDone: true },
     )
-    expect(events).toHaveLength(1)
-    expect(events[0]).toMatchObject({ kind: 'level-up', level: 7, themes: [], nextGift: 8 })
+    expect(events).toEqual([])
   })
 
   it('emits one event per gift level when several are crossed at once', () => {
     const events = planCelebrations(
       { level: 1, firstTaskDone: true },
-      { level: 4, firstTaskDone: true },
+      { level: 5, firstTaskDone: true },
     )
-    expect(events.map((e) => e.level)).toEqual([2, 3, 4])
+    expect(events.map((e) => e.level)).toEqual([2, 3, 4, 5])
     expect(events.every((e) => e.kind === 'level-up')).toBe(true)
   })
 

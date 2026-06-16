@@ -35,15 +35,27 @@ beforeEach(() => {
 })
 
 describe('QuestPanel', () => {
-  it('renders quest titles from i18n', () => {
+  it('is collapsed by default and hides the quest list', () => {
     const wrapper = mount(QuestPanel)
-    expect(wrapper.text()).toContain('Выполни 1 задачу')
-    expect(wrapper.text()).toContain('Добавь 3 задачи в список')
-    expect(wrapper.text()).toContain('Выполни главную задачу дня')
+    expect(wrapper.find('[data-test="quest-panel"]').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('Выполни 1 задачу')
   })
 
-  it('shows progress for unfinished quests', () => {
+  it('shows the done/total aggregate in the header', () => {
+    questsData.value = [
+      quest({ id: 'complete_1', done: true, progress: 1 }),
+      quest({ id: 'add_3', target: 3, progress: 1 }),
+      quest({ id: 'complete_mit' }),
+    ]
     const wrapper = mount(QuestPanel)
+    expect(wrapper.text()).toContain('1/3')
+  })
+
+  it('reveals quest titles and progress after expanding', async () => {
+    const wrapper = mount(QuestPanel)
+    await wrapper.find('[data-test="quest-toggle"]').trigger('click')
+    expect(wrapper.text()).toContain('Выполни 1 задачу')
+    expect(wrapper.text()).toContain('Добавь 3 задачи в список')
     expect(wrapper.text()).toContain('1 из 3')
   })
 
@@ -52,9 +64,10 @@ describe('QuestPanel', () => {
     expect(wrapper.find('[data-test="quest-claim"]').exists()).toBe(false)
   })
 
-  it('shows claim button when quest is done and unclaimed', () => {
+  it('auto-expands and shows claim button when a quest is claimable', () => {
     questsData.value = [quest({ done: true, progress: 1 })]
     const wrapper = mount(QuestPanel)
+    expect(wrapper.find('[data-test="quest-ready"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="quest-claim"]').exists()).toBe(true)
   })
 
@@ -66,9 +79,10 @@ describe('QuestPanel', () => {
     expect(mockClaim).toHaveBeenCalledWith('complete_1')
   })
 
-  it('shows awarded xp and tier on claimed quest', () => {
+  it('shows awarded xp and tier on claimed quest after expanding', async () => {
     questsData.value = [quest({ done: true, progress: 1, claimed: true, tier: 'epic', xp: 50 })]
     const wrapper = mount(QuestPanel)
+    await wrapper.find('[data-test="quest-toggle"]').trigger('click')
     expect(wrapper.text()).toContain('+50 XP')
     expect(wrapper.text()).toContain('Эпик')
     expect(wrapper.find('[data-test="quest-claim"]').exists()).toBe(false)

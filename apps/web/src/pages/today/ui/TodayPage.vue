@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  AppProgressRing,
-  AppToast,
-  AppIcon,
-  AppButton,
-  AppInput,
-  StreakFlame,
-  ActivityHeatmap,
-} from '@/shared/ui'
+import { AppProgressRing, AppToast, AppIcon, AppButton, AppInput, StreakFlame } from '@/shared/ui'
 import {
   useDailyToday,
   useAddDailyEntry,
@@ -21,7 +13,6 @@ import {
   useReopenTask,
   useProfile,
   useRewards,
-  useHeatmap,
 } from '@/shared/api'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useSuccessToast } from '@/shared/lib/useSuccessToast'
@@ -43,7 +34,6 @@ const { data: daily, isPending } = useDailyToday()
 const { data: taskList } = useTasks()
 const { data: profile } = useProfile()
 const { data: rewards } = useRewards()
-const { data: heatmap } = useHeatmap()
 
 const { mutateAsync: createTaskAsync } = useCreateTask()
 const { mutateAsync: addEntryAsync } = useAddDailyEntry()
@@ -83,7 +73,6 @@ const userName = computed(() => profile.value?.name ?? '')
 const streak = computed(() => rewards.value?.streak ?? 0)
 const shields = computed(() => rewards.value?.shields ?? 0)
 const shieldUsedRecently = computed(() => rewards.value?.shieldUsedRecently ?? false)
-const level = computed(() => rewards.value?.level ?? 1)
 const isComeback = computed(() => (rewards.value?.comebackDays ?? 0) >= 2)
 
 watch(
@@ -101,6 +90,12 @@ const greetingFull = computed(() => {
   const base = t(greetingKey.value)
   return userName.value ? `${base}, ${userName.value}` : base
 })
+
+// Evening journal is a reflective, end-of-day surface — only show it in the
+// evening/night so the morning view stays focused on the task list.
+const isEvening = computed(
+  () => greetingKey.value === 'greeting.evening' || greetingKey.value === 'greeting.night',
+)
 
 const taskMap = computed(() => {
   const map = new Map<
@@ -128,8 +123,6 @@ const entries = computed(() => daily.value?.entries ?? [])
 const doneCount = computed(
   () => entries.value.filter((e) => taskMap.value.get(e.taskId)?.status === 'done').length,
 )
-
-const mitCount = computed(() => entries.value.filter((e) => e.isMIT).length)
 
 const activeEntries = computed(() =>
   entries.value
@@ -272,50 +265,14 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
             />
             <div class="min-w-0 flex-1">
               <p class="font-body text-ink text-sm leading-snug font-semibold">{{ summaryMsg }}</p>
-              <div
-                v-if="streak > 0 || entries.length > 0 || level > 1"
-                class="mt-2 flex flex-wrap gap-1.5"
-              >
+              <div v-if="streak > 0" class="mt-2 flex flex-wrap gap-1.5">
                 <StreakFlame
-                  v-if="streak > 0"
                   :streak="streak"
                   :shields="shields"
                   :shield-used-recently="shieldUsedRecently"
                 />
-                <div
-                  v-if="entries.length > 0"
-                  class="bg-sage/10 inline-flex items-center gap-1 rounded-full px-2.5 py-1"
-                >
-                  <AppIcon name="zap" :size="13" class="text-sage-deep" />
-                  <span class="text-sage-deep text-xs font-bold">{{
-                    t('today.mitCounter', { count: mitCount })
-                  }}</span>
-                </div>
-                <div
-                  v-if="level > 1"
-                  data-test="level-chip"
-                  class="bg-cat-mauve/15 inline-flex items-center rounded-full px-2.5 py-1"
-                >
-                  <span class="text-cat-mauve text-xs font-bold">{{
-                    t('today.level', { n: level })
-                  }}</span>
-                </div>
               </div>
             </div>
-          </div>
-
-          <!-- Activity heatmap (compact) -->
-          <div
-            v-if="heatmap && heatmap.max > 0"
-            class="surface-card mb-6 rounded-2xl p-4 shadow-sm"
-          >
-            <div class="mb-3 flex items-center gap-1.5">
-              <AppIcon name="flame" :size="14" class="text-apricot-deep" />
-              <p class="font-display text-ink text-xs font-extrabold">
-                {{ t('rewards.heatmap.title') }}
-              </p>
-            </div>
-            <ActivityHeatmap :days="heatmap.days" :max="heatmap.max" :show-labels="false" />
           </div>
 
           <!-- Loading -->
@@ -381,8 +338,8 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
             <QuestPanel />
           </div>
 
-          <!-- Evening journal: log already-done tasks + thoughts of the day -->
-          <EveningJournal />
+          <!-- Evening journal: log already-done tasks + thoughts of the day (evening/night only) -->
+          <EveningJournal v-if="isEvening" />
 
           <!-- Gentle note (mobile/tablet) -->
           <SoftNote class="mt-5 lg:hidden">{{ t('rewards.gentleNote') }}</SoftNote>
