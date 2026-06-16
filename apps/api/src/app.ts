@@ -14,8 +14,9 @@ import { buildFeedbackHandlers } from './service/feedback.js'
 import { buildRewardsHandlers } from './service/rewards.js'
 import { buildQuestsHandlers } from './service/quests.js'
 import { buildPushHandlers } from './service/push.js'
-import { buildAuthHandlers } from './auth/handlers.js'
+import { buildAuthHandlers, stubAuthHandlers } from './auth/handlers.js'
 import type { GetUserId } from './auth/guard.js'
+import type { TokenService } from './auth/tokens.js'
 
 /** BearerAuth security handler: succeeds (optionally setting `req.userId`) or throws to reject. */
 type BearerGuard = (req: import('fastify').FastifyRequest) => Promise<void>
@@ -31,6 +32,8 @@ export interface AppOptions {
   getUserId?: GetUserId
   /** Real BearerAuth guard (Phase 4+). When absent, a `getUserId` pass-through is used. */
   bearerGuard?: BearerGuard
+  /** Token service powering /auth handlers. When absent, auth routes are stubbed (501). */
+  tokens?: TokenService
 }
 
 export function buildApp(opts: AppOptions = {}) {
@@ -63,7 +66,7 @@ export function buildApp(opts: AppOptions = {}) {
           ...buildRewardsHandlers(opts.prisma, opts.getUserId),
           ...buildQuestsHandlers(opts.prisma, opts.getUserId),
           ...buildPushHandlers(opts.prisma, opts.getUserId),
-          ...buildAuthHandlers(opts.prisma),
+          ...(opts.tokens ? buildAuthHandlers(opts.prisma, opts.tokens) : stubAuthHandlers),
         }
       : stubService
 

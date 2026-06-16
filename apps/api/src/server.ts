@@ -16,6 +16,7 @@ const app = buildApp({
   prisma,
   getUserId: getUserIdFromRequest,
   bearerGuard: makeBearerGuard(tokens),
+  tokens,
 })
 
 async function shutdown(): Promise<void> {
