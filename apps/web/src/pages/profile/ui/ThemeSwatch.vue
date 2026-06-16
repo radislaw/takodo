@@ -11,6 +11,10 @@ const props = defineProps<{
   active: boolean
   locked: boolean
   lockedLevel?: number
+  /** When true the lock is a first-task gift, not a level gate. */
+  lockFirstTask?: boolean
+  /** Short display label override (e.g. "Светлая") — falls back to the theme name. */
+  label?: string
 }>()
 
 const emit = defineEmits<{ select: [id: string] }>()
@@ -18,13 +22,16 @@ const emit = defineEmits<{ select: [id: string] }>()
 const { t } = useI18n({ useScope: 'global' })
 
 function ariaLabel(): string {
-  if (props.locked) {
-    return t('profile.theme.lockedAria', {
-      name: t('profile.themes.' + props.id),
-      level: props.lockedLevel,
-    })
-  }
-  return t('profile.themes.' + props.id)
+  const name = t('profile.themes.' + props.id)
+  if (props.lockFirstTask) return t('profile.theme.lockedFirstTaskAria', { name })
+  if (props.locked) return t('profile.theme.lockedAria', { name, level: props.lockedLevel })
+  return name
+}
+
+function bottomLabel(): string {
+  if (props.lockFirstTask) return t('profile.theme.lockedFirstTask')
+  if (props.locked) return t('profile.theme.lockedLevel', { n: props.lockedLevel })
+  return props.label ?? t(`profile.themes.${props.id}`)
 }
 </script>
 
@@ -57,7 +64,14 @@ function ariaLabel(): string {
         <AppIcon name="check" :size="12" color="#fff" :stroke-width="3" />
       </span>
       <span
-        v-if="locked"
+        v-else-if="lockFirstTask"
+        data-test="theme-gift"
+        class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[11px] shadow-sm"
+        aria-hidden="true"
+        >{{ t('profile.theme.lockedFirstTask') }}</span
+      >
+      <span
+        v-else-if="locked"
         data-test="theme-lock"
         class="bg-ink-soft absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full shadow-sm"
       >
@@ -65,10 +79,10 @@ function ariaLabel(): string {
       </span>
     </div>
     <span
-      class="text-center text-[11px] leading-tight font-bold"
+      class="w-14 truncate text-center text-[11px] leading-tight font-bold"
       :class="active ? 'text-ink' : 'text-ink-soft'"
     >
-      {{ locked ? t('profile.theme.lockedLevel', { n: lockedLevel }) : t(`profile.themes.${id}`) }}
+      {{ bottomLabel() }}
     </span>
   </button>
 </template>

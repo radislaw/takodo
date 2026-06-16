@@ -10,21 +10,22 @@ describe('AppLogoMark', () => {
     expect(svg.attributes('height')).toBe('28')
   })
 
-  it('renders 3 paths', () => {
+  it('renders the octopus body paths and two eye rects', () => {
     const wrapper = mount(AppLogoMark)
-    expect(wrapper.findAll('path').length).toBe(3)
+    expect(wrapper.findAll('path').length).toBe(4)
+    expect(wrapper.findAll('rect').length).toBe(2)
   })
 
-  it('uses dark stroke for bottom path when not light', () => {
+  it('fills eyes with the theme gradient when not light', () => {
     const wrapper = mount(AppLogoMark, { props: { light: false } })
-    const paths = wrapper.findAll('path')
-    expect(paths[0]!.attributes('stroke')).toBe('#2C3A33')
+    const eyes = wrapper.findAll('rect')
+    expect(eyes[0]!.attributes('fill')).toBe('var(--logo-eye-override, url(#lgm-grad))')
   })
 
-  it('uses light transparent stroke when light=true', () => {
+  it('fills eyes with translucent white when light=true', () => {
     const wrapper = mount(AppLogoMark, { props: { light: true } })
-    const paths = wrapper.findAll('path')
-    expect(paths[0]!.attributes('stroke')).toBe('rgba(255,255,255,.3)')
+    const eyes = wrapper.findAll('rect')
+    expect(eyes[0]!.attributes('fill')).toBe('rgba(255,255,255,0.9)')
   })
 
   it('applies custom size', () => {

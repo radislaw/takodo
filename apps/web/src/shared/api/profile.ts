@@ -4,7 +4,6 @@ import { useErrorToast } from '@/shared/lib/useErrorToast'
 type Theme =
   | 'light'
   | 'lavender'
-  | 'cloud'
   | 'eco'
   | 'ocean'
   | 'silent'
@@ -13,8 +12,11 @@ type Theme =
   | 'dark'
   | 'forest'
   | 'lavender-dark'
+  | 'ocean-dark'
+  | 'silent-dark'
   | 'cyberpunk'
   | 'amber'
+  | 'amber-dark'
   | 'amoled'
 
 export function useProfile() {

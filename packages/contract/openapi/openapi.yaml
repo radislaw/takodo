@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: tootoo API
+  title: TakoDo API
   description: |-
-    tootoo API — the single source of truth contract.
+    TakoDo API — the single source of truth contract.
     Scope: Phase 0.4 — single-user, no auth.
     Changes happen only here → regen OpenAPI/types. Do not edit generated output by hand.
   version: 0.0.0
@@ -1339,7 +1339,6 @@ components:
       enum:
         - light
         - lavender
-        - cloud
         - eco
         - ocean
         - silent
@@ -1348,8 +1347,11 @@ components:
         - dark
         - forest
         - lavender-dark
-        - cyberpunk
+        - ocean-dark
+        - silent-dark
         - amber
+        - amber-dark
+        - cyberpunk
         - amoled
       description: Matches data-theme attribute values in tokens.css.
     VapidPublicKey:

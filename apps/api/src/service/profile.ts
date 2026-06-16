@@ -1,7 +1,12 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
-import { isThemeUnlocked, themeUnlockLevel } from '../domain/unlocks.js'
-import { getUserLevel } from './xp.js'
+import {
+  isThemeUnlocked,
+  isBaseTheme,
+  isFirstTaskTheme,
+  themeUnlockLevel,
+} from '../domain/unlocks.js'
+import { getUserProgress } from './xp.js'
 
 type GetUserId = () => Promise<string>
 
@@ -37,14 +42,15 @@ export function buildProfileHandlers(prisma: PrismaClient, getUserId: GetUserId)
         language?: string
       }
 
-      // Level-1 themes skip the level computation entirely.
-      if (body.theme !== undefined && themeUnlockLevel(body.theme) > 1) {
-        const level = await getUserLevel(prisma, userId)
-        if (!isThemeUnlocked(body.theme, level)) {
-          return reply.code(403).send({
-            code: 'theme_locked',
-            message: `Theme "${body.theme}" unlocks at level ${themeUnlockLevel(body.theme)}`,
-          })
+      // Base themes (light, high-contrast) are always allowed — skip the query.
+      // First-task and level-gated themes need the user's progress.
+      if (body.theme !== undefined && !isBaseTheme(body.theme)) {
+        const progress = await getUserProgress(prisma, userId)
+        if (!isThemeUnlocked(body.theme, progress)) {
+          const reason = isFirstTaskTheme(body.theme)
+            ? `Theme "${body.theme}" unlocks after the first completed task`
+            : `Theme "${body.theme}" unlocks at level ${themeUnlockLevel(body.theme)}`
+          return reply.code(403).send({ code: 'theme_locked', message: reason })
         }
       }
 
