@@ -28,7 +28,6 @@ enum TaskCategory {
 enum Theme {
   light,
   lavender,
-  cloud,
   eco,
   ocean,
   silent,
@@ -37,8 +36,11 @@ enum Theme {
   dark,
   forest,
   lavenderDark: "lavender-dark",
-  cyberpunk,
+  oceanDark: "ocean-dark",
+  silentDark: "silent-dark",
   amber,
+  amberDark: "amber-dark",
+  cyberpunk,
   amoled,
 }
 

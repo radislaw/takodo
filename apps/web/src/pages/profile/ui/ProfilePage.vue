@@ -3,7 +3,7 @@ import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppIcon } from '@/shared/ui'
 import { useProfile, useUpdateProfile, useRewards, useNotifications } from '@/shared/api'
-import { isThemeUnlocked, themeUnlockLevel } from '@/shared/lib/unlocks'
+import { isThemeUnlocked, isFirstTaskTheme, themeUnlockLevel } from '@/shared/lib/unlocks'
 import { TIMEZONE_IDS, detectTimezone, formatTimezoneLabel } from '@/shared/lib/timezones'
 import ThemeSwatch from './ThemeSwatch.vue'
 import ProfileSurvey from './ProfileSurvey.vue'
@@ -15,6 +15,10 @@ const { mutate: updateProfile } = useUpdateProfile()
 const { data: rewards } = useRewards()
 
 const level = computed(() => rewards.value?.level ?? 1)
+const firstTaskDone = computed(
+  () => rewards.value?.badges?.find((b) => b.id === 'first_step')?.earned ?? false,
+)
+const unlockState = computed(() => ({ level: level.value, firstTaskDone: firstTaskDone.value }))
 
 // Timezone: friendly select; auto-detect and persist once when the user has none.
 const detectedTz = detectTimezone()
@@ -39,21 +43,27 @@ watch(
 )
 
 function isLocked(id: string): boolean {
-  return !isThemeUnlocked(id, level.value)
+  return !isThemeUnlocked(id, unlockState.value)
+}
+
+function isGiftLock(id: string): boolean {
+  return isFirstTaskTheme(id) && isLocked(id)
 }
 
 type ThemeId =
   | 'light'
   | 'lavender'
-  | 'cloud'
   | 'eco'
   | 'ocean'
   | 'silent'
   | 'dark'
   | 'forest'
   | 'lavender-dark'
+  | 'ocean-dark'
+  | 'silent-dark'
   | 'cyberpunk'
   | 'amber'
+  | 'amber-dark'
   | 'amoled'
 
 type A11yThemeId = 'high-contrast' | 'high-contrast-dark'
@@ -66,69 +76,100 @@ interface ThemeMeta {
   border?: string
 }
 
-const THEMES: ThemeMeta[] = [
-  {
+interface ThemeGroup {
+  key: string
+  light: ThemeMeta
+  dark: ThemeMeta
+}
+
+const M = {
+  light: {
     id: 'light',
     bg: 'linear-gradient(135deg, #DCEAFF 0%, #F3E3F7 55%, #DFF0F4 100%)',
     accent: '#4F8FDD',
     reward: '#E89A6E',
   },
-  {
-    id: 'lavender',
-    bg: 'linear-gradient(135deg, #E8E0F4 0%, #F8E4F4 55%, #EEEAFF 100%)',
-    accent: '#8E84B8',
-    reward: '#E0A87E',
-  },
-  {
-    id: 'cloud',
-    bg: 'linear-gradient(135deg, #D8E8F2 0%, #F0EEF8 55%, #E4EEF8 100%)',
-    accent: '#6890BE',
-    reward: '#E09070',
-  },
-  {
-    id: 'eco',
-    bg: 'linear-gradient(135deg, #DDE8D2 0%, #F5F2E4 55%, #EBEEDC 100%)',
-    accent: '#6B8A56',
-    reward: '#C57043',
-  },
-  {
-    id: 'ocean',
-    bg: 'linear-gradient(135deg, #C8E8F0 0%, #EAF8F5 55%, #DAF0F8 100%)',
-    accent: '#2E8FA8',
-    reward: '#E07050',
-  },
-  {
-    id: 'silent',
-    bg: 'linear-gradient(135deg, #EAE9E6 0%, #F2F0ED 55%, #F0EDEA 100%)',
-    accent: '#8E9090',
-    reward: '#C4A78A',
-  },
-  {
+  dark: {
     id: 'dark',
     bg: 'linear-gradient(135deg, #131A2E 0%, #261632 55%, #122230 100%)',
     accent: '#6DA3E8',
     reward: '#EBA87C',
   },
-  {
-    id: 'forest',
-    bg: 'linear-gradient(135deg, #121A14 0%, #1E2414 55%, #172018 100%)',
-    accent: '#8FAEA5',
-    reward: '#E6B088',
+  lavender: {
+    id: 'lavender',
+    bg: 'linear-gradient(135deg, #E8E0F4 0%, #F8E4F4 55%, #EEEAFF 100%)',
+    accent: '#8E84B8',
+    reward: '#E0A87E',
   },
-  {
+  'lavender-dark': {
     id: 'lavender-dark',
     bg: 'linear-gradient(135deg, #141220 0%, #261534 55%, #1C1830 100%)',
     accent: '#A49AD4',
     reward: '#E6B088',
   },
-  { id: 'cyberpunk', bg: '#0A0820', accent: '#2F6BFF', reward: '#9D3DFF' },
-  {
+  eco: {
+    id: 'eco',
+    bg: 'linear-gradient(135deg, #DDE8D2 0%, #F5F2E4 55%, #EBEEDC 100%)',
+    accent: '#6B8A56',
+    reward: '#C57043',
+  },
+  forest: {
+    id: 'forest',
+    bg: 'linear-gradient(135deg, #121A14 0%, #1E2414 55%, #172018 100%)',
+    accent: '#8FAEA5',
+    reward: '#E6B088',
+  },
+  ocean: {
+    id: 'ocean',
+    bg: 'linear-gradient(135deg, #C8E8F0 0%, #EAF8F5 55%, #DAF0F8 100%)',
+    accent: '#2E8FA8',
+    reward: '#E07050',
+  },
+  'ocean-dark': {
+    id: 'ocean-dark',
+    bg: 'linear-gradient(135deg, #0A1820 0%, #102832 55%, #0C2230 100%)',
+    accent: '#3AAFC8',
+    reward: '#E88868',
+  },
+  silent: {
+    id: 'silent',
+    bg: 'linear-gradient(135deg, #EAE9E6 0%, #F2F0ED 55%, #F0EDEA 100%)',
+    accent: '#8E9090',
+    reward: '#C4A78A',
+  },
+  'silent-dark': {
+    id: 'silent-dark',
+    bg: 'linear-gradient(135deg, #1A1A18 0%, #1E1D1B 55%, #1C1B19 100%)',
+    accent: '#9CA09F',
+    reward: '#C4A78A',
+  },
+  amber: {
     id: 'amber',
+    bg: 'linear-gradient(135deg, #F6ECD6 0%, #F8EED8 55%, #F6ECD8 100%)',
+    accent: '#B87E10',
+    reward: '#C85A28',
+  },
+  'amber-dark': {
+    id: 'amber-dark',
     bg: 'linear-gradient(135deg, #161008 0%, #281600 55%, #201808 100%)',
     accent: '#C89018',
     reward: '#C85A28',
   },
+} as const satisfies Record<string, ThemeMeta>
+
+const THEME_GROUPS: ThemeGroup[] = [
+  { key: 'classic', light: M.light, dark: M.dark },
+  { key: 'lavender', light: M.lavender, dark: M['lavender-dark'] },
+  { key: 'eco', light: M.eco, dark: M.forest },
+  { key: 'ocean', light: M.ocean, dark: M['ocean-dark'] },
+  { key: 'silent', light: M.silent, dark: M['silent-dark'] },
+  { key: 'amber', light: M.amber, dark: M['amber-dark'] },
+]
+
+// Dark-only "special" themes — menu-only; the toggle pairs them with light.
+const SPECIAL_THEMES: ThemeMeta[] = [
   { id: 'amoled', bg: '#000000', accent: '#5AB4A0', reward: '#E09A64' },
+  { id: 'cyberpunk', bg: '#0A0820', accent: '#2F6BFF', reward: '#9D3DFF' },
 ]
 
 const A11Y_THEMES: ThemeMeta[] = [
@@ -242,17 +283,51 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
           </div>
         </div>
 
-        <!-- Regular themes -->
-        <div class="flex flex-wrap gap-x-2 gap-y-4">
-          <ThemeSwatch
-            v-for="th in THEMES"
-            :key="th.id"
-            v-bind="th"
-            :active="profile?.theme === th.id"
-            :locked="isLocked(th.id)"
-            :locked-level="themeUnlockLevel(th.id)"
-            @select="selectTheme"
-          />
+        <!-- Light/dark pairs — two-column grid keeps it compact -->
+        <div class="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3">
+          <div v-for="g in THEME_GROUPS" :key="g.key">
+            <p class="text-ink-soft mb-2 truncate text-xs font-semibold">
+              {{ t(`profile.theme.groups.${g.key}`) }}
+            </p>
+            <div class="flex gap-x-2">
+              <ThemeSwatch
+                v-bind="g.light"
+                :label="t('profile.theme.variantLight')"
+                :active="profile?.theme === g.light.id"
+                :locked="isLocked(g.light.id)"
+                :locked-level="themeUnlockLevel(g.light.id)"
+                :lock-first-task="isGiftLock(g.light.id)"
+                @select="selectTheme"
+              />
+              <ThemeSwatch
+                v-bind="g.dark"
+                :label="t('profile.theme.variantDark')"
+                :active="profile?.theme === g.dark.id"
+                :locked="isLocked(g.dark.id)"
+                :locked-level="themeUnlockLevel(g.dark.id)"
+                :lock-first-task="isGiftLock(g.dark.id)"
+                @select="selectTheme"
+              />
+            </div>
+          </div>
+
+          <!-- Special dark-only themes -->
+          <div>
+            <p class="text-ink-soft mb-2 truncate text-xs font-semibold">
+              {{ t('profile.theme.specialLabel') }}
+            </p>
+            <div class="flex gap-x-2">
+              <ThemeSwatch
+                v-for="th in SPECIAL_THEMES"
+                :key="th.id"
+                v-bind="th"
+                :active="profile?.theme === th.id"
+                :locked="isLocked(th.id)"
+                :locked-level="themeUnlockLevel(th.id)"
+                @select="selectTheme"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -261,14 +336,17 @@ function toggleNotif(key: 'notifMorning' | 'notifEvening') {
         {{ t('profile.theme.a11yLabel') }}
       </p>
       <div class="surface-card rounded-2xl p-5 shadow-md">
-        <div class="flex flex-wrap gap-x-2 gap-y-4">
-          <!-- A11y themes are level 1 by domain rule — never locked. -->
+        <div class="flex gap-x-2">
+          <!-- high-contrast is always available; high-contrast-dark is a first-task gift. -->
           <ThemeSwatch
-            v-for="th in A11Y_THEMES"
+            v-for="(th, i) in A11Y_THEMES"
             :key="th.id"
             v-bind="th"
+            :label="i === 0 ? t('profile.theme.variantLight') : t('profile.theme.variantDark')"
             :active="profile?.theme === th.id"
-            :locked="false"
+            :locked="isLocked(th.id)"
+            :locked-level="themeUnlockLevel(th.id)"
+            :lock-first-task="isGiftLock(th.id)"
             @select="selectTheme"
           />
         </div>

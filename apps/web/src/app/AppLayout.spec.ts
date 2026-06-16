@@ -6,6 +6,7 @@ import AppLayout from './AppLayout.vue'
 
 vi.mock('@/shared/api', () => ({
   useProfile: () => ({ data: ref({ name: '', theme: 'amoled' }) }),
+  useUpdateProfile: () => ({ mutate: vi.fn() }),
   useRewards: () => ({
     data: ref({ streak: 6, shields: 1, shieldUsedRecently: false, week: [], badges: [] }),
   }),

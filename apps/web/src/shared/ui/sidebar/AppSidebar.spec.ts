@@ -70,7 +70,8 @@ describe('AppSidebar', () => {
 
   it('renders the two-tone wordmark', () => {
     const wrapper = make()
-    expect(wrapper.text()).toContain('Too')
+    expect(wrapper.text()).toContain('Tako')
+    expect(wrapper.text()).toContain('Do')
   })
 
   it('matches snapshot', () => {

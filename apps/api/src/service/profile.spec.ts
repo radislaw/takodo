@@ -79,8 +79,8 @@ describe('Profile routes', () => {
 
   describe('PATCH /me', () => {
     it('updates theme', async () => {
-      // amoled unlocks at level 5 → 1600 xp → 160 completed tasks
-      mockLevelSources({ completedCount: 160 })
+      // amoled unlocks at level 15 → 19600 xp → 1960 completed tasks
+      mockLevelSources({ completedCount: 1960 })
       prisma.user.update.mockResolvedValue(makeUser({ theme: 'amoled' }))
       const res = await app.inject({
         method: 'PATCH',
@@ -150,7 +150,32 @@ describe('Profile routes', () => {
       expect(prisma.task.findMany).not.toHaveBeenCalled()
     })
 
-    it('accepts base theme without level queries', async () => {
+    it('accepts base theme without progress queries', async () => {
+      prisma.user.update.mockResolvedValue(makeUser({ theme: 'light' }))
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { theme: 'light' },
+      })
+      expect(res.statusCode).toBe(200)
+      expect(prisma.task.aggregate).not.toHaveBeenCalled()
+      expect(prisma.dailyEntry.count).not.toHaveBeenCalled()
+    })
+
+    it('rejects first-task theme (dark) before any task is completed', async () => {
+      mockLevelSources({ completedCount: 0 })
+      const res = await app.inject({
+        method: 'PATCH',
+        url: '/me',
+        payload: { theme: 'dark' },
+      })
+      expect(res.statusCode).toBe(403)
+      expect((res.json() as { code: string }).code).toBe('theme_locked')
+      expect(prisma.user.update).not.toHaveBeenCalled()
+    })
+
+    it('accepts first-task theme (dark) once a task is completed', async () => {
+      mockLevelSources({ completedCount: 1 }) // first task done, still level 1
       prisma.user.update.mockResolvedValue(makeUser({ theme: 'dark' }))
       const res = await app.inject({
         method: 'PATCH',
@@ -158,8 +183,7 @@ describe('Profile routes', () => {
         payload: { theme: 'dark' },
       })
       expect(res.statusCode).toBe(200)
-      expect(prisma.task.aggregate).not.toHaveBeenCalled()
-      expect(prisma.dailyEntry.count).not.toHaveBeenCalled()
+      expect((res.json() as { theme: string }).theme).toBe('dark')
     })
 
     it('skips level check when only name is updated', async () => {

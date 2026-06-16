@@ -559,80 +559,6 @@
 }
 
 /* ============================================================
-   CLOUD DANCER THEME — "облачный танец"
-   Airy, matte — soft sky mist, pale aqua recess, periwinkle
-   blue accent. Quiet and light like an overcast morning.
-   Opt in with <element data-theme="cloud">.
-   ============================================================ */
-[data-theme='cloud'] {
-  /* Fill tokens — must re-declare so var(--sage) resolves in this scope */
-  --accent-fill: var(--sage);
-  --reward-fill: var(--apricot);
-  --logo-start: #2c70bc;
-  --logo-end: #88c8f6;
-  /* Surfaces — sky mist gradient */
-  --cream: linear-gradient(
-    165deg,
-    #d8e8f2 0%,
-    #eaf3fa 28%,
-    #f0eef8 55%,
-    #d6e8f4 82%,
-    #e4eef8 100%
-  ); /* soft cloud white */
-  --cream-deep: #e0e8f0; /* blue-grey well */
-  --card: #f7fafd; /* lifted cloud white */
-
-  /* Ink — cool slate-blue, never harsh */
-  --ink: #334455;
-  --ink-soft: #7090a4;
-  --ink-faint: #aabece;
-
-  /* Accent — periwinkle sky blue */
-  --sage: #6890be;
-  --sage-press: #5478ac;
-  --sage-deep: #3d6494; /* accent text on light */
-  --sage-tint: #d8e8f5;
-  --sage-tint-2: #c0d8ee;
-
-  /* Reward — warm coral-peach (warm/cool contrast) */
-  --apricot: #e09070;
-  --apricot-press: #cc7858;
-  --apricot-deep: #a85c3c;
-  --apricot-tint: #f5e4dc;
-
-  /* Soft semantic — sky-tinted pastels */
-  --done: #6aa898;
-  --done-tint: #d8eee8;
-  --gentle: #c8a850;
-  --gentle-tint: #f0e8d4;
-  --softrose: #c09898;
-  --softrose-tint: #eee2e0;
-
-  /* Category dots — sky & cloud spectrum */
-  --cat-sage: #78a8c8;
-  --cat-apricot: #e09070;
-  --cat-blue: #6890be;
-  --cat-clay: #c09888;
-  --cat-gold: #c8b070;
-  --cat-mauve: #9894bc;
-
-  /* Lines & edges */
-  --line: #d0dcea;
-  --line-card: #dce8f2;
-  --line-strong: #bacad8;
-
-  --nav-inactive: #5b7686;
-
-  /* Elevation — airy, barely there */
-  --shadow-sm: 0 1px 2px rgba(51, 68, 85, 0.05), 0 1px 1px rgba(51, 68, 85, 0.03);
-  --shadow-md: 0 2px 6px rgba(51, 68, 85, 0.06), 0 4px 12px rgba(51, 68, 85, 0.04);
-  --shadow-lg: 0 6px 16px rgba(51, 68, 85, 0.07), 0 12px 32px rgba(51, 68, 85, 0.05);
-  --shadow-pop: 0 12px 40px rgba(51, 68, 85, 0.13);
-  --ring: 0 0 0 3px rgba(104, 144, 190, 0.32);
-  --ring-apr: 0 0 0 3px rgba(224, 144, 112, 0.34);
-}
-
-/* ============================================================
    OCEAN THEME — "океан"
    Deep teal waters, coral reward, pale seafoam surfaces.
    Calm and expansive — like the sea on a quiet morning.
@@ -704,6 +630,73 @@
   --shadow-pop: 0 12px 40px rgba(24, 52, 68, 0.14);
   --ring: 0 0 0 3px rgba(46, 143, 168, 0.34);
   --ring-apr: 0 0 0 3px rgba(224, 112, 80, 0.34);
+}
+
+/* ============================================================
+   OCEAN DARK THEME — "океан · ночь"
+   Dark counterpart of OCEAN. Deep abyssal navy gradient,
+   lifted teal accent, warm coral reward over dark sea-glass.
+   Opt in with <element data-theme="ocean-dark">.
+   ============================================================ */
+[data-theme='ocean-dark'] {
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  --logo-start: #1c64c4;
+  --logo-end: #5ab8ee;
+
+  /* Surfaces — deep abyssal navy gradient */
+  --cream: linear-gradient(165deg, #0a1820 0%, #0e222c 28%, #102832 55%, #0a1c26 82%, #0c2230 100%);
+  --cream-deep: #081218;
+  --card: #14282f;
+
+  /* Ink — pale seafoam off-white */
+  --ink: #e4f1f6;
+  --ink-soft: #93b4c1;
+  --ink-faint: #5a7986;
+
+  /* Accent — teal, lifted for contrast on dark */
+  --sage: #3aafc8;
+  --sage-press: #2e9bb2;
+  --sage-deep: #6fcfe2; /* accent text on dark */
+  --sage-tint: #102b33; /* selected bg, teal wash */
+  --sage-tint-2: #18353f; /* stronger wash, progress track */
+
+  /* Reward — warm coral, lifted */
+  --apricot: #e88868;
+  --apricot-press: #d67454;
+  --apricot-deep: #f0a586; /* reward text on dark */
+  --apricot-tint: #311810; /* reward wash, badge bg */
+
+  /* Soft semantic — ocean-tinted dark washes */
+  --done: #4cb89c;
+  --done-tint: #102a26;
+  --gentle: #d2a850;
+  --gentle-tint: #2a2410;
+  --softrose: #cc8a8a;
+  --softrose-tint: #2e1c1c;
+
+  /* Category dots — lifted, read on dark sea-glass */
+  --cat-sage: #3aafc8;
+  --cat-apricot: #e88868;
+  --cat-blue: #4c92d4;
+  --cat-clay: #cc9070;
+  --cat-gold: #d2b04c;
+  --cat-mauve: #9c8cd0;
+
+  /* Lines & edges */
+  --line: #1e3a44;
+  --line-card: #1a333c;
+  --line-strong: #2c4e5a;
+
+  --nav-inactive: #93b4c1;
+
+  /* Elevation — deep sea shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.44), 0 1px 2px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 8px 22px rgba(0, 0, 0, 0.5);
+  --shadow-pop: 0 16px 44px rgba(0, 0, 0, 0.6);
+  --ring: 0 0 0 3px rgba(58, 175, 200, 0.42);
+  --ring-apr: 0 0 0 3px rgba(232, 136, 104, 0.42);
 }
 
 /* ============================================================
@@ -843,13 +836,81 @@
 }
 
 /* ============================================================
-   AMBER THEME — "янтарь" (low-blue-light, evening)
+   SILENT DARK THEME — "тихий · ночь"
+   Dark counterpart of SILENT. Near-monochrome dark: colour is
+   drained almost to zero so nothing vibrates. Warm graphite
+   surfaces, quiet grey accent, barely-there dusty reward.
+   Opt in with <element data-theme="silent-dark">.
+   ============================================================ */
+[data-theme='silent-dark'] {
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  --logo-start: #50506e;
+  --logo-end: #aaaace;
+
+  /* Surfaces — near-monochrome dark, barely perceptible warmth */
+  --cream: linear-gradient(165deg, #1a1a18 0%, #201f1d 28%, #1e1d1b 55%, #161614 82%, #1c1b19 100%);
+  --cream-deep: #141413;
+  --card: #252422;
+
+  /* Ink — warm soft off-white, never pure */
+  --ink: #e6e4e0;
+  --ink-soft: #9d9a95;
+  --ink-faint: #6a6762;
+
+  /* Accent — quiet grey, almost colourless */
+  --sage: #9ca09f;
+  --sage-press: #8a8e8d;
+  --sage-deep: #c0c4c3; /* accent text on dark */
+  --sage-tint: #2a2a28; /* selected bg */
+  --sage-tint-2: #353433; /* progress track */
+
+  /* Reward — dusty tan, barely warm */
+  --apricot: #c4a78a;
+  --apricot-press: #b09476;
+  --apricot-deep: #d6bca0; /* reward text on dark */
+  --apricot-tint: #2c261f; /* reward wash */
+
+  /* Soft semantic — all desaturated dark */
+  --done: #8fa494;
+  --done-tint: #1e2620;
+  --gentle: #bba880;
+  --gentle-tint: #2a2418;
+  --softrose: #c0a5a5;
+  --softrose-tint: #2a2222;
+
+  /* Category dots — muted grey tones, nothing vibrates */
+  --cat-sage: #9ca09f;
+  --cat-apricot: #c0a98e;
+  --cat-blue: #94a2ac;
+  --cat-clay: #b0a290;
+  --cat-gold: #bcb494;
+  --cat-mauve: #b0a4b2;
+
+  /* Lines & edges */
+  --line: #2e2d2a;
+  --line-card: #2a2926;
+  --line-strong: #403e3a;
+
+  --nav-inactive: #9d9a95;
+
+  /* Elevation — barely there, dark */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.34);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.36), 0 1px 2px rgba(0, 0, 0, 0.26);
+  --shadow-lg: 0 8px 22px rgba(0, 0, 0, 0.42);
+  --shadow-pop: 0 16px 44px rgba(0, 0, 0, 0.52);
+  --ring: 0 0 0 3px rgba(156, 160, 159, 0.3);
+  --ring-apr: 0 0 0 3px rgba(196, 167, 138, 0.32);
+}
+
+/* ============================================================
+   AMBER DARK THEME — "янтарь · ночь" (low-blue-light, evening)
    Warm dark brown void, amber accent, rust reward. No blue.
    Designed for wind-down: minimum blue-channel stimulation
    so the app can be used right before sleep without disruption.
-   Opt in with <element data-theme="amber">.
+   Opt in with <element data-theme="amber-dark">.
    ============================================================ */
-[data-theme='amber'] {
+[data-theme='amber-dark'] {
   --accent-fill: var(--sage);
   --reward-fill: var(--apricot);
   --logo-start: #c47414;
@@ -908,6 +969,74 @@
   --shadow-pop: 0 16px 44px rgba(0, 0, 0, 0.6);
   --ring: 0 0 0 3px rgba(200, 144, 24, 0.38);
   --ring-apr: 0 0 0 3px rgba(200, 90, 40, 0.38);
+}
+
+/* ============================================================
+   AMBER THEME — "янтарь" (warm daylight)
+   Light counterpart of AMBER DARK. Warm cream-amber paper,
+   amber accent, rust-copper reward. Low blue, cosy and warm —
+   the daytime sibling of the wind-down dark amber.
+   Opt in with <element data-theme="amber">.
+   ============================================================ */
+[data-theme='amber'] {
+  --accent-fill: var(--sage);
+  --reward-fill: var(--apricot);
+  --logo-start: #c47414;
+  --logo-end: #f6b850;
+
+  /* Surfaces — warm cream-amber paper gradient */
+  --cream: linear-gradient(165deg, #f6ecd6 0%, #faf3e2 28%, #f8eed8 55%, #f0e2c6 82%, #f6ecd8 100%);
+  --cream-deep: #ece0c6;
+  --card: #fdf8ee;
+
+  /* Ink — deep warm umber */
+  --ink: #3a2c16;
+  --ink-soft: #8a7450;
+  --ink-faint: #b8a584;
+
+  /* Accent — warm amber */
+  --sage: #b87e10;
+  --sage-press: #a06c0a;
+  --sage-deep: #8a5c08; /* accent text on light */
+  --sage-tint: #f2e6c8;
+  --sage-tint-2: #e8d6a8;
+
+  /* Reward — warm rust-copper */
+  --apricot: #c85a28;
+  --apricot-press: #b04a1e;
+  --apricot-deep: #8c3c18;
+  --apricot-tint: #f5e0d2;
+
+  /* Soft semantic — warm, no cool tones */
+  --done: #6f8a4e;
+  --done-tint: #e6ecd4;
+  --gentle: #c08818;
+  --gentle-tint: #f2e8cc;
+  --softrose: #b85a4a;
+  --softrose-tint: #f2ddd6;
+
+  /* Category dots — warm amber spectrum */
+  --cat-sage: #b87e10;
+  --cat-apricot: #c85a28;
+  --cat-blue: #6f8a4e; /* no blue — use warm green instead */
+  --cat-clay: #a06840;
+  --cat-gold: #c89818;
+  --cat-mauve: #a07868;
+
+  /* Lines & edges */
+  --line: #e6d6b8;
+  --line-card: #ecdec4;
+  --line-strong: #d4c096;
+
+  --nav-inactive: #8a7450;
+
+  /* Elevation — warm soft shadows */
+  --shadow-sm: 0 1px 2px rgba(80, 56, 16, 0.06), 0 1px 1px rgba(80, 56, 16, 0.04);
+  --shadow-md: 0 2px 6px rgba(80, 56, 16, 0.08), 0 4px 12px rgba(80, 56, 16, 0.05);
+  --shadow-lg: 0 6px 16px rgba(80, 56, 16, 0.09), 0 12px 32px rgba(80, 56, 16, 0.06);
+  --shadow-pop: 0 12px 40px rgba(80, 56, 16, 0.15);
+  --ring: 0 0 0 3px rgba(184, 126, 16, 0.36);
+  --ring-apr: 0 0 0 3px rgba(200, 90, 40, 0.36);
 }
 
 /* ============================================================

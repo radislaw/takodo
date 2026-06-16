@@ -2,13 +2,21 @@
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppBottomNav, AppSidebar, RewardBurst, AppToast } from '@/shared/ui'
+import {
+  AppBottomNav,
+  AppSidebar,
+  RewardBurst,
+  AppToast,
+  ThemeToggle,
+  GiftModal,
+} from '@/shared/ui'
 import type { IconName } from '@/shared/ui/icon/icons'
 import { useReward } from '@/shared/lib/useReward'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 import { useUndoDelete } from '@/shared/lib/useUndoDelete'
-import { useProfile, useRewards } from '@/shared/api'
+import { useProgressCelebration } from '@/shared/lib/useProgressCelebration'
+import { useProfile, useUpdateProfile, useRewards } from '@/shared/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -18,9 +26,20 @@ const { key: errorKey, hideError } = useErrorToast()
 const { key: successKey, hideSuccess } = useSuccessToast()
 const { pending: undoPending } = useUndoDelete()
 const { data: profile } = useProfile()
+const { mutate: updateProfile } = useUpdateProfile()
 const { data: rewards } = useRewards()
+const { current: celebration, dismiss: dismissCelebration } = useProgressCelebration()
 
-const theme = computed(() => profile.value?.theme ?? 'amoled')
+const theme = computed(() => profile.value?.theme ?? 'light')
+
+// The light/dark toggle is itself a first-task reward — hidden until then.
+const firstTaskDone = computed(
+  () => rewards.value?.badges?.find((b) => b.id === 'first_step')?.earned ?? false,
+)
+
+function handleThemeSelect(target: string) {
+  updateProfile({ theme: target as Parameters<typeof updateProfile>[0]['theme'] })
+}
 
 watch(
   () => profile.value?.language,
@@ -81,7 +100,9 @@ function handleTabChange(id: string) {
         @update:model-value="handleTabChange"
       />
     </div>
+    <ThemeToggle v-if="showChrome && firstTaskDone" :theme="theme" @select="handleThemeSelect" />
     <RewardBurst :show="isVisible" :epic="isEpic" @close="hide" />
+    <GiftModal :event="celebration" @dismiss="dismissCelebration" />
 
     <Teleport to="body">
       <Transition name="error-toast">

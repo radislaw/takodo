@@ -714,7 +714,7 @@ export interface components {
          * @description Matches data-theme attribute values in tokens.css.
          * @enum {string}
          */
-        Theme: "light" | "lavender" | "cloud" | "eco" | "ocean" | "silent" | "high-contrast" | "high-contrast-dark" | "dark" | "forest" | "lavender-dark" | "cyberpunk" | "amber" | "amoled";
+        Theme: "light" | "lavender" | "eco" | "ocean" | "silent" | "high-contrast" | "high-contrast-dark" | "dark" | "forest" | "lavender-dark" | "ocean-dark" | "silent-dark" | "amber" | "amber-dark" | "cyberpunk" | "amoled";
         VapidPublicKey: {
             publicKey: string;
         };

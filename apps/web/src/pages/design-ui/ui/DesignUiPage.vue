@@ -28,11 +28,13 @@ const themes = [
   { id: 'cyberpunk', label: 'Cyberpunk' },
   { id: 'high-contrast', label: 'High Contrast' },
   { id: 'high-contrast-dark', label: 'High Contrast Dark' },
-  { id: 'cloud', label: 'Cloud' },
   { id: 'ocean', label: 'Ocean' },
+  { id: 'ocean-dark', label: 'Ocean Dark' },
   { id: 'eco', label: 'Eco' },
   { id: 'silent', label: 'Silent' },
+  { id: 'silent-dark', label: 'Silent Dark' },
   { id: 'amber', label: 'Amber' },
+  { id: 'amber-dark', label: 'Amber Dark' },
   { id: 'amoled', label: 'AMOLED' },
 ]
 
