@@ -55,6 +55,16 @@ Product: Todo app for people with ADHD. Core loop: **brain dump → recursive sp
 - On Rewards page (full grid) and Today screen (compact, labels off; shown only with activity)
 - Rewards cache invalidations widened to prefix-match so the heatmap refreshes on completion
 
+### Auth — Multi-user JWT (2026-06-16)
+
+- In-house JWT (access 15 min + refresh 7d, rotate-on-use, reuse → family revoke)
+- Email + password (argon2id), email-link accounts
+- OAuth 2.0 / OIDC: Google, Yandex (ru/kk/be/uz locales only), Apple
+- Fastify `BearerAuth` guard wired via TypeSpec `@useAuth`; handlers resolve caller via `getUserId(req)`
+- Web: `/login`, `/signup`, `/auth/callback`; `beforeEach` router guard; single-flight refresh-on-401
+- Theme toggle + level-based unlocks (dark unlocks on first task; 7 levels → cyberpunk)
+- 819 tests pass
+
 ---
 
 ## Up next (no specific order)
@@ -71,16 +81,10 @@ Product: Todo app for people with ADHD. Core loop: **brain dump → recursive sp
 - `POST /tasks/:id/split` in contract; web shows editable suggestion list
 - `analytics.track('task_split')` seam wired
 
-### Logo & brand
-
-- 16 logo concepts designed (E and B variants nominated)
-- Select final, update `logo.svg` + `manifest.webmanifest` icons
-
 ### Leaderboard / social proof (Phase 2)
 
 - Anonymous weekly leaderboard (tasks done)
 - Streak comparison with friends (invite code)
-- Requires auth — blocked until auth ships
 
 ---
 
@@ -109,12 +113,6 @@ Product: Todo app for people with ADHD. Core loop: **brain dump → recursive sp
 - Onboarding calendar: user marks active days for streak seed
 - Deferred until public launch (requires auth + user identity)
 
-### Auth
-
-- Magic-link or OAuth
-- Multi-user: each user's data isolated by `userId`
-- Prerequisite for leaderboard, sync, notifications per-user push
-
 ### Rate limiting + deployment hardening
 
 - Accepted MVP debt — revisit before any non-localhost deployment
@@ -136,12 +134,12 @@ Product: Todo app for people with ADHD. Core loop: **brain dump → recursive sp
 
 ## Current state
 
-| Metric        | Value                                                           |
-| ------------- | --------------------------------------------------------------- |
-| Tests         | 623 (263 API + 360 web)                                         |
-| Screens       | Today, Tasks, Frequent, Do-mode, Profile, Rewards, Help         |
-| Themes        | 12 (AMOLED default)                                             |
-| Gamification  | XP, levels, streaks, shields, badges, quests, comeback, heatmap |
-| Notifications | VAPID push (morning + evening cron)                             |
-| Auth          | None (single-user MVP, `SEED_USER_EMAIL`)                       |
-| Deployment    | localhost only                                                  |
+| Metric        | Value                                                                  |
+| ------------- | ---------------------------------------------------------------------- |
+| Tests         | 819 (532 API + 287 web)                                                |
+| Screens       | Today, Tasks, Frequent, Do-mode, Profile, Rewards, Help, Login, Signup |
+| Themes        | 12 (AMOLED default; dark unlocks on first task)                        |
+| Gamification  | XP, levels, streaks, shields, badges, quests, comeback, heatmap        |
+| Notifications | VAPID push (morning + evening cron)                                    |
+| Auth          | JWT + argon2id + OAuth (Google / Yandex / Apple); multi-user           |
+| Deployment    | localhost only                                                         |
