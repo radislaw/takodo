@@ -14,6 +14,10 @@ import { buildFeedbackHandlers } from './service/feedback.js'
 import { buildRewardsHandlers } from './service/rewards.js'
 import { buildQuestsHandlers } from './service/quests.js'
 import { buildPushHandlers } from './service/push.js'
+import { buildAuthHandlers } from './auth/handlers.js'
+
+/** BearerAuth security handler: succeeds (optionally setting `req.userId`) or throws to reject. */
+type BearerGuard = (req: import('fastify').FastifyRequest) => Promise<void>
 
 const SPEC_PATH = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -24,6 +28,8 @@ export interface AppOptions {
   logger?: boolean
   prisma?: PrismaClient
   getUserId?: () => Promise<string>
+  /** Real BearerAuth guard (Phase 4+). When absent, a `getUserId` pass-through is used. */
+  bearerGuard?: BearerGuard
 }
 
 export function buildApp(opts: AppOptions = {}) {
@@ -41,6 +47,8 @@ export function buildApp(opts: AppOptions = {}) {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   })
 
+  app.decorateRequest('userId', '')
+
   app.get('/health', async () => ({ status: 'ok' }))
 
   const service =
@@ -54,12 +62,25 @@ export function buildApp(opts: AppOptions = {}) {
           ...buildRewardsHandlers(opts.prisma, opts.getUserId),
           ...buildQuestsHandlers(opts.prisma, opts.getUserId),
           ...buildPushHandlers(opts.prisma, opts.getUserId),
+          ...buildAuthHandlers(opts.prisma),
         }
       : stubService
+
+  // Pick the BearerAuth guard: real token verification (Phase 4+) if supplied,
+  // otherwise a test/dev pass-through that injects the seed user id.
+  const getUserId = opts.getUserId
+  const bearerGuard: BearerGuard | undefined =
+    opts.bearerGuard ??
+    (getUserId
+      ? async (req) => {
+          req.userId = await getUserId()
+        }
+      : undefined)
 
   void app.register(openapiGlue, {
     specification: SPEC_PATH,
     serviceHandlers: service,
+    ...(bearerGuard ? { securityHandlers: { BearerAuth: bearerGuard } } : {}),
   })
 
   return app

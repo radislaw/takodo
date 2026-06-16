@@ -25,6 +25,12 @@ export const stubService = {
   Me_update: notImplemented,
   FeedbackApi_create: notImplemented,
   Rewards_get: notImplemented,
+  Auth_signup: notImplemented,
+  Auth_login: notImplemented,
+  Auth_refresh: notImplemented,
+  Auth_logout: notImplemented,
+  Auth_oauthStart: notImplemented,
+  Auth_oauthCallback: notImplemented,
 }
 
 export type ServiceHandlers = typeof stubService
