@@ -31,6 +31,8 @@ function makeUser(overrides: Partial<User> = {}): User {
     notifMorning: true,
     notifEvening: true,
     createdAt: new Date(),
+    passwordHash: null,
+    emailVerified: null,
     gender: null,
     birthDate: null,
     timezone: null,
