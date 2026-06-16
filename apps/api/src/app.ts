@@ -15,6 +15,7 @@ import { buildRewardsHandlers } from './service/rewards.js'
 import { buildQuestsHandlers } from './service/quests.js'
 import { buildPushHandlers } from './service/push.js'
 import { buildAuthHandlers } from './auth/handlers.js'
+import type { GetUserId } from './auth/guard.js'
 
 /** BearerAuth security handler: succeeds (optionally setting `req.userId`) or throws to reject. */
 type BearerGuard = (req: import('fastify').FastifyRequest) => Promise<void>
@@ -27,7 +28,7 @@ const SPEC_PATH = join(
 export interface AppOptions {
   logger?: boolean
   prisma?: PrismaClient
-  getUserId?: () => Promise<string>
+  getUserId?: GetUserId
   /** Real BearerAuth guard (Phase 4+). When absent, a `getUserId` pass-through is used. */
   bearerGuard?: BearerGuard
 }
@@ -73,7 +74,7 @@ export function buildApp(opts: AppOptions = {}) {
     opts.bearerGuard ??
     (getUserId
       ? async (req) => {
-          req.userId = await getUserId()
+          req.userId = await getUserId(req)
         }
       : undefined)
 

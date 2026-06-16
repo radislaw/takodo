@@ -1,8 +1,7 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
 import { getVapidPublicKey, isAllowedPushEndpoint, sendPushToSubscription } from '../domain/push.js'
-
-type GetUserId = () => Promise<string>
+import type { GetUserId } from '../auth/guard.js'
 
 export function pushEnabled(): boolean {
   return Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY)
@@ -26,7 +25,7 @@ export function buildPushHandlers(prisma: PrismaClient, getUserId: GetUserId) {
           code: 'push_not_configured',
           message: 'Push notifications are not configured on this server.',
         })
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const body = req.body as { endpoint: string; p256dh: string; auth: string }
       if (!isAllowedPushEndpoint(body.endpoint))
         return reply.code(400).send({
@@ -54,7 +53,7 @@ export function buildPushHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Push_unsubscribe(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const body = req.body as { endpoint: string }
       await prisma.pushSubscription.deleteMany({
         where: { userId, endpoint: body.endpoint },

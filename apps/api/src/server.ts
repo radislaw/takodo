@@ -1,27 +1,22 @@
 import { buildApp } from './app.js'
 import { prisma } from './db/client.js'
 import { buildScheduler } from './service/push-scheduler.js'
+import { loadAuthConfig } from './auth/config.js'
+import { createTokenService } from './auth/tokens.js'
+import { getUserIdFromRequest, makeBearerGuard } from './auth/guard.js'
 
 const PORT = Number(process.env.PORT ?? 3001)
 const HOST = process.env.HOST ?? '127.0.0.1'
-const SEED_EMAIL = process.env.SEED_USER_EMAIL ?? 'dev@takodo.local'
 
-let cachedUserId: string | null = null
-
-async function getUserId(): Promise<string> {
-  if (cachedUserId) return cachedUserId
-  const user = await prisma.user.findUnique({ where: { email: SEED_EMAIL } })
-  if (!user) {
-    throw new Error(
-      `Seed user "${SEED_EMAIL}" not found — run \`pnpm --filter @takodo/api db:seed\``,
-    )
-  }
-  cachedUserId = user.id
-  return cachedUserId
-}
+const tokens = createTokenService(loadAuthConfig(), prisma)
 
 const scheduler = buildScheduler(prisma)
-const app = buildApp({ logger: true, prisma, getUserId })
+const app = buildApp({
+  logger: true,
+  prisma,
+  getUserId: getUserIdFromRequest,
+  bearerGuard: makeBearerGuard(tokens),
+})
 
 async function shutdown(): Promise<void> {
   scheduler.stop()

@@ -2,13 +2,12 @@ import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
 import { aggregateFrequent } from '../domain/frequent.js'
 import type { DomainTask, DomainDailyEntry } from '../domain/types.js'
-
-type GetUserId = () => Promise<string>
+import type { GetUserId } from '../auth/guard.js'
 
 export function buildFrequentHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
     async Frequent_list(req: FastifyRequest, _reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const query = req.query as { minDays?: string }
       const minDays = query.minDays !== undefined ? parseInt(query.minDays, 10) : 1
 

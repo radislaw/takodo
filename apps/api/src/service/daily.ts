@@ -2,13 +2,12 @@ import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
 import { toDateStr, parseDate } from '../domain/date.js'
 import { normalizeTitle } from '../domain/normalize.js'
-
-type GetUserId = () => Promise<string>
+import type { GetUserId } from '../auth/guard.js'
 
 export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
     async Daily_create(req: FastifyRequest, _reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { date } = req.body as { date: string }
       const dateVal = parseDate(date)
 
@@ -26,7 +25,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Daily_getByDate(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { date } = req.params as { date: string }
       const dateVal = parseDate(date)
 
@@ -54,7 +53,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Daily_addEntry(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { date } = req.params as { date: string }
       const { taskId } = req.body as { taskId: string }
       const dateVal = parseDate(date)
@@ -91,7 +90,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Daily_updateEntry(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { date, entryId } = req.params as { date: string; entryId: string }
       const dateVal = parseDate(date)
 
@@ -127,7 +126,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Daily_removeEntry(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { date, entryId } = req.params as { date: string; entryId: string }
       const dateVal = parseDate(date)
 
@@ -144,7 +143,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Daily_moveToTomorrow(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { date, entryId } = req.params as { date: string; entryId: string }
       const today = parseDate(date)
       const tomorrow = new Date(today)
@@ -194,7 +193,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Daily_setNote(req: FastifyRequest, _reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { date } = req.params as { date: string }
       const { note } = req.body as { note: string }
       const dateVal = parseDate(date)
@@ -221,7 +220,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
     },
 
     async Daily_logDone(req: FastifyRequest, _reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const { date } = req.params as { date: string }
       const { title } = req.body as { title: string }
       const dateVal = parseDate(date)

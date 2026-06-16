@@ -1,14 +1,13 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
-
-type GetUserId = () => Promise<string>
+import type { GetUserId } from '../auth/guard.js'
 
 const KINDS = new Set(['review', 'wish', 'support'])
 
 export function buildFeedbackHandlers(prisma: PrismaClient, getUserId: GetUserId) {
   return {
     async FeedbackApi_create(req: FastifyRequest, reply: FastifyReply) {
-      const userId = await getUserId()
+      const userId = await getUserId(req)
       const body = req.body as { kind: string; message: string; rating?: number }
 
       if (!KINDS.has(body.kind))
