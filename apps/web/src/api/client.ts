@@ -1,7 +1,7 @@
 import createClient from 'openapi-fetch'
 
 import type { paths } from '../../../../packages/contract/openapi/types.gen'
-import { getTokens, setTokens, clearTokens } from '@/shared/lib/authStorage'
+import { type AuthTokens, getTokens, setTokens, clearTokens } from '@/shared/lib/authStorage'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
 
@@ -26,8 +26,8 @@ async function refreshSession(): Promise<boolean> {
         clearTokens()
         return false
       }
-      const pair = (await res.json()) as { accessToken: string; refreshToken: string }
-      setTokens({ accessToken: pair.accessToken, refreshToken: pair.refreshToken })
+      const pair = (await res.json()) as AuthTokens
+      setTokens(pair)
       return true
     } catch {
       clearTokens()

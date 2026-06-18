@@ -1,7 +1,7 @@
-import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
+import { useQuery, useQueryCache } from '@pinia/colada'
 import { apiClient } from '@/api/client'
-import { useErrorToast } from '@/shared/lib/useErrorToast'
 import { useReward } from '@/shared/lib/useReward'
+import { useAppMutation } from '@/shared/api/useMutationHelper'
 
 export function todayDate(timeZone?: string): string {
   const tz = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -27,19 +27,17 @@ export async function fetchDailyByDate(date: string) {
 }
 
 export function useDailyToday() {
-  const date = todayDate()
   return useQuery({
-    key: () => ['daily', date],
-    query: () => fetchDailyByDate(date),
+    key: () => ['daily', todayDate()],
+    query: () => fetchDailyByDate(todayDate()),
   })
 }
 
 export function useAddDailyEntry() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  const date = todayDate()
-  return useMutation({
+  return useAppMutation({
     mutation: async (taskId: string) => {
+      const date = todayDate()
       const { data, error } = await apiClient.POST('/daily/{date}/entries', {
         params: { path: { date } },
         body: { taskId },
@@ -47,10 +45,8 @@ export function useAddDailyEntry() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onError: () => {
-      showError('errors.saveFailed')
-    },
     onSettled: () => {
+      const date = todayDate()
       // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
@@ -61,9 +57,7 @@ export function useAddDailyEntry() {
 
 export function useUpdateDailyEntry() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  const date = todayDate()
-  return useMutation({
+  return useAppMutation({
     mutation: async ({
       entryId,
       isMIT,
@@ -73,6 +67,7 @@ export function useUpdateDailyEntry() {
       isMIT?: boolean
       order?: number
     }) => {
+      const date = todayDate()
       const { data, error, response } = await apiClient.PATCH('/daily/{date}/entries/{entryId}', {
         params: { path: { date, entryId } },
         body: { isMIT, order },
@@ -84,12 +79,11 @@ export function useUpdateDailyEntry() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onError: (err: unknown) => {
-      if ((err as { code?: string }).code !== 'mit_limit') {
-        showError('errors.saveFailed')
-      }
+    onError: (err) => {
+      if ((err as { code?: string }).code === 'mit_limit') return true
     },
     onSettled: () => {
+      const date = todayDate()
       // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
@@ -100,10 +94,9 @@ export function useUpdateDailyEntry() {
 
 export function useMoveToTomorrow() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  const today = todayDate()
-  return useMutation({
+  return useAppMutation({
     mutation: async ({ entryId }: { entryId: string; taskId: string }) => {
+      const today = todayDate()
       const { data, error } = await apiClient.POST(
         '/daily/{date}/entries/{entryId}/move-to-tomorrow',
         { params: { path: { date: today, entryId } } },
@@ -111,10 +104,8 @@ export function useMoveToTomorrow() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onError: () => {
-      showError('errors.saveFailed')
-    },
     onSettled: () => {
+      const today = todayDate()
       // Server increments gentleMoves (badge) and today's entry set changes.
       queryCache.invalidateQueries({ key: ['daily', today], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })
@@ -125,10 +116,9 @@ export function useMoveToTomorrow() {
 
 export function useUpdateDailyNote() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  const date = todayDate()
-  return useMutation({
+  return useAppMutation({
     mutation: async (note: string) => {
+      const date = todayDate()
       const { data, error } = await apiClient.PUT('/daily/{date}/note', {
         params: { path: { date } },
         body: { note },
@@ -136,22 +126,18 @@ export function useUpdateDailyNote() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onError: () => {
-      showError('errors.saveFailed')
-    },
     onSettled: () => {
-      queryCache.invalidateQueries({ key: ['daily', date], exact: true })
+      queryCache.invalidateQueries({ key: ['daily', todayDate()], exact: true })
     },
   })
 }
 
 export function useLogDoneTask() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
   const { celebrate } = useReward()
-  const date = todayDate()
-  return useMutation({
+  return useAppMutation({
     mutation: async (title: string) => {
+      const date = todayDate()
       const { data, error } = await apiClient.POST('/daily/{date}/done', {
         params: { path: { date } },
         body: { title },
@@ -163,10 +149,8 @@ export function useLogDoneTask() {
       // Logging an already-done task earns the same dopamine burst as completing one.
       celebrate()
     },
-    onError: () => {
-      showError('errors.saveFailed')
-    },
     onSettled: () => {
+      const date = todayDate()
       // A done task counts toward stats — refresh rewards/quests alongside the day.
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
@@ -178,19 +162,16 @@ export function useLogDoneTask() {
 
 export function useRemoveDailyEntry() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  const date = todayDate()
-  return useMutation({
+  return useAppMutation({
     mutation: async (entryId: string) => {
+      const date = todayDate()
       const { error } = await apiClient.DELETE('/daily/{date}/entries/{entryId}', {
         params: { path: { date, entryId } },
       })
       if (error) throw new Error(error.message)
     },
-    onError: () => {
-      showError('errors.saveFailed')
-    },
     onSettled: () => {
+      const date = todayDate()
       // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
       queryCache.invalidateQueries({ key: ['daily', date], exact: true })
       queryCache.invalidateQueries({ key: ['quests'], exact: false })

@@ -9,25 +9,10 @@ import {
   type DayStats,
 } from '../domain/quests.js'
 import { gapDays, isComeback } from '../domain/comeback.js'
-import { toDateStr, parseDate } from '../domain/date.js'
+import { toDateStr, parseDate, resolveClientDate } from '../domain/date.js'
 import type { GetUserId } from '../auth/guard.js'
 
 type Db = PrismaClient | Prisma.TransactionClient
-
-const DAY_MS = 24 * 60 * 60 * 1000
-
-/**
- * The client's local day may differ from server UTC by up to one calendar day
- * (UTC-12…UTC+14). Accept it within that window; otherwise reject so a client
- * cannot claim quests for arbitrary past/future days.
- */
-function resolveQuestDate(raw: string | undefined): string | null {
-  const serverToday = toDateStr(new Date())
-  if (!raw) return serverToday
-  const diff = Math.abs(parseDate(raw).getTime() - parseDate(serverToday).getTime())
-  if (Number.isNaN(diff) || diff > DAY_MS) return null
-  return raw
-}
 
 async function loadDayStats(db: Db, userId: string, dateStr: string): Promise<DayStats> {
   const dayStart = parseDate(dateStr)
@@ -86,7 +71,7 @@ export function buildQuestsHandlers(prisma: PrismaClient, getUserId: GetUserId) 
   return {
     async Quests_list(req: FastifyRequest, reply: FastifyReply) {
       const userId = await getUserId(req)
-      const today = resolveQuestDate((req.query as { date?: string }).date)
+      const today = resolveClientDate((req.query as { date?: string }).date)
       if (!today) {
         return reply
           .status(400)
@@ -108,7 +93,7 @@ export function buildQuestsHandlers(prisma: PrismaClient, getUserId: GetUserId) 
     async Quests_claim(req: FastifyRequest, reply: FastifyReply) {
       const userId = await getUserId(req)
       const { id } = req.params as { id: string }
-      const today = resolveQuestDate((req.query as { date?: string }).date)
+      const today = resolveClientDate((req.query as { date?: string }).date)
       if (!today) {
         return reply
           .status(400)

@@ -57,7 +57,7 @@ export function useSignup() {
     mutation: async (body: { email: string; password: string; name?: string }) => {
       const { data, error } = await apiClient.POST('/auth/signup', { body })
       if (error || !data) throw error ?? new Error('signup_failed')
-      return data as AuthTokens
+      return data
     },
     onSuccess: (data) => applyTokens(data),
     onError: () => showError('auth.errors.signupFailed'),
@@ -70,7 +70,7 @@ export function useLogin() {
     mutation: async (body: { email: string; password: string }) => {
       const { data, error } = await apiClient.POST('/auth/login', { body })
       if (error || !data) throw error ?? new Error('login_failed')
-      return data as AuthTokens
+      return data
     },
     onSuccess: (data) => applyTokens(data),
     onError: () => showError('auth.errors.loginFailed'),
@@ -121,7 +121,7 @@ export function useOAuthCallback() {
         body: { code: vars.code, state: vars.state },
       })
       if (error || !data) throw error ?? new Error('oauth_callback_failed')
-      return data as AuthTokens
+      return data
     },
     onSuccess: (data) => applyTokens(data),
   })
