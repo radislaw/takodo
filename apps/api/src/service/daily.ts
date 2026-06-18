@@ -93,36 +93,38 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       const userId = await getUserId(req)
       const { date, entryId } = req.params as { date: string; entryId: string }
       const dateVal = parseDate(date)
-
-      const list = await prisma.dailyList.findUnique({
-        where: { userId_date: { userId, date: dateVal } },
-        include: { entries: true },
-      })
-      if (!list) {
-        return reply.status(404).send({ code: 'not_found', message: 'Daily list not found' })
-      }
-
-      const existingEntry = list.entries.find((e) => e.id === entryId)
-      if (!existingEntry) {
-        return reply.status(404).send({ code: 'not_found', message: 'Entry not found' })
-      }
-
       const body = req.body as { isMIT?: boolean; order?: number }
 
-      // enforce MIT limit of 3
-      if (body.isMIT === true) {
-        const mitCount = list.entries.filter((e) => e.isMIT && e.id !== entryId).length
-        if (mitCount >= 3) {
-          return reply.status(400).send({ code: 'mit_limit', message: 'MIT limit of 3 reached' })
+      const result = await prisma.$transaction(async (tx) => {
+        const list = await tx.dailyList.findUnique({
+          where: { userId_date: { userId, date: dateVal } },
+          include: { entries: true },
+        })
+        if (!list) {
+          return reply.status(404).send({ code: 'not_found', message: 'Daily list not found' })
         }
-      }
 
-      const entry = await prisma.dailyEntry.update({
-        where: { id: entryId },
-        data: { isMIT: body.isMIT, order: body.order },
+        const existingEntry = list.entries.find((e) => e.id === entryId)
+        if (!existingEntry) {
+          return reply.status(404).send({ code: 'not_found', message: 'Entry not found' })
+        }
+
+        // enforce MIT limit of 3 atomically with the write
+        if (body.isMIT === true) {
+          const mitCount = list.entries.filter((e) => e.isMIT && e.id !== entryId).length
+          if (mitCount >= 3) {
+            return reply.status(400).send({ code: 'mit_limit', message: 'MIT limit of 3 reached' })
+          }
+        }
+
+        return tx.dailyEntry.update({
+          where: { id: entryId },
+          data: { isMIT: body.isMIT, order: body.order },
+        })
       })
 
-      return { id: entry.id, taskId: entry.taskId, isMIT: entry.isMIT, order: entry.order }
+      if (!('id' in result)) return result
+      return { id: result.id, taskId: result.taskId, isMIT: result.isMIT, order: result.order }
     },
 
     async Daily_removeEntry(req: FastifyRequest, reply: FastifyReply) {

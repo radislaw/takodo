@@ -3,29 +3,12 @@ import type { PrismaClient, Task } from '@prisma/client'
 import { normalizeTitle } from '../domain/normalize.js'
 import { assembleTree } from '../domain/tree.js'
 import { bubbleUp, reopenTask, reopenAncestors } from '../domain/task-status.js'
-import type { DomainTask } from '../domain/types.js'
+import { taskToDomain } from '../domain/types.js'
 import type { GetUserId } from '../auth/guard.js'
 
 function toResponse(task: Task) {
   const { userId: _userId, ...rest } = task
   return rest
-}
-
-function toDomain(task: Task): DomainTask {
-  return {
-    id: task.id,
-    parentId: task.parentId,
-    title: task.title,
-    note: task.note,
-    resistanceResolved: task.resistanceResolved,
-    estimateMinutes: task.estimateMinutes,
-    status: task.status as 'open' | 'done',
-    completedAt: task.completedAt,
-    normalizedTitle: task.normalizedTitle,
-    createdAt: task.createdAt,
-    focusSeconds: task.focusSeconds,
-    pomodoros: task.pomodoros,
-  }
 }
 
 function findInTree(
@@ -65,38 +48,42 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
         }
       }
 
-      const task = await prisma.task.create({
-        data: {
-          userId,
-          title: body.title,
-          note: body.note,
-          parentId: body.parentId ?? null,
-          estimateMinutes: body.estimateMinutes,
-          category: body.category,
-          normalizedTitle: normalizeTitle(body.title),
-        },
-      })
+      const task = await prisma.$transaction(async (tx) => {
+        const created = await tx.task.create({
+          data: {
+            userId,
+            title: body.title,
+            note: body.note,
+            parentId: body.parentId ?? null,
+            estimateMinutes: body.estimateMinutes,
+            category: body.category,
+            normalizedTitle: normalizeTitle(body.title),
+          },
+        })
 
-      if (body.parentId) {
-        const allTasks = await prisma.task.findMany({ where: { userId } })
-        const parent = allTasks.find((t) => t.id === body.parentId)
-        if (parent && parent.status === 'done') {
-          const domainTasks = allTasks.map(toDomain)
-          const afterReopen = reopenAncestors(domainTasks, task.id)
-          const reopenedIds = afterReopen
-            .filter((after) => {
-              const before = domainTasks.find((t) => t.id === after.id)
-              return before && before.status === 'done' && after.status === 'open'
-            })
-            .map((t) => t.id)
-          if (reopenedIds.length > 0) {
-            await prisma.task.updateMany({
-              where: { id: { in: reopenedIds } },
-              data: { status: 'open', completedAt: null },
-            })
+        if (body.parentId) {
+          const allTasks = await tx.task.findMany({ where: { userId } })
+          const parent = allTasks.find((t) => t.id === body.parentId)
+          if (parent && parent.status === 'done') {
+            const domainTasks = allTasks.map(taskToDomain)
+            const afterReopen = reopenAncestors(domainTasks, created.id)
+            const reopenedIds = afterReopen
+              .filter((after) => {
+                const before = domainTasks.find((t) => t.id === after.id)
+                return before && before.status === 'done' && after.status === 'open'
+              })
+              .map((t) => t.id)
+            if (reopenedIds.length > 0) {
+              await tx.task.updateMany({
+                where: { id: { in: reopenedIds } },
+                data: { status: 'open', completedAt: null },
+              })
+            }
           }
         }
-      }
+
+        return created
+      })
 
       return toResponse(task)
     },
@@ -152,7 +139,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       const userId = await getUserId(req)
       const { id } = req.params as { id: string }
       const allTasks = await prisma.task.findMany({ where: { userId } })
-      const roots = assembleTree(allTasks.map(toDomain))
+      const roots = assembleTree(allTasks.map(taskToDomain))
       const node = findInTree(roots, id)
       if (!node) {
         return reply.status(404).send({ code: 'not_found', message: 'Task not found' })
@@ -170,8 +157,8 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
       }
 
       const now = new Date()
-      const updatedTarget = { ...toDomain(target), status: 'done' as const, completedAt: now }
-      const domainTasks = allTasks.map((t) => (t.id === id ? updatedTarget : toDomain(t)))
+      const updatedTarget = { ...taskToDomain(target), status: 'done' as const, completedAt: now }
+      const domainTasks = allTasks.map((t) => (t.id === id ? updatedTarget : taskToDomain(t)))
       const afterBubble = bubbleUp(domainTasks, id)
 
       const changedIds = afterBubble
@@ -204,7 +191,7 @@ export function buildTasksHandlers(prisma: PrismaClient, getUserId: GetUserId) {
         return reply.status(404).send({ code: 'not_found', message: 'Task not found' })
       }
 
-      const domainTasks = allTasks.map(toDomain)
+      const domainTasks = allTasks.map(taskToDomain)
       const afterReopen = reopenTask(domainTasks, id)
 
       const reopenedIds = afterReopen

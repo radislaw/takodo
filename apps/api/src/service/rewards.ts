@@ -1,21 +1,12 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
 import { computeRewards, computeHeatmap } from '../domain/rewards.js'
-import { toDateStr, parseDate } from '../domain/date.js'
+import { parseDate, resolveClientDate } from '../domain/date.js'
 import type { GetUserId } from '../auth/guard.js'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const DEFAULT_WEEKS = 12
 const MAX_WEEKS = 53
-
-/** Client local day may differ from server UTC by ≤1 calendar day; reject anything outside. */
-function resolveDate(raw: string | undefined): string | null {
-  const serverToday = toDateStr(new Date())
-  if (!raw) return serverToday
-  const diff = Math.abs(parseDate(raw).getTime() - parseDate(serverToday).getTime())
-  if (Number.isNaN(diff) || diff > DAY_MS) return null
-  return raw
-}
 
 function resolveWeeks(raw: string | number | undefined): number {
   const n = typeof raw === 'string' ? Number.parseInt(raw, 10) : raw
@@ -54,7 +45,7 @@ export function buildRewardsHandlers(prisma: PrismaClient, getUserId: GetUserId)
     async Rewards_heatmap(req: FastifyRequest, reply: FastifyReply) {
       const userId = await getUserId(req)
       const query = req.query as { weeks?: string; date?: string }
-      const dateStr = resolveDate(query.date)
+      const dateStr = resolveClientDate(query.date)
       if (!dateStr) {
         return reply
           .status(400)

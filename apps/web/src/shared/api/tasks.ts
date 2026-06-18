@@ -1,9 +1,13 @@
-import { useMutation, useQuery, useQueryCache } from '@pinia/colada'
+import { useQuery, useQueryCache } from '@pinia/colada'
 import { toValue } from 'vue'
 import type { Ref } from 'vue'
+import type { components } from '../../../../../packages/contract/openapi/types.gen'
 import { apiClient } from '@/api/client'
 import { useReward } from '@/shared/lib/useReward'
-import { useErrorToast } from '@/shared/lib/useErrorToast'
+import { useAppMutation } from '@/shared/api/useMutationHelper'
+
+type TaskCreateBody = components['schemas']['TaskCreate']
+type TaskUpdateBody = components['schemas']['TaskUpdate']
 
 export function useTasks() {
   return useQuery({
@@ -31,20 +35,11 @@ export function useTaskTree(id: Ref<string> | string) {
 
 export function useCreateTask() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  return useMutation({
-    mutation: async (body: {
-      title: string
-      note?: string
-      parentId?: string
-      estimateMinutes?: number
-    }) => {
+  return useAppMutation({
+    mutation: async (body: TaskCreateBody) => {
       const { data } = await apiClient.POST('/tasks', { body })
       if (!data) throw new Error('Failed to create task')
       return data
-    },
-    onError: () => {
-      showError('errors.saveFailed')
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
@@ -55,8 +50,7 @@ export function useCreateTask() {
 export function useCompleteTask() {
   const queryCache = useQueryCache()
   const { celebrate, hide } = useReward()
-  const { showError } = useErrorToast()
-  return useMutation({
+  return useAppMutation({
     mutation: async (id: string) => {
       const { data, error } = await apiClient.POST('/tasks/{id}/complete', {
         params: { path: { id } },
@@ -67,9 +61,8 @@ export function useCompleteTask() {
     onMutate: () => {
       celebrate()
     },
-    onError: () => {
+    onError: (_err) => {
       hide()
-      showError('errors.saveFailed')
     },
     onSettled: () => {
       // Completion changes streak/XP/badges and quest progress too.
@@ -82,17 +75,13 @@ export function useCompleteTask() {
 
 export function useReopenTask() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  return useMutation({
+  return useAppMutation({
     mutation: async (id: string) => {
       const { data, error } = await apiClient.POST('/tasks/{id}/reopen', {
         params: { path: { id } },
       })
       if (error) throw new Error(error.message)
       return data!
-    },
-    onError: () => {
-      showError('errors.saveFailed')
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
@@ -104,26 +93,14 @@ export function useReopenTask() {
 
 export function useUpdateTask() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  return useMutation({
-    mutation: async ({
-      id,
-      ...body
-    }: {
-      id: string
-      title?: string
-      note?: string
-      estimateMinutes?: number
-    }) => {
+  return useAppMutation({
+    mutation: async ({ id, ...body }: { id: string } & TaskUpdateBody) => {
       const { data, error } = await apiClient.PATCH('/tasks/{id}', {
         params: { path: { id } },
         body,
       })
       if (error) throw new Error('Failed to update task')
       return data!
-    },
-    onError: () => {
-      showError('errors.saveFailed')
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
@@ -133,16 +110,12 @@ export function useUpdateTask() {
 
 export function useDeleteTask() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  return useMutation({
+  return useAppMutation({
     mutation: async (id: string) => {
       const { error } = await apiClient.DELETE('/tasks/{id}', {
         params: { path: { id } },
       })
       if (error) throw new Error('Failed to delete task')
-    },
-    onError: () => {
-      showError('errors.saveFailed')
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
@@ -152,17 +125,13 @@ export function useDeleteTask() {
 
 export function useResolveResistance() {
   const queryCache = useQueryCache()
-  const { showError } = useErrorToast()
-  return useMutation({
+  return useAppMutation({
     mutation: async (id: string) => {
       const { data, error } = await apiClient.POST('/tasks/{id}/resolve-resistance', {
         params: { path: { id } },
       })
       if (error) throw new Error('Failed to resolve resistance')
       return data!
-    },
-    onError: () => {
-      showError('errors.saveFailed')
     },
     onSettled: () => {
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
@@ -172,7 +141,7 @@ export function useResolveResistance() {
 
 export function useRecordFocus() {
   const queryCache = useQueryCache()
-  return useMutation({
+  return useAppMutation({
     mutation: async ({
       id,
       seconds,

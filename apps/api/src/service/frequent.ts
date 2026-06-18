@@ -1,7 +1,8 @@
 import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
 import { aggregateFrequent } from '../domain/frequent.js'
-import type { DomainTask, DomainDailyEntry } from '../domain/types.js'
+import { taskToDomain } from '../domain/types.js'
+import type { DomainDailyEntry } from '../domain/types.js'
 import type { GetUserId } from '../auth/guard.js'
 
 export function buildFrequentHandlers(prisma: PrismaClient, getUserId: GetUserId) {
@@ -21,18 +22,7 @@ export function buildFrequentHandlers(prisma: PrismaClient, getUserId: GetUserId
         include: { entries: true },
       })
 
-      const domainTasks: DomainTask[] = tasks.map((t) => ({
-        id: t.id,
-        parentId: t.parentId,
-        title: t.title,
-        note: t.note,
-        resistanceResolved: t.resistanceResolved,
-        estimateMinutes: t.estimateMinutes,
-        status: t.status as 'open' | 'done',
-        completedAt: t.completedAt,
-        normalizedTitle: t.normalizedTitle,
-        createdAt: t.createdAt,
-      }))
+      const domainTasks = tasks.map(taskToDomain)
 
       const domainEntries: DomainDailyEntry[] = dailyLists.flatMap((list) =>
         list.entries.map((e) => ({ dailyListId: list.id, taskId: e.taskId })),
