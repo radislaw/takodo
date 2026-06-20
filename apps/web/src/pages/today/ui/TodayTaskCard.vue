@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppCheckbox, AppIcon, AppBadge, AppActionSheet, ChildProgress } from '@/shared/ui'
 import { formatFocusDuration } from '@/shared/lib/formatFocus'
+import { CAT_COLORS } from '@/shared/lib/categories'
 
 interface Entry {
   id: string
@@ -38,13 +39,6 @@ const router = useRouter()
 const actionsOpen = ref(false)
 
 const isDone = computed(() => props.task?.status === 'done')
-
-const CAT_COLORS: Record<string, string> = {
-  home: 'var(--cat-sage)',
-  health: 'var(--cat-apricot)',
-  work: 'var(--cat-blue)',
-  self: 'var(--cat-mauve)',
-}
 
 const categoryColor = computed(() =>
   props.task?.category ? (CAT_COLORS[props.task.category] ?? 'var(--ink-faint)') : null,

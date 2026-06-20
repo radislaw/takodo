@@ -3,6 +3,7 @@ import { ref, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppIcon, AppButton, PomodoroTimer, AppCheckbox, AppInput } from '@/shared/ui'
+import { CAT_COLORS } from '@/shared/lib/categories'
 import {
   useDailyToday,
   useTasks,
@@ -33,13 +34,6 @@ const subtaskInputRef = ref<{ focus: () => void } | null>(null)
 
 const skippedIds = ref<string[]>([])
 const completingIds = ref<string[]>([])
-
-const CAT_COLORS: Record<string, string> = {
-  home: 'var(--cat-sage)',
-  health: 'var(--cat-apricot)',
-  work: 'var(--cat-blue)',
-  self: 'var(--cat-mauve)',
-}
 
 const taskMap = computed(() => {
   const map = new Map<

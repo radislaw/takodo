@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
 import { toDateStr, parseDate } from '../domain/date.js'
 import { normalizeTitle } from '../domain/normalize.js'
+import { MIT_LIMIT, canAddMIT } from '../domain/daily.js'
 import type { GetUserId } from '../auth/guard.js'
 
 export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
@@ -72,14 +73,13 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
           return reply.status(404).send({ code: 'not_found', message: 'Daily list not found' })
         }
 
-        const mitCount = list.entries.filter((e) => e.isMIT).length
         const maxOrder = list.entries.reduce((m, e) => Math.max(m, e.order), -1)
 
         return tx.dailyEntry.create({
           data: {
             dailyListId: list.id,
             taskId,
-            isMIT: mitCount < 3,
+            isMIT: canAddMIT(list.entries),
             order: maxOrder + 1,
           },
         })
@@ -109,11 +109,13 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
           return reply.status(404).send({ code: 'not_found', message: 'Entry not found' })
         }
 
-        // enforce MIT limit of 3 atomically with the write
+        // enforce MIT limit atomically with the write
         if (body.isMIT === true) {
-          const mitCount = list.entries.filter((e) => e.isMIT && e.id !== entryId).length
-          if (mitCount >= 3) {
-            return reply.status(400).send({ code: 'mit_limit', message: 'MIT limit of 3 reached' })
+          const othersWithMIT = list.entries.filter((e) => e.isMIT && e.id !== entryId)
+          if (!canAddMIT(othersWithMIT)) {
+            return reply
+              .status(400)
+              .send({ code: 'mit_limit', message: `MIT limit of ${MIT_LIMIT} reached` })
           }
         }
 

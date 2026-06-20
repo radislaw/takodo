@@ -1,10 +1,11 @@
-import { useQuery, useQueryCache } from '@pinia/colada'
+import { useQuery } from '@pinia/colada'
 import { toValue } from 'vue'
 import type { Ref } from 'vue'
 import type { components } from '../../../../../packages/contract/openapi/types.gen'
 import { apiClient } from '@/api/client'
 import { useReward } from '@/shared/lib/useReward'
 import { useAppMutation } from '@/shared/api/useMutationHelper'
+import { useCacheInvalidate } from './cache-deps'
 
 type TaskCreateBody = components['schemas']['TaskCreate']
 type TaskUpdateBody = components['schemas']['TaskUpdate']
@@ -34,22 +35,20 @@ export function useTaskTree(id: Ref<string> | string) {
 }
 
 export function useCreateTask() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async (body: TaskCreateBody) => {
       const { data } = await apiClient.POST('/tasks', { body })
       if (!data) throw new Error('Failed to create task')
       return data
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
-    },
+    onSettled: () => inv.taskMutation(),
   })
 }
 
 export function useCompleteTask() {
-  const queryCache = useQueryCache()
-  const { celebrate, hide } = useReward()
+  const inv = useCacheInvalidate()
+  const { celebrate } = useReward()
   return useAppMutation({
     mutation: async (id: string) => {
       const { data, error } = await apiClient.POST('/tasks/{id}/complete', {
@@ -58,23 +57,15 @@ export function useCompleteTask() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onMutate: () => {
+    onSuccess: () => {
       celebrate()
     },
-    onError: (_err) => {
-      hide()
-    },
-    onSettled: () => {
-      // Completion changes streak/XP/badges and quest progress too.
-      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
-      queryCache.invalidateQueries({ key: ['quests'], exact: false })
-    },
+    onSettled: () => inv.taskComplete(),
   })
 }
 
 export function useReopenTask() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async (id: string) => {
       const { data, error } = await apiClient.POST('/tasks/{id}/reopen', {
@@ -83,16 +74,12 @@ export function useReopenTask() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
-      queryCache.invalidateQueries({ key: ['quests'], exact: false })
-    },
+    onSettled: () => inv.taskComplete(),
   })
 }
 
 export function useUpdateTask() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async ({ id, ...body }: { id: string } & TaskUpdateBody) => {
       const { data, error } = await apiClient.PATCH('/tasks/{id}', {
@@ -102,14 +89,12 @@ export function useUpdateTask() {
       if (error) throw new Error('Failed to update task')
       return data!
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
-    },
+    onSettled: () => inv.taskMutation(),
   })
 }
 
 export function useDeleteTask() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async (id: string) => {
       const { error } = await apiClient.DELETE('/tasks/{id}', {
@@ -117,14 +102,12 @@ export function useDeleteTask() {
       })
       if (error) throw new Error('Failed to delete task')
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
-    },
+    onSettled: () => inv.taskMutation(),
   })
 }
 
 export function useResolveResistance() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async (id: string) => {
       const { data, error } = await apiClient.POST('/tasks/{id}/resolve-resistance', {
@@ -133,14 +116,12 @@ export function useResolveResistance() {
       if (error) throw new Error('Failed to resolve resistance')
       return data!
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
-    },
+    onSettled: () => inv.taskMutation(),
   })
 }
 
 export function useRecordFocus() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async ({
       id,
@@ -158,10 +139,6 @@ export function useRecordFocus() {
       if (error) throw new Error('Failed to record focus')
       return data!
     },
-    onSettled: () => {
-      // Pomodoros feed XP/level.
-      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
-    },
+    onSettled: () => inv.taskFocus(),
   })
 }

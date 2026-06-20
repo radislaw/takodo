@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { CAT_COLORS } from '@/shared/lib/categories'
 
 defineProps<{
   counts: { category: string; count: number }[]
 }>()
 
 const { t } = useI18n({ useScope: 'global' })
-
-const CAT_COLORS: Record<string, string> = {
-  home: 'var(--cat-sage)',
-  health: 'var(--cat-apricot)',
-  work: 'var(--cat-blue)',
-  self: 'var(--cat-mauve)',
-}
 </script>
 
 <template>

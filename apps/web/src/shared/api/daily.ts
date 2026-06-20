@@ -1,7 +1,8 @@
-import { useQuery, useQueryCache } from '@pinia/colada'
+import { useQuery } from '@pinia/colada'
 import { apiClient } from '@/api/client'
 import { useReward } from '@/shared/lib/useReward'
 import { useAppMutation } from '@/shared/api/useMutationHelper'
+import { useCacheInvalidate } from './cache-deps'
 
 export function todayDate(timeZone?: string): string {
   const tz = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -34,7 +35,7 @@ export function useDailyToday() {
 }
 
 export function useAddDailyEntry() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async (taskId: string) => {
       const date = todayDate()
@@ -45,18 +46,12 @@ export function useAddDailyEntry() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onSettled: () => {
-      const date = todayDate()
-      // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
-      queryCache.invalidateQueries({ key: ['daily', date], exact: true })
-      queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
-    },
+    onSettled: () => inv.dailyEntry(),
   })
 }
 
 export function useUpdateDailyEntry() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async ({
       entryId,
@@ -82,18 +77,12 @@ export function useUpdateDailyEntry() {
     onError: (err) => {
       if ((err as { code?: string }).code === 'mit_limit') return true
     },
-    onSettled: () => {
-      const date = todayDate()
-      // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
-      queryCache.invalidateQueries({ key: ['daily', date], exact: true })
-      queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
-    },
+    onSettled: () => inv.dailyEntry(),
   })
 }
 
 export function useMoveToTomorrow() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async ({ entryId }: { entryId: string; taskId: string }) => {
       const today = todayDate()
@@ -104,18 +93,12 @@ export function useMoveToTomorrow() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onSettled: () => {
-      const today = todayDate()
-      // Server increments gentleMoves (badge) and today's entry set changes.
-      queryCache.invalidateQueries({ key: ['daily', today], exact: true })
-      queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
-    },
+    onSettled: () => inv.dailyEntry(),
   })
 }
 
 export function useUpdateDailyNote() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async (note: string) => {
       const date = todayDate()
@@ -126,14 +109,12 @@ export function useUpdateDailyNote() {
       if (error) throw new Error(error.message)
       return data!
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: ['daily', todayDate()], exact: true })
-    },
+    onSettled: () => inv.dailyNote(),
   })
 }
 
 export function useLogDoneTask() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   const { celebrate } = useReward()
   return useAppMutation({
     mutation: async (title: string) => {
@@ -146,22 +127,14 @@ export function useLogDoneTask() {
       return data!
     },
     onSuccess: () => {
-      // Logging an already-done task earns the same dopamine burst as completing one.
       celebrate()
     },
-    onSettled: () => {
-      const date = todayDate()
-      // A done task counts toward stats — refresh rewards/quests alongside the day.
-      queryCache.invalidateQueries({ key: ['daily', date], exact: true })
-      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
-      queryCache.invalidateQueries({ key: ['quests'], exact: false })
-    },
+    onSettled: () => inv.logDone(),
   })
 }
 
 export function useRemoveDailyEntry() {
-  const queryCache = useQueryCache()
+  const inv = useCacheInvalidate()
   return useAppMutation({
     mutation: async (entryId: string) => {
       const date = todayDate()
@@ -170,12 +143,6 @@ export function useRemoveDailyEntry() {
       })
       if (error) throw new Error(error.message)
     },
-    onSettled: () => {
-      const date = todayDate()
-      // Entries feed quest progress (add_entries / complete_mit) and MIT-XP.
-      queryCache.invalidateQueries({ key: ['daily', date], exact: true })
-      queryCache.invalidateQueries({ key: ['quests'], exact: false })
-      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
-    },
+    onSettled: () => inv.dailyEntry(),
   })
 }
