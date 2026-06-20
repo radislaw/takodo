@@ -45,11 +45,16 @@ describe('TodayTaskCard', () => {
     expect(wrapper.emitted('toggleDone')?.[0]).toEqual(['t1', 'open'])
   })
 
-  it('emits toggleMit from the actions overflow sheet', async () => {
+  it('emits toggleMit on direct MIT button click', async () => {
     const wrapper = mountCard()
-    await wrapper.find('[aria-label="Действия"]').trigger('click')
-    bodyButton('Сделать главным')?.click()
+    await wrapper.find('[aria-label="Сделать главным"]').trigger('click')
     expect(wrapper.emitted('toggleMit')?.[0]).toEqual(['e1', false])
+  })
+
+  it('emits toggleMit to unset when entry is MIT', async () => {
+    const wrapper = mountCard({ entry: { ...ENTRY, isMIT: true } })
+    await wrapper.find('[aria-label="Убрать из главных"]').trigger('click')
+    expect(wrapper.emitted('toggleMit')?.[0]).toEqual(['e1', true])
   })
 
   it('emits moveTomorrow from the actions overflow sheet', async () => {

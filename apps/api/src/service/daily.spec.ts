@@ -138,6 +138,23 @@ describe('Daily routes', () => {
       expect(res.statusCode).toBe(200)
     })
 
+    it('always creates entry with isMIT=false regardless of current MIT count', async () => {
+      const list = { ...makeList(), entries: [] }
+      prisma.task.findUnique.mockResolvedValue(makeTask())
+      prisma.dailyList.findUnique.mockResolvedValue(
+        list as Parameters<typeof prisma.dailyList.findUnique.mockResolvedValue>[0],
+      )
+      prisma.dailyEntry.create.mockResolvedValue(makeEntry({ isMIT: false }))
+      await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/entries',
+        payload: { taskId: 'task-1' },
+      })
+      expect(prisma.dailyEntry.create).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ isMIT: false }) }),
+      )
+    })
+
     it('returns 404 when task not found', async () => {
       prisma.task.findUnique.mockResolvedValue(null)
       const res = await app.inject({

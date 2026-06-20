@@ -62,7 +62,6 @@ function handleToggleDone() {
 
 function handleToggleMit() {
   emit('toggleMit', props.entry.id, props.entry.isMIT)
-  actionsOpen.value = false
 }
 
 function handleMoveTomorrow() {
@@ -124,20 +123,23 @@ function handleMoveTomorrow() {
         </div>
       </div>
 
-      <!-- MIT status (glanceable, non-interactive — toggle lives in the actions sheet) -->
-      <span
-        v-if="entry.isMIT"
-        class="flex-shrink-0"
+      <!-- MIT toggle: active badge when MIT, faint zap when not -->
+      <button
+        v-if="!isDone"
+        type="button"
+        class="flex-shrink-0 cursor-pointer transition-colors"
         :class="{ 'mt-0.5': hasBottomRow }"
-        :aria-label="t('today.mitLabel')"
+        :aria-label="entry.isMIT ? t('today.actions.unmakeMit') : t('today.actions.makeMit')"
+        @click="handleToggleMit"
       >
-        <AppBadge variant="done">
+        <AppBadge v-if="entry.isMIT" variant="done">
           <template #icon>
             <AppIcon name="zap" :size="12" />
           </template>
           <span class="hidden sm:inline">{{ t('today.mitLabel') }}</span>
         </AppBadge>
-      </span>
+        <AppIcon v-else name="zap" :size="16" class="text-ink-faint hover:text-sage" />
+      </button>
 
       <!-- Start Do-mode with this task (active tasks only) -->
       <button
@@ -171,15 +173,6 @@ function handleMoveTomorrow() {
     @close="actionsOpen = false"
   >
     <div class="flex flex-col gap-1 pt-1">
-      <button
-        type="button"
-        class="font-body text-ink flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors"
-        @click="handleToggleMit"
-      >
-        <AppIcon name="zap" :size="16" class="text-sage-deep" />
-        {{ entry.isMIT ? t('today.actions.unmakeMit') : t('today.actions.makeMit') }}
-      </button>
-
       <button
         type="button"
         class="font-body text-ink flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors"

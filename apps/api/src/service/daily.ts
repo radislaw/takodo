@@ -79,7 +79,7 @@ export function buildDailyHandlers(prisma: PrismaClient, getUserId: GetUserId) {
           data: {
             dailyListId: list.id,
             taskId,
-            isMIT: canAddMIT(list.entries),
+            isMIT: false,
             order: maxOrder + 1,
           },
         })

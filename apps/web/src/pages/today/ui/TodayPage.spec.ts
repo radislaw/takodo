@@ -250,16 +250,11 @@ describe('TodayPage', () => {
     const wrapper = mountPage()
     await wrapper.vm.$nextTick()
 
-    // MIT toggle now lives in the task card's overflow sheet (teleported to body)
-    const overflow = wrapper
+    // MIT toggle is now an inline button on the task card
+    const mitBtn = wrapper
       .findAll('button')
-      .find((b) => b.attributes('aria-label') === 'Действия')
-    await overflow?.trigger('click')
-    await wrapper.vm.$nextTick()
-    const mitBtn = Array.from(document.body.querySelectorAll('button')).find((b) =>
-      b.textContent?.includes('Сделать главным'),
-    )
-    mitBtn?.click()
+      .find((b) => b.attributes('aria-label') === 'Сделать главным')
+    await mitBtn?.trigger('click')
     await wrapper.vm.$nextTick()
     await new Promise((r) => setTimeout(r, 10))
 
