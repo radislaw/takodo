@@ -100,7 +100,7 @@ async function handleAddToToday() {
 
 <template>
   <div
-    class="mb-2 flex items-center gap-3 rounded-2xl border-[1.5px] px-3 py-2.5 shadow-sm"
+    class="mb-2 flex w-full items-center gap-3 rounded-2xl border-[1.5px] px-3 py-2.5 shadow-sm"
     :class="selected ? 'bg-sage-tint border-sage' : 'surface-card border-transparent'"
   >
     <AppCheckbox
@@ -146,7 +146,6 @@ async function handleAddToToday() {
     </button>
 
     <button
-      v-if="task.status !== 'done'"
       type="button"
       class="text-sage hover:text-sage-deep flex-shrink-0 cursor-pointer transition-colors"
       :aria-label="t('tasks.actions.addToToday')"

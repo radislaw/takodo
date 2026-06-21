@@ -31,7 +31,7 @@ async function handleReAdd(title: string) {
       </div>
     </header>
 
-    <main class="mx-auto max-w-xl px-4 pt-6 md:max-w-2xl md:px-8">
+    <main class="px-4 pt-6 md:px-8">
       <div v-if="isPending" class="text-ink-soft font-body py-12 text-center text-sm">
         {{ t('frequent.loading') }}
       </div>

@@ -17,12 +17,6 @@ function mountCard(props = {}) {
   })
 }
 
-function bodyButton(text: string): HTMLButtonElement | undefined {
-  return Array.from(document.body.querySelectorAll('button')).find((b) =>
-    b.textContent?.includes(text),
-  )
-}
-
 afterEach(() => {
   document.body.innerHTML = ''
 })
@@ -57,16 +51,15 @@ describe('TodayTaskCard', () => {
     expect(wrapper.emitted('toggleMit')?.[0]).toEqual(['e1', true])
   })
 
-  it('emits moveTomorrow from the actions overflow sheet', async () => {
+  it('emits moveTomorrow on direct inline button click', async () => {
     const wrapper = mountCard()
-    await wrapper.find('[aria-label="Действия"]').trigger('click')
-    bodyButton('Перенести на завтра')?.click()
+    await wrapper.find('[aria-label="Перенести на завтра"]').trigger('click')
     expect(wrapper.emitted('moveTomorrow')?.[0]).toEqual(['e1', 't1'])
   })
 
-  it('hides the actions overflow button for done task', () => {
+  it('hides move-to-tomorrow button for done task', () => {
     const wrapper = mountCard({ task: { ...TASK, status: 'done' } })
-    expect(wrapper.find('[aria-label="Действия"]').exists()).toBe(false)
+    expect(wrapper.find('[aria-label="Перенести на завтра"]').exists()).toBe(false)
   })
 
   it('shows MIT badge when isMIT is true', () => {

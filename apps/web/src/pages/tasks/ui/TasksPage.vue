@@ -21,7 +21,7 @@ const { t } = useI18n({ useScope: 'global' })
         </div>
       </header>
 
-      <TaskListPane class="mx-auto max-w-xl px-4 pt-6 lg:max-w-none" />
+      <TaskListPane class="px-4 pt-6" />
     </div>
 
     <!-- Detail placeholder (desktop) -->

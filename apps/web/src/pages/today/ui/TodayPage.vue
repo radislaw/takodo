@@ -181,7 +181,7 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
       </div>
     </Transition>
 
-    <main class="mx-auto max-w-xl px-4 pt-14 pb-4 md:max-w-3xl md:px-8 lg:max-w-5xl lg:pt-8">
+    <main class="px-4 pt-14 pb-4 md:px-8 lg:pt-8">
       <div class="lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-[22px]">
         <div class="min-w-0">
           <!-- Greeting -->

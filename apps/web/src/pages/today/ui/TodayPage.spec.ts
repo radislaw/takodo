@@ -325,16 +325,11 @@ describe('TodayPage', () => {
     const wrapper = mountPage()
     await wrapper.vm.$nextTick()
 
-    // "Move to tomorrow" now lives in the task card's overflow sheet
-    const overflow = wrapper
+    // "Move to tomorrow" is now an inline button on the task card
+    const moveBtn = wrapper
       .findAll('button')
-      .find((b) => b.attributes('aria-label') === 'Действия')
-    await overflow?.trigger('click')
-    await wrapper.vm.$nextTick()
-    const moveBtn = Array.from(document.body.querySelectorAll('button')).find((b) =>
-      b.textContent?.includes('Перенести на завтра'),
-    )
-    moveBtn?.click()
+      .find((b) => b.attributes('aria-label') === 'Перенести на завтра')
+    await moveBtn?.trigger('click')
     await wrapper.vm.$nextTick()
     await new Promise((r) => setTimeout(r, 10))
 

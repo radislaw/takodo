@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppCheckbox, AppIcon, AppBadge, AppActionSheet, ChildProgress } from '@/shared/ui'
+import { AppCheckbox, AppIcon, AppBadge, ChildProgress } from '@/shared/ui'
 import { formatFocusDuration } from '@/shared/lib/formatFocus'
 import { CAT_COLORS } from '@/shared/lib/categories'
 
@@ -36,8 +36,6 @@ const emit = defineEmits<{
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 
-const actionsOpen = ref(false)
-
 const isDone = computed(() => props.task?.status === 'done')
 
 const categoryColor = computed(() =>
@@ -66,12 +64,11 @@ function handleToggleMit() {
 
 function handleMoveTomorrow() {
   emit('moveTomorrow', props.entry.id, props.entry.taskId)
-  actionsOpen.value = false
 }
 </script>
 
 <template>
-  <div class="surface-card cursor-pointer rounded-2xl px-3 py-3 shadow-sm">
+  <div class="surface-card w-full cursor-pointer rounded-2xl px-3 py-3 shadow-sm">
     <div class="flex gap-3" :class="hasBottomRow ? 'items-start' : 'items-center'">
       <AppCheckbox
         class="flex-shrink-0"
@@ -141,6 +138,18 @@ function handleMoveTomorrow() {
         <AppIcon v-else name="zap" :size="16" class="text-ink-faint hover:text-sage" />
       </button>
 
+      <!-- Move to tomorrow (active tasks only) -->
+      <button
+        v-if="!isDone"
+        type="button"
+        class="text-ink-soft hover:text-sage flex-shrink-0 cursor-pointer transition-colors"
+        :class="{ 'mt-0.5': hasBottomRow }"
+        :aria-label="t('today.actions.moveTomorrow')"
+        @click="handleMoveTomorrow"
+      >
+        <AppIcon name="arrowR" :size="16" />
+      </button>
+
       <!-- Start Do-mode with this task (active tasks only) -->
       <button
         v-if="!isDone"
@@ -152,35 +161,6 @@ function handleMoveTomorrow() {
       >
         <AppIcon name="play" :size="16" />
       </button>
-
-      <!-- Overflow: MIT toggle + move to tomorrow (active tasks only) -->
-      <button
-        v-if="!isDone"
-        type="button"
-        class="text-ink-soft hover:text-ink flex-shrink-0 cursor-pointer transition-colors"
-        :class="{ 'mt-0.5': hasBottomRow }"
-        :aria-label="t('today.actions.title')"
-        @click="actionsOpen = true"
-      >
-        <AppIcon name="more" :size="20" />
-      </button>
     </div>
   </div>
-
-  <AppActionSheet
-    :open="actionsOpen"
-    :title="t('today.actions.title')"
-    @close="actionsOpen = false"
-  >
-    <div class="flex flex-col gap-1 pt-1">
-      <button
-        type="button"
-        class="font-body text-ink flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors"
-        @click="handleMoveTomorrow"
-      >
-        <AppIcon name="arrowR" :size="16" class="text-ink-soft" />
-        {{ t('today.actions.moveTomorrow') }}
-      </button>
-    </div>
-  </AppActionSheet>
 </template>

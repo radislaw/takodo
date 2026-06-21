@@ -205,6 +205,11 @@ describe('TaskCard', () => {
     expect(mockShowSuccess).toHaveBeenCalledWith('success.addedToToday')
   })
 
+  it('shows "+ в сегодня" button for done task', () => {
+    wrapper = mount(TaskCard, { props: { task: doneTask }, attachTo: document.body })
+    expect(wrapper.find('[aria-label="+ в сегодня"]').exists()).toBe(true)
+  })
+
   it('hides resolve resistance from the action sheet (badge is the only path)', async () => {
     wrapper = mount(TaskCard, { props: { task: openTask }, attachTo: document.body })
     await wrapper.find('[aria-label="Действия"]').trigger('click')
