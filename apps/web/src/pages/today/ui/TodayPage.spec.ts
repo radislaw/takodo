@@ -336,12 +336,12 @@ describe('TodayPage', () => {
     expect(mockMoveToTomorrow).toHaveBeenCalledWith({ entryId: 'e1', taskId: 't1' })
   })
 
-  it('renders BrainDumpBar with tablet-up visibility classes', () => {
+  it('renders BrainDumpBar as the primary capture at every breakpoint', () => {
     const wrapper = mountPage()
     const bar = wrapper.findComponent({ name: 'BrainDumpBar' })
     expect(bar.exists()).toBe(true)
-    expect(bar.classes()).toContain('hidden')
-    expect(bar.classes()).toContain('md:flex')
+    // No longer gated behind `hidden md:flex` — mobile must show it too (#1).
+    expect(bar.classes()).not.toContain('hidden')
   })
 
   it('BrainDumpBar submit calls createTask then addEntry', async () => {

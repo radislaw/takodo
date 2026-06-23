@@ -5,6 +5,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- **UX usability pass — 6 ADHD-focused fixes** across the shipped screens (audit against fast-capture / low-load / gain-framing / never-punish).
+  - _Today — brain dump always-on_: `BrainDumpBar` no longer gated behind `hidden md:flex`; the zero-friction capture now shows at every breakpoint (mobile FAB + sheet kept as the secondary "add with category" path).
+  - _Today — three-zone hierarchy_: `QuestPanel` + `EveningJournal` grouped under a divider as secondary surfaces below the task spine; the duplicate mobile `SoftNote` removed.
+  - _Anti-shame copy_: Frequent reworded (`hint` invitational; `undoneDays` → «ждёт N дней», no "undone" framing); Rewards heatmap now leads with a gain-framed «Активных дней: N» summary (`rewards.heatmap.activeSummary`) instead of reading as a wall of empty cells.
+  - _Task detail — edit affordances_: new `pencil` icon beside the title and the note label; an empty note renders as a dashed tappable field (`tasks.detail.noteEmptyHint`) instead of a bare "—"; `editTitleAria` / `editNoteAria` labels added.
+  - _Tasks — depth signal_: already-nested rows show a non-interactive `ChildProgress` badge via a new `TaskCard` `staticProgress` prop, so grandchild counts are visible without turning the list into a fully recursive tree.
+  - _Shared `AppScreenHeader`_ (`shared/ui/screen-header/`) — one sticky card header (title + optional subtitle + optional back button, `a11y.back`) replacing the duplicated `<header>` markup in Tasks, Frequent, Help, and the Tasks-detail list pane.
+  - 496 web tests green (new `AppScreenHeader` spec + updated `TodayPage` brain-dump visibility assertion).
+
 - **UX declutter: Today screen, progress, Profile** — 8 UX improvements targeting ADHD focus load.
   - _Today — heatmap removed_ from Today screen (vanity metric without action; remains on Rewards page).
   - _Today — summary card stripped_ to 3 elements: progress ring + summary message + StreakFlame. Level chip moved to Rewards page; MIT counter removed (duplicated zap badges on each card).

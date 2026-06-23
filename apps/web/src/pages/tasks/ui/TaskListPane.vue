@@ -152,7 +152,13 @@ function handleKeydown(e: KeyboardEvent) {
                 :key="child.id"
                 class="ml-6"
               >
-                <TaskCard :task="child" :selected="child.id === selectedId" />
+                <TaskCard
+                  :task="child"
+                  :selected="child.id === selectedId"
+                  :child-done="childProgress.get(child.id)?.done"
+                  :child-total="childProgress.get(child.id)?.total"
+                  static-progress
+                />
               </div>
             </template>
           </template>

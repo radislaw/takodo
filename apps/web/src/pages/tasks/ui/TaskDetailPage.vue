@@ -2,7 +2,14 @@
 import { ref, computed, nextTick, type ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppCheckbox, AppIcon, AppInput, AppProgressRing, AppActionSheet } from '@/shared/ui'
+import {
+  AppCheckbox,
+  AppIcon,
+  AppInput,
+  AppProgressRing,
+  AppActionSheet,
+  AppScreenHeader,
+} from '@/shared/ui'
 import { formatFocusDuration } from '@/shared/lib/formatFocus'
 import {
   useTaskTree,
@@ -152,13 +159,7 @@ function handleDeleteConfirmed() {
     <div
       class="lg:border-line hidden lg:block lg:h-full lg:w-[380px] lg:flex-shrink-0 lg:overflow-y-auto lg:border-r"
     >
-      <header class="surface-card border-line sticky top-0 z-10 border-b shadow-sm">
-        <div class="px-5 py-4">
-          <h1 class="font-display text-ink text-xl leading-tight font-extrabold">
-            {{ t('tasks.title') }}
-          </h1>
-        </div>
-      </header>
+      <AppScreenHeader :title="t('tasks.title')" />
       <TaskListPane :selected-id="id" class="px-4 pt-6" />
     </div>
 
@@ -220,9 +221,15 @@ function handleDeleteConfirmed() {
                   type="button"
                   class="font-display text-ink break-anywhere w-full text-left text-2xl leading-tight font-extrabold"
                   :class="{ 'line-through opacity-50': tree.status === 'done' }"
+                  :title="t('tasks.detail.editTitleAria')"
                   @click="startEditTitle"
                 >
-                  {{ tree.title }}
+                  {{ tree.title
+                  }}<AppIcon
+                    name="pencil"
+                    :size="15"
+                    class="text-ink-faint ml-2 inline-block align-middle"
+                  />
                 </button>
               </div>
               <AppProgressRing
@@ -318,8 +325,11 @@ function handleDeleteConfirmed() {
 
             <!-- Note -->
             <div class="border-line-card mt-4 border-t pt-3">
-              <p class="text-ink-faint mb-1 text-xs font-semibold tracking-wide uppercase">
+              <p
+                class="text-ink-faint mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase"
+              >
                 {{ t('tasks.detail.notePlaceholder') }}
+                <AppIcon name="pencil" :size="12" class="text-ink-faint" />
               </p>
               <textarea
                 v-if="editingNote"
@@ -331,10 +341,16 @@ function handleDeleteConfirmed() {
               <button
                 v-else
                 type="button"
-                class="font-body text-ink-soft w-full text-left text-sm"
+                class="font-body w-full rounded-lg text-left text-sm"
+                :class="
+                  tree.note
+                    ? 'text-ink-soft'
+                    : 'border-line text-ink-faint border border-dashed px-3 py-2'
+                "
+                :aria-label="t('tasks.detail.editNoteAria')"
                 @click="startEditNote"
               >
-                {{ tree.note || '—' }}
+                {{ tree.note || t('tasks.detail.noteEmptyHint') }}
               </button>
             </div>
           </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useQueryCache } from '@pinia/colada'
-import { AppIcon, AppButton } from '@/shared/ui'
+import { AppIcon, AppButton, AppScreenHeader } from '@/shared/ui'
 import { useFrequent, useCreateTask, useAddDailyEntry } from '@/shared/api'
 import { useSuccessToast } from '@/shared/lib/useSuccessToast'
 
@@ -22,14 +22,7 @@ async function handleReAdd(title: string) {
 
 <template>
   <div class="surface-app pb-nav min-h-full">
-    <header class="surface-card border-line sticky top-0 z-10 border-b shadow-sm">
-      <div class="px-5 py-4">
-        <h1 class="font-display text-ink text-xl leading-tight font-extrabold">
-          {{ t('frequent.title') }}
-        </h1>
-        <p class="text-ink-soft mt-0.5 text-xs">{{ t('frequent.hint') }}</p>
-      </div>
-    </header>
+    <AppScreenHeader :title="t('frequent.title')" :subtitle="t('frequent.hint')" />
 
     <main class="px-4 pt-6 md:px-8">
       <div v-if="isPending" class="text-ink-soft font-body py-12 text-center text-sm">

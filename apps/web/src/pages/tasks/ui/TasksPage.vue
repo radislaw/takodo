@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { AppScreenHeader } from '@/shared/ui'
 import TaskListPane from './TaskListPane.vue'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -13,13 +14,7 @@ const { t } = useI18n({ useScope: 'global' })
     <div
       class="lg:border-line lg:h-full lg:w-[380px] lg:flex-shrink-0 lg:overflow-y-auto lg:border-r"
     >
-      <header class="surface-card border-line sticky top-0 z-10 border-b shadow-sm">
-        <div class="px-5 py-4">
-          <h1 class="font-display text-ink text-xl leading-tight font-extrabold">
-            {{ t('tasks.title') }}
-          </h1>
-        </div>
-      </header>
+      <AppScreenHeader :title="t('tasks.title')" />
 
       <TaskListPane class="px-4 pt-6" />
     </div>

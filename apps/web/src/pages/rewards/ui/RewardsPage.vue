@@ -17,6 +17,10 @@ const { t } = useI18n({ useScope: 'global' })
 const { data: rewards, isPending } = useRewards()
 const { data: heatmap } = useHeatmap()
 
+// Gain-framing: lead the heatmap with a count of active days (a win) rather than
+// letting the grid of empty cells read as a tally of missed days.
+const activeDays = computed(() => (heatmap.value?.days ?? []).filter((d) => d.count > 0).length)
+
 const weekdayLabel = computed(() => {
   if (!rewards.value) return []
   return rewards.value.week.map((day) => {
@@ -194,9 +198,14 @@ const stats = computed<Stat[]>(() => {
 
           <!-- Activity heatmap -->
           <div v-if="heatmap" class="surface-card mt-5 rounded-2xl p-5 shadow-sm">
-            <p class="font-display text-ink mb-4 text-sm font-extrabold">
-              {{ t('rewards.heatmap.title') }}
-            </p>
+            <div class="mb-4 flex items-baseline justify-between gap-2">
+              <p class="font-display text-ink text-sm font-extrabold">
+                {{ t('rewards.heatmap.title') }}
+              </p>
+              <p class="text-sage-deep text-xs font-semibold">
+                {{ t('rewards.heatmap.activeSummary', { n: activeDays }) }}
+              </p>
+            </div>
             <ActivityHeatmap :days="heatmap.days" :max="heatmap.max" />
           </div>
 
