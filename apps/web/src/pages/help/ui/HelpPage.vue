@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { AppIcon } from '@/shared/ui'
+import { AppIcon, AppScreenHeader } from '@/shared/ui'
 
 const { t, tm, rt } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -36,20 +36,7 @@ function tips(key: string): string[] {
 
 <template>
   <div class="surface-app pb-nav min-h-full">
-    <header class="surface-card border-line sticky top-0 z-10 border-b shadow-sm">
-      <div class="flex items-center gap-3 px-5 py-4">
-        <button
-          type="button"
-          class="text-ink-soft hover:text-ink -ml-1 flex h-9 w-9 cursor-pointer items-center justify-center"
-          @click="router.back()"
-        >
-          <AppIcon name="chevronR" :size="22" style="transform: rotate(180deg)" />
-        </button>
-        <h1 class="font-display text-ink text-xl leading-tight font-extrabold">
-          {{ t('help.title') }}
-        </h1>
-      </div>
-    </header>
+    <AppScreenHeader :title="t('help.title')" show-back @back="router.back()" />
 
     <main class="mx-auto max-w-xl px-4 pt-4 pb-6 md:max-w-2xl md:px-8">
       <p class="font-body text-ink-soft mb-5 text-sm">{{ t('help.subtitle') }}</p>

@@ -31,6 +31,10 @@ const props = defineProps<{
   childTotal?: number
   expanded?: boolean
   selected?: boolean
+  // Render child progress as a non-interactive depth signal (no expand chevron) —
+  // used for already-nested rows so deeper structure stays visible without the list
+  // turning into a fully recursive tree.
+  staticProgress?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -118,8 +122,14 @@ async function handleAddToToday() {
       {{ task.title }}
     </button>
 
+    <span
+      v-if="staticProgress && childTotal && childTotal > 0"
+      class="text-ink-soft flex flex-shrink-0 items-center"
+    >
+      <ChildProgress :done="childDone ?? 0" :total="childTotal" />
+    </span>
     <button
-      v-if="childTotal && childTotal > 0"
+      v-else-if="childTotal && childTotal > 0"
       type="button"
       class="text-ink-soft hover:text-ink flex flex-shrink-0 cursor-pointer items-center gap-0.5 transition-colors"
       :aria-expanded="expanded"

@@ -195,8 +195,8 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
           <!-- Comeback (anti-shame) banner -->
           <ComebackBanner v-if="isComeback" />
 
-          <!-- Inline brain dump (tablet/desktop) -->
-          <BrainDumpBar class="mb-5 hidden md:flex" :disabled="isAdding" @submit="addTask" />
+          <!-- Inline brain dump — primary zero-friction capture at every breakpoint -->
+          <BrainDumpBar class="mb-5" :disabled="isAdding" @submit="addTask" />
 
           <!-- Summary card -->
           <div class="surface-card mb-6 flex items-center gap-4 rounded-2xl p-4 shadow-md">
@@ -275,16 +275,13 @@ async function handleToggleMIT(entryId: string, currentMIT: boolean) {
             </template>
           </template>
 
-          <!-- Daily quests -->
-          <div class="mt-5">
+          <!-- Zone C — secondary surfaces, subordinated below the task spine by a divider -->
+          <div class="border-line mt-6 flex flex-col gap-5 border-t pt-6">
             <QuestPanel />
+
+            <!-- Evening journal: log already-done tasks + thoughts of the day (evening/night only) -->
+            <EveningJournal v-if="isEvening" />
           </div>
-
-          <!-- Evening journal: log already-done tasks + thoughts of the day (evening/night only) -->
-          <EveningJournal v-if="isEvening" />
-
-          <!-- Gentle note (mobile/tablet) -->
-          <SoftNote class="mt-5 lg:hidden">{{ t('rewards.gentleNote') }}</SoftNote>
         </div>
 
         <!-- Desktop right rail -->
