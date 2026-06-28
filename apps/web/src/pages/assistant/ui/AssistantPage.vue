@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AppIcon, AppScreenHeader } from '@/shared/ui'
+import { AppActionSheet, AppIcon, AppScreenHeader } from '@/shared/ui'
 import {
   useConversations,
   useConversation,
@@ -48,6 +48,7 @@ const pendingText = ref<string | null>(null)
 const isSending = ref(false)
 const sendFailed = ref(false)
 const showHistory = ref(false)
+const pendingDeleteId = ref<string | null>(null)
 
 const scrollEl = ref<HTMLElement | null>(null)
 function scrollToBottom() {
@@ -108,8 +109,10 @@ function selectConversation(id: string) {
   sendFailed.value = false
 }
 
-async function removeConversation(id: string) {
-  if (!window.confirm(t('assistant.deleteConfirm'))) return
+async function confirmDelete() {
+  const id = pendingDeleteId.value
+  if (!id) return
+  pendingDeleteId.value = null
   await deleteConversation(id)
   if (id === activeId.value) {
     // Drop the active id → the bootstrap watcher re-picks the newest or opens fresh.
@@ -331,7 +334,7 @@ function useExample(text: string) {
                 type="button"
                 :aria-label="t('assistant.delete')"
                 class="text-ink-faint flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-full hover:text-rose-500"
-                @click="removeConversation(c.id)"
+                @click="pendingDeleteId = c.id"
               >
                 <AppIcon name="trash" :size="16" />
               </button>
@@ -340,6 +343,31 @@ function useExample(text: string) {
         </div>
       </aside>
     </Transition>
+
+    <!-- Delete confirmation -->
+    <AppActionSheet
+      :open="pendingDeleteId !== null"
+      :title="t('assistant.confirmDelete.title')"
+      :subtitle="t('assistant.confirmDelete.subtitle')"
+      @close="pendingDeleteId = null"
+    >
+      <div class="flex flex-col gap-2 pt-2">
+        <button
+          type="button"
+          class="font-body text-softrose bg-softrose-tint flex min-h-[44px] w-full items-center justify-center rounded-xl text-sm font-bold transition-colors"
+          @click="confirmDelete"
+        >
+          {{ t('assistant.confirmDelete.confirm') }}
+        </button>
+        <button
+          type="button"
+          class="font-body text-ink-soft flex min-h-[44px] w-full items-center justify-center rounded-xl text-sm font-semibold transition-colors"
+          @click="pendingDeleteId = null"
+        >
+          {{ t('assistant.confirmDelete.cancel') }}
+        </button>
+      </div>
+    </AppActionSheet>
   </div>
 </template>
 
