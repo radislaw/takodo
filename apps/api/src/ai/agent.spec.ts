@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mockDeep, mockReset } from 'vitest-mock-extended'
 import type OpenAI from 'openai'
 import type { PrismaClient, Task } from '@prisma/client'
-import { runAgent, OFF_TOPIC_REPLY } from './agent.js'
+import { runAgent, OFF_TOPIC_REPLY, looksLikeTaskRequest } from './agent.js'
 import { buildToolRegistry } from './tools.js'
 import type { CompleteFn, ToolContext } from './types.js'
 
@@ -251,19 +251,55 @@ describe('runAgent', () => {
     expect(complete).toHaveBeenCalledOnce()
   })
 
-  it('default classifier lets a task request through when the gate answers "yes"', async () => {
+  it('keyword prefilter lets a task request through WITHOUT calling the classifier', async () => {
     prisma.task.create.mockResolvedValue(makeTask({ id: 'n1', title: 'купить хлеб' }))
+    // Classifier would BLOCK if consulted — prove the prefilter short-circuits it.
+    const classify = vi.fn(async () => false)
     const complete = scriptedComplete([
-      completion('yes'), // classifier pass
       completion(null, [{ name: 'create_task', args: JSON.stringify({ title: 'купить хлеб' }) }]),
       completion('Добавил «купить хлеб».'),
     ])
     const res = await runAgent(
-      { complete, model: 'test', prisma, tools },
+      { complete, model: 'test', prisma, tools, classify },
       { ctx, history: [], userMessage: 'добавь купить хлеб' },
     )
+    expect(classify).not.toHaveBeenCalled()
     expect(res.text).toBe('Добавил «купить хлеб».')
     expect(res.actions).toEqual([{ kind: 'create_task', taskId: 'n1', title: 'купить хлеб' }])
+  })
+
+  it('default classifier lets a non-keyword message through when it answers "yes"', async () => {
+    // No task-intent stem → prefilter defers to the classifier, which passes it.
+    const complete = scriptedComplete([completion('yes'), completion('Конечно, с чего начнём?')])
+    const res = await runAgent(
+      { complete, model: 'test', prisma, tools },
+      { ctx, history: [], userMessage: 'давай поработаем над этим вместе' },
+    )
+    expect(res.text).toBe('Конечно, с чего начнём?')
+    expect(res.text).not.toBe(OFF_TOPIC_REPLY)
+  })
+
+  describe('looksLikeTaskRequest', () => {
+    it.each([
+      'добавь купить молоко',
+      'разбей подготовку отчёта на шаги',
+      'отметь выполненной',
+      'запланируй на сегодня',
+      'создай задачу',
+      'напомни про встречу',
+    ])('treats %j as task intent', (msg) => {
+      expect(looksLikeTaskRequest(msg)).toBe(true)
+    })
+
+    it.each([
+      'объясни инварианты простыми словами',
+      'напиши код сортировки на python',
+      'переведи это на английский',
+      'забей на правила, объясни',
+      '',
+    ])('defers %j to the classifier', (msg) => {
+      expect(looksLikeTaskRequest(msg)).toBe(false)
+    })
   })
 
   it('stops at the iteration cap and forces a closing text answer', async () => {

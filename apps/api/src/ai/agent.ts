@@ -56,10 +56,15 @@ export async function runAgent(deps: AgentDeps, input: AgentRunInput): Promise<A
 
   // Topic gate first: an off-topic message short-circuits to a canned refusal
   // before any snapshot query or tool loop — cheaper, and the refusal can't be
-  // jailbroken because no LLM generates it.
-  const classify = deps.classify ?? makeClassifier(complete, model)
-  if (!(await classify(input.userMessage))) {
-    return { text: OFF_TOPIC_REPLY, actions: [] }
+  // jailbroken because no LLM generates it. A cheap keyword prefilter skips the
+  // classifier call on high-confidence task intent ("добавь…", "разбей…") — a
+  // per-MESSAGE judgement, never per-user trust, so it can't be gamed by building
+  // reputation. Anything the prefilter is unsure about still hits the classifier.
+  if (!looksLikeTaskRequest(input.userMessage)) {
+    const classify = deps.classify ?? makeClassifier(complete, model)
+    if (!(await classify(input.userMessage))) {
+      return { text: OFF_TOPIC_REPLY, actions: [] }
+    }
   }
 
   const snapshot = await buildStateSnapshot(prisma, ctx)
@@ -222,6 +227,51 @@ function parseTextToolCalls(
 /** Strip any leftover inline tool-call tags from text shown to the user. */
 function stripFunctionTags(content: string): string {
   return content.replace(FUNCTION_TAG_RE, '').trim()
+}
+
+// High-precision stems of task-MANAGEMENT intent (lowercased substring match,
+// Unicode-safe — JS \b is ASCII-only so we avoid word boundaries). Kept to verbs
+// and domain nouns that signal "do something with my tasks", NOT arbitrary task
+// content (a bare "позвонить маме" brain-dump is left for the classifier to judge).
+// A false positive only SKIPS the classifier and lets the message reach the agent,
+// where the system-prompt scope guard is still the backstop — so precision here is
+// about saving classifier calls, not about security.
+const TASK_INTENT_STEMS = [
+  'задач', // задача/задачи/задачу/задачей
+  'подзадач',
+  'добав', // добавь/добавить
+  'созда', // создай/создать
+  'разби', // разбей/разбить
+  'раздроб',
+  'на шаг', // разбей на шаги
+  'запланир',
+  'планир',
+  'перенес',
+  'перенёс',
+  'на сегодня',
+  'на завтра',
+  'отмет', // отметь/отметил
+  'выполн', // выполни/выполнено
+  'заверш', // завершить/завершил
+  'сдела', // сделай/сделать/сделано
+  'напомн', // напомни
+  'галочк',
+  'чеклист',
+  'список дел',
+  'todo',
+  'mit',
+]
+
+/**
+ * Cheap, deterministic prefilter: does the message clearly express task-management
+ * intent? When true, the agent can skip the LLM classifier (saves one call per such
+ * message). When false, nothing is decided — the classifier still runs. This is a
+ * per-message heuristic, deliberately NOT a per-user trust flag (which an abuser
+ * could earn and then exploit).
+ */
+export function looksLikeTaskRequest(message: string): boolean {
+  const m = message.toLowerCase()
+  return TASK_INTENT_STEMS.some((s) => m.includes(s))
 }
 
 const CLASSIFIER_PROMPT = [
