@@ -302,6 +302,30 @@ describe('runAgent', () => {
     })
   })
 
+  it('bare brain-dump infinitive is captured, not rejected', async () => {
+    prisma.task.create.mockResolvedValue(
+      makeTask({ id: 'n1', title: 'Посмотреть курс по ИИ агентам' }),
+    )
+    const complete = scriptedComplete([
+      completion(null, [
+        {
+          name: 'create_task',
+          args: JSON.stringify({ title: 'Посмотреть курс по ИИ агентам' }),
+        },
+      ]),
+      completion('Добавил «Посмотреть курс по ИИ агентам».'),
+    ])
+    // classify: true simulates the fixed classifier correctly returning yes for brain dumps
+    const res = await runAgent(
+      { complete, model: 'test', prisma, tools, classify: async () => true },
+      { ctx, history: [], userMessage: 'Посмотреть курс по ИИ агентам' },
+    )
+    expect(res.text).not.toBe(OFF_TOPIC_REPLY)
+    expect(res.actions).toEqual([
+      { kind: 'create_task', taskId: 'n1', title: 'Посмотреть курс по ИИ агентам' },
+    ])
+  })
+
   it('stops at the iteration cap and forces a closing text answer', async () => {
     prisma.task.create.mockResolvedValue(makeTask())
     // The model keeps calling tools forever; cap must break the loop.
