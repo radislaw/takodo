@@ -7,6 +7,7 @@ import {
   useConversation,
   useCreateConversation,
   useDeleteConversation,
+  useDeleteTask,
   useSendMessage,
 } from '@/shared/api'
 
@@ -15,6 +16,7 @@ const { t } = useI18n({ useScope: 'global' })
 const { data: conversations } = useConversations()
 const { mutateAsync: createConversation } = useCreateConversation()
 const { mutateAsync: deleteConversation } = useDeleteConversation()
+const { mutateAsync: deleteTask } = useDeleteTask()
 const { mutateAsync: sendMessage } = useSendMessage()
 
 const activeId = ref<string | undefined>()
@@ -49,6 +51,9 @@ const isSending = ref(false)
 const sendFailed = ref(false)
 const showHistory = ref(false)
 const pendingDeleteId = ref<string | null>(null)
+// The agent never deletes; it proposes (request_delete action). The user confirms
+// here, and only then do we call the real DELETE /tasks/{id}.
+const pendingDeleteTask = ref<{ id: string; title?: string } | null>(null)
 
 const scrollEl = ref<HTMLElement | null>(null)
 function scrollToBottom() {
@@ -145,6 +150,13 @@ function regenerate() {
   if (lastUserContent.value) void dispatch(lastUserContent.value)
 }
 
+async function confirmDeleteTask() {
+  const target = pendingDeleteTask.value
+  if (!target) return
+  pendingDeleteTask.value = null
+  await deleteTask(target.id)
+}
+
 const examples = computed(() => [t('assistant.example1'), t('assistant.example2')])
 function useExample(text: string) {
   draft.value = text
@@ -215,18 +227,33 @@ function useExample(text: string) {
             >
               {{ m.content }}
               <div v-if="m.actions && m.actions.length" class="mt-2 flex flex-wrap gap-1.5">
-                <span
-                  v-for="(a, i) in m.actions"
-                  :key="i"
-                  class="bg-sage-tint text-sage-deep inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
-                >
-                  <AppIcon name="check" :size="12" :stroke-width="2.5" />
-                  {{
-                    a.title
-                      ? t('assistant.action.' + a.kind) + ' · ' + a.title
-                      : t('assistant.action.' + a.kind)
-                  }}
-                </span>
+                <template v-for="(a, i) in m.actions" :key="i">
+                  <!-- The agent only proposes a delete — the user confirms it here. -->
+                  <button
+                    v-if="a.kind === 'request_delete'"
+                    type="button"
+                    class="bg-softrose-tint text-softrose hover:bg-softrose-tint/70 inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors"
+                    @click="pendingDeleteTask = { id: a.taskId!, title: a.title }"
+                  >
+                    <AppIcon name="trash" :size="12" :stroke-width="2.5" />
+                    {{
+                      a.title
+                        ? t('assistant.action.request_delete') + ' · ' + a.title
+                        : t('assistant.action.request_delete')
+                    }}
+                  </button>
+                  <span
+                    v-else
+                    class="bg-sage-tint text-sage-deep inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
+                  >
+                    <AppIcon name="check" :size="12" :stroke-width="2.5" />
+                    {{
+                      a.title
+                        ? t('assistant.action.' + a.kind) + ' · ' + a.title
+                        : t('assistant.action.' + a.kind)
+                    }}
+                  </span>
+                </template>
               </div>
             </div>
           </div>
@@ -400,6 +427,31 @@ function useExample(text: string) {
           @click="pendingDeleteId = null"
         >
           {{ t('assistant.confirmDelete.cancel') }}
+        </button>
+      </div>
+    </AppActionSheet>
+
+    <!-- Task delete confirmation (proposed by the agent) -->
+    <AppActionSheet
+      :open="pendingDeleteTask !== null"
+      :title="t('assistant.confirmDeleteTask.title')"
+      :subtitle="pendingDeleteTask?.title ?? t('assistant.confirmDeleteTask.subtitle')"
+      @close="pendingDeleteTask = null"
+    >
+      <div class="flex flex-col gap-2 pt-2">
+        <button
+          type="button"
+          class="font-body text-softrose bg-softrose-tint flex min-h-[44px] w-full items-center justify-center rounded-xl text-sm font-bold transition-colors"
+          @click="confirmDeleteTask"
+        >
+          {{ t('assistant.confirmDeleteTask.confirm') }}
+        </button>
+        <button
+          type="button"
+          class="font-body text-ink-soft flex min-h-[44px] w-full items-center justify-center rounded-xl text-sm font-semibold transition-colors"
+          @click="pendingDeleteTask = null"
+        >
+          {{ t('assistant.confirmDeleteTask.cancel') }}
         </button>
       </div>
     </AppActionSheet>
