@@ -32,11 +32,14 @@ const emit = defineEmits<{ back: [] }>()
       >
         <AppIcon name="chevronR" :size="22" style="transform: rotate(180deg)" />
       </button>
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <h1 class="font-display text-ink text-xl leading-tight font-extrabold">
           {{ title }}
         </h1>
         <p v-if="subtitle" class="text-ink-soft mt-0.5 text-xs">{{ subtitle }}</p>
+      </div>
+      <div v-if="$slots.actions" class="flex flex-shrink-0 items-center gap-1">
+        <slot name="actions" />
       </div>
     </div>
   </header>

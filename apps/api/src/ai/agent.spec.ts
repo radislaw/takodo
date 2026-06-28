@@ -364,3 +364,65 @@ describe('runAgent', () => {
     expect(res.text).toContain('изменения')
   })
 })
+
+describe('tools', () => {
+  beforeEach(() => {
+    mockReset(prisma)
+    prisma.$transaction.mockImplementation(async (fn) => fn(prisma))
+  })
+
+  describe('get_day', () => {
+    it('returns the day with each task title and done flag', async () => {
+      prisma.dailyList.findUnique.mockResolvedValue({
+        id: 'list-1',
+        date: new Date('2024-01-14T00:00:00.000Z'),
+        createdAt: new Date('2024-01-14T00:00:00.000Z'),
+        note: null,
+        entries: [
+          { id: 'e1', taskId: 'task-1', isMIT: true, order: 0 },
+          { id: 'e2', taskId: 'task-2', isMIT: false, order: 1 },
+        ],
+      } as never)
+      prisma.task.findMany.mockResolvedValue([
+        makeTask({ id: 'task-1', title: 'Done one', status: 'done' }),
+        makeTask({ id: 'task-2', title: 'Open one', status: 'open' }),
+      ])
+
+      const out = await tools.get('get_day')!.run(prisma, ctx, { date: '2024-01-14' })
+      expect(out.result).toEqual({
+        date: '2024-01-14',
+        entries: [
+          { taskId: 'task-1', title: 'Done one', isMIT: true, done: true },
+          { taskId: 'task-2', title: 'Open one', isMIT: false, done: false },
+        ],
+      })
+    })
+
+    it('returns empty entries when the day has no list', async () => {
+      prisma.dailyList.findUnique.mockResolvedValue(null)
+      const out = await tools.get('get_day')!.run(prisma, ctx, { date: '2024-01-10' })
+      expect(out.result).toEqual({ date: '2024-01-10', entries: [] })
+    })
+
+    it('rejects a malformed date', async () => {
+      await expect(tools.get('get_day')!.run(prisma, ctx, { date: 'yesterday' })).rejects.toThrow()
+    })
+  })
+
+  describe('request_delete_task', () => {
+    it('proposes a delete (no write) and records the request_delete action', async () => {
+      prisma.task.findUnique.mockResolvedValue(makeTask({ id: 'task-9', title: 'Kill me' }))
+      const out = await tools.get('request_delete_task')!.run(prisma, ctx, { taskId: 'task-9' })
+      expect(out.action).toEqual({ kind: 'request_delete', taskId: 'task-9', title: 'Kill me' })
+      expect(prisma.task.delete).not.toHaveBeenCalled()
+    })
+
+    it("404s on another user's task without proposing anything", async () => {
+      prisma.task.findUnique.mockResolvedValue(makeTask({ id: 'task-9', userId: 'other' }))
+      await expect(
+        tools.get('request_delete_task')!.run(prisma, ctx, { taskId: 'task-9' }),
+      ).rejects.toThrow()
+      expect(prisma.task.delete).not.toHaveBeenCalled()
+    })
+  })
+})

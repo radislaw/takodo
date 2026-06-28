@@ -45,6 +45,19 @@ export function useCreateConversation() {
   })
 }
 
+export function useDeleteConversation() {
+  const queryCache = useQueryCache()
+  return useAppMutation({
+    mutation: async (id: string) => {
+      const { error } = await apiClient.DELETE('/ai/conversations/{id}', {
+        params: { path: { id } },
+      })
+      if (error) throw new Error('Failed to delete conversation')
+    },
+    onSettled: () => queryCache.invalidateQueries({ key: ['ai', 'conversations'], exact: true }),
+  })
+}
+
 /**
  * Send a user message; the agent acts autonomously and replies. On settle we
  * refresh the conversation AND every cache the agent's tools may have changed

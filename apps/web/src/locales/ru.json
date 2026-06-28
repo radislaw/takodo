@@ -148,13 +148,33 @@
     "placeholder": "Напишите задачу или вопрос…",
     "send": "Отправить",
     "working": "Думаю…",
+    "newChat": "Новый чат",
+    "history": "Чаты",
+    "noHistory": "Пока нет переписок",
+    "untitled": "Новый чат",
+    "delete": "Удалить чат",
+    "confirmDelete": {
+      "title": "Удалить переписку?",
+      "subtitle": "Это действие нельзя отменить.",
+      "confirm": "Удалить",
+      "cancel": "Отмена"
+    },
+    "errorTitle": "Не удалось получить ответ",
+    "retry": "Повторить запрос",
+    "confirmDeleteTask": {
+      "title": "Удалить задачу?",
+      "subtitle": "Задача и все её подзадачи будут удалены безвозвратно.",
+      "confirm": "Удалить",
+      "cancel": "Отмена"
+    },
     "action": {
       "create_task": "Создал задачу",
       "complete_task": "Отметил готовым",
       "reopen_task": "Вернул в работу",
       "add_to_today": "Добавил на сегодня",
       "set_mit": "Сделал главным",
-      "move_to_tomorrow": "Перенёс на завтра"
+      "move_to_tomorrow": "Перенёс на завтра",
+      "request_delete": "Удалить задачу"
     }
   },
   "greeting": {
@@ -679,7 +699,8 @@
   },
   "a11y": {
     "mainNav": "Основная навигация",
-    "back": "Назад"
+    "back": "Назад",
+    "close": "Закрыть"
   },
   "progressRing": {
     "aria": "{done} из {total}",

@@ -14,8 +14,10 @@ import type { AgentAction, ToolContext } from './types.js'
 
 /**
  * The agent's toolset. Every tool wraps a `userId`-scoped op (`ops/*`), so the
- * model can never reach another user's data. Only reversible actions are exposed
- * (no delete) — full autonomy must never destroy. set_mit / move_to_tomorrow take
+ * model can never reach another user's data. The agent never destroys directly:
+ * the only delete path is `request_delete_task`, which writes nothing and merely
+ * surfaces a confirmation the user must tap (so the "reversible actions only"
+ * invariant holds even under prompt injection). set_mit / move_to_tomorrow take
  * a `taskId` (the agent thinks in tasks) and resolve the daily entry internally.
  */
 
@@ -111,6 +113,50 @@ const TOOLS: ToolImpl[] = [
             title: titleOf.get(e.taskId) ?? null,
             isMIT: e.isMIT,
           })),
+        },
+      }
+    },
+  },
+  {
+    def: {
+      type: 'function',
+      function: {
+        name: 'get_day',
+        description:
+          "Get the user's task list for ANY past or future day (e.g. yesterday). Use this whenever the user asks about a day other than today — \"what didn't I finish yesterday\", tasks on a date, etc. Compute the date from today's date given in the prompt. Each entry tells you the task title and whether it is done.",
+        parameters: {
+          type: 'object',
+          properties: {
+            date: { type: 'string', description: 'Target day as YYYY-MM-DD.' },
+          },
+          required: ['date'],
+        },
+      },
+    },
+    async run(prisma, ctx, args) {
+      const date = str(args, 'date')
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        throw new OpError('bad_args', 400, 'date must be in YYYY-MM-DD format')
+      }
+      const day = await getDailyByDate(prisma, ctx.userId, date).catch((e) => {
+        if (e instanceof OpError) return null
+        throw e
+      })
+      if (!day) return { result: { date, entries: [] } }
+      const tasks = await listTasks(prisma, ctx.userId)
+      const byId = new Map(tasks.map((t) => [t.id, t]))
+      return {
+        result: {
+          date: day.date,
+          entries: day.entries.map((e) => {
+            const task = byId.get(e.taskId)
+            return {
+              taskId: e.taskId,
+              title: task?.title ?? null,
+              isMIT: e.isMIT,
+              done: task?.status === 'done',
+            }
+          }),
         },
       }
     },
@@ -340,6 +386,31 @@ const TOOLS: ToolImpl[] = [
       return {
         result: { taskId, movedTo: 'tomorrow' },
         action: { kind: 'move_to_tomorrow', taskId },
+      }
+    },
+  },
+  {
+    def: {
+      type: 'function',
+      function: {
+        name: 'request_delete_task',
+        description:
+          "Ask the user to confirm permanently deleting a task (and all its subtasks). You do NOT delete anything — this only surfaces a confirmation button the user must tap. Deletion is irreversible, so it always goes through the user. Use only when the user clearly wants a task gone. After calling, tell the user you've asked them to confirm — never claim the task is already deleted.",
+        parameters: {
+          type: 'object',
+          properties: { taskId: { type: 'string' } },
+          required: ['taskId'],
+        },
+      },
+    },
+    async run(prisma, ctx, args) {
+      const taskId = str(args, 'taskId')
+      // Ownership check only — no write. The agent proposes; the user disposes.
+      const task = await prisma.task.findUnique({ where: { id: taskId } })
+      if (!task || task.userId !== ctx.userId) throw notFound('Task not found')
+      return {
+        result: { taskId, title: task.title, status: 'awaiting_user_confirmation' },
+        action: { kind: 'request_delete', taskId, title: task.title },
       }
     },
   },

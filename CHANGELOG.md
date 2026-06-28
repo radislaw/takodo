@@ -5,6 +5,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- **AI assistant — chat controls + new agent capabilities.**
+  - _Conversation management_: delete a conversation (`DELETE /ai/conversations/{id}`, cascade-deletes messages, ownership-checked → 404 otherwise), start a new chat, and a history drawer to switch between past conversations. First user message auto-titles the conversation so the list is scannable. `useDeleteConversation` composable; delete confirmed via an `AppActionSheet` bottom sheet (no native `confirm`).
+  - _Retry / regenerate_: a "Повторить запрос" button under the last reply resends the last user turn — covers both transport failures and the open-model case where the request succeeds (200) but the agent apologises about an internal failure (the catch-based retry never fires there).
+  - _View any day — `get_day` tool_: the agent can now read any past/future day's list (task title + done flag), so "что я не закончил вчера" works. Date computed from today's date in the prompt; read-only. `get_today` stays today-only.
+  - _Propose task deletion — `request_delete_task` tool (confirm-gated)_: the agent never destroys directly. The tool writes nothing — it ownership-checks the task and emits a `request_delete` action; the web renders it as a destructive confirm chip → `AppActionSheet` → the existing `DELETE /tasks/{id}`. Only the user's tap deletes, so the reversible-actions-only invariant holds even under prompt injection. Prompt rules added for both tools; CLAUDE.md invariant updated.
+  - New i18n under `assistant.*` (history/retry/confirm-delete copy, `action.request_delete`). Web 496 green; agent tool tests 31 green (get_day happy/empty/bad-date, request_delete proposes-no-write + cross-user 404).
+
 - **UX usability pass — 6 ADHD-focused fixes** across the shipped screens (audit against fast-capture / low-load / gain-framing / never-punish).
   - _Today — brain dump always-on_: `BrainDumpBar` no longer gated behind `hidden md:flex`; the zero-friction capture now shows at every breakpoint (mobile FAB + sheet kept as the secondary "add with category" path).
   - _Today — three-zone hierarchy_: `QuestPanel` + `EveningJournal` grouped under a divider as secondary surfaces below the task spine; the duplicate mobile `SoftNote` removed.

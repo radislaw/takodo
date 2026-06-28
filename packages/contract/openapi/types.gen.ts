@@ -33,7 +33,8 @@ export interface paths {
         get: operations["Assistant_getConversation"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** @description Delete a conversation and all its messages. */
+        delete: operations["Assistant_deleteConversation"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1030,6 +1031,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ConversationDetail"];
                 };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Assistant_deleteConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description There is no content to send for this request, but the headers may be useful. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description An unexpected error response. */
             default: {

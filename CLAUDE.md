@@ -127,7 +127,11 @@ three `LLM_*` env vars only. Invariants when touching `ai/`:
 
 - **Tools wrap `userId`-scoped ops** (`apps/api/src/ops/*`, shared with the HTTP handlers) — the
   agent can never reach another user's data, even under prompt injection.
-- **Reversible actions only.** No `deleteTask` in the toolset; full autonomy must never destroy.
+- **Reversible actions only — the agent never destroys directly.** There is no `deleteTask` op in
+  the toolset. The single delete path is `request_delete_task`, which writes nothing: it ownership-
+  checks the task and emits a `request_delete` action that the web surfaces as a confirm button; the
+  user taps it and the web calls the existing `DELETE /tasks/{id}`. So even under prompt injection the
+  agent can only _propose_ a delete, never perform one. Reading other days is read-only (`get_day`).
 - **Bounded loop.** Hard cap on tool-call rounds per turn; failed tool calls are fed back as results
   (repair path) so weaker open models can self-correct.
 - **Topic gate (abuse guard).** Two layers keep the agent from being used as a free general chatbot:
