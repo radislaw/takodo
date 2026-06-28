@@ -86,6 +86,29 @@ describe('Assistant routes', () => {
     })
   })
 
+  describe('DELETE /ai/conversations/:id', () => {
+    it('deletes a conversation the user owns', async () => {
+      prisma.conversation.findUnique.mockResolvedValue(makeConversation())
+      prisma.conversation.delete.mockResolvedValue(makeConversation())
+      const res = await app.inject({ method: 'DELETE', url: '/ai/conversations/conv-1' })
+      expect(res.statusCode).toBe(204)
+      expect(prisma.conversation.delete).toHaveBeenCalledWith({ where: { id: 'conv-1' } })
+    })
+
+    it('returns 404 when the conversation belongs to another user', async () => {
+      prisma.conversation.findUnique.mockResolvedValue(makeConversation({ userId: 'other' }))
+      const res = await app.inject({ method: 'DELETE', url: '/ai/conversations/conv-1' })
+      expect(res.statusCode).toBe(404)
+      expect(prisma.conversation.delete).not.toHaveBeenCalled()
+    })
+
+    it('returns 404 when the conversation does not exist', async () => {
+      prisma.conversation.findUnique.mockResolvedValue(null)
+      const res = await app.inject({ method: 'DELETE', url: '/ai/conversations/missing' })
+      expect(res.statusCode).toBe(404)
+    })
+  })
+
   describe('POST /ai/conversations/:id/messages', () => {
     it('runs the agent, persists both turns, returns reply + actions', async () => {
       prisma.conversation.findUnique.mockResolvedValue({
@@ -120,6 +143,41 @@ describe('Assistant routes', () => {
       expect(body.actions).toHaveLength(1)
       expect(prisma.message.create).toHaveBeenCalledTimes(2)
       expect(runner.run).toHaveBeenCalledOnce()
+    })
+
+    it('names an untitled conversation from the first user message', async () => {
+      prisma.conversation.findUnique.mockResolvedValue({
+        ...makeConversation({ title: null }),
+        messages: [],
+      } as Parameters<typeof prisma.conversation.findUnique.mockResolvedValue>[0])
+      vi.mocked(runner.run).mockResolvedValue({ text: 'ok', actions: [] })
+      prisma.message.create.mockResolvedValue(makeMessage())
+
+      await app.inject({
+        method: 'POST',
+        url: '/ai/conversations/conv-1/messages',
+        payload: { content: 'разбей задачу про отчёт' },
+      })
+      expect(prisma.conversation.update).toHaveBeenCalledWith({
+        where: { id: 'conv-1' },
+        data: { title: 'разбей задачу про отчёт' },
+      })
+    })
+
+    it('does not rename a conversation that already has messages', async () => {
+      prisma.conversation.findUnique.mockResolvedValue({
+        ...makeConversation({ title: 'Старый' }),
+        messages: [makeMessage({ role: 'user', content: 'привет' })],
+      } as Parameters<typeof prisma.conversation.findUnique.mockResolvedValue>[0])
+      vi.mocked(runner.run).mockResolvedValue({ text: 'ok', actions: [] })
+      prisma.message.create.mockResolvedValue(makeMessage())
+
+      await app.inject({
+        method: 'POST',
+        url: '/ai/conversations/conv-1/messages',
+        payload: { content: 'ещё' },
+      })
+      expect(prisma.conversation.update).not.toHaveBeenCalled()
     })
 
     it('returns 404 when conversation not found', async () => {

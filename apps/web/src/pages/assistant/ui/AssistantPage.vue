@@ -6,6 +6,7 @@ import {
   useConversations,
   useConversation,
   useCreateConversation,
+  useDeleteConversation,
   useSendMessage,
 } from '@/shared/api'
 
@@ -13,6 +14,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 const { data: conversations } = useConversations()
 const { mutateAsync: createConversation } = useCreateConversation()
+const { mutateAsync: deleteConversation } = useDeleteConversation()
 const { mutateAsync: sendMessage } = useSendMessage()
 
 const activeId = ref<string | undefined>()
@@ -44,6 +46,8 @@ const messages = computed(() => conversation.value?.messages ?? [])
 const draft = ref('')
 const pendingText = ref<string | null>(null)
 const isSending = ref(false)
+const sendFailed = ref(false)
+const showHistory = ref(false)
 
 const scrollEl = ref<HTMLElement | null>(null)
 function scrollToBottom() {
@@ -52,26 +56,66 @@ function scrollToBottom() {
     if (el) el.scrollTop = el.scrollHeight
   })
 }
-watch([messages, pendingText], scrollToBottom, { deep: true })
+watch([messages, pendingText, sendFailed], scrollToBottom, { deep: true })
 
-async function send() {
-  const content = draft.value.trim()
-  if (!content || !activeId.value || isSending.value) return
-  draft.value = ''
+async function dispatch(content: string) {
+  if (!activeId.value || isSending.value) return
   pendingText.value = content
+  sendFailed.value = false
   isSending.value = true
   try {
     await sendMessage({ conversationId: activeId.value, content })
+    pendingText.value = null
+  } catch {
+    // Keep the failed text on screen so the user can retry it.
+    sendFailed.value = true
   } finally {
     isSending.value = false
-    pendingText.value = null
   }
+}
+
+function send() {
+  const content = draft.value.trim()
+  if (!content) return
+  draft.value = ''
+  void dispatch(content)
+}
+
+function retry() {
+  if (pendingText.value) void dispatch(pendingText.value)
 }
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
-    void send()
+    send()
+  }
+}
+
+async function newChat() {
+  showHistory.value = false
+  const conv = await createConversation()
+  activeId.value = conv.id
+  pendingText.value = null
+  sendFailed.value = false
+}
+
+function selectConversation(id: string) {
+  showHistory.value = false
+  if (id === activeId.value) return
+  activeId.value = id
+  pendingText.value = null
+  sendFailed.value = false
+}
+
+async function removeConversation(id: string) {
+  if (!window.confirm(t('assistant.deleteConfirm'))) return
+  await deleteConversation(id)
+  if (id === activeId.value) {
+    // Drop the active id → the bootstrap watcher re-picks the newest or opens fresh.
+    activeId.value = undefined
+    pendingText.value = null
+    sendFailed.value = false
   }
 }
 
@@ -82,8 +126,27 @@ function useExample(text: string) {
 </script>
 
 <template>
-  <div class="surface-app flex h-full flex-col">
-    <AppScreenHeader :title="t('assistant.title')" :subtitle="t('assistant.hint')" />
+  <div class="surface-app relative flex h-full flex-col">
+    <AppScreenHeader :title="t('assistant.title')" :subtitle="t('assistant.hint')">
+      <template #actions>
+        <button
+          type="button"
+          :aria-label="t('assistant.history')"
+          class="text-ink-soft hover:text-ink flex h-9 w-9 cursor-pointer items-center justify-center rounded-full"
+          @click="showHistory = true"
+        >
+          <AppIcon name="layers" :size="20" />
+        </button>
+        <button
+          type="button"
+          :aria-label="t('assistant.newChat')"
+          class="text-ink-soft hover:text-ink flex h-9 w-9 cursor-pointer items-center justify-center rounded-full"
+          @click="newChat"
+        >
+          <AppIcon name="plus" :size="22" />
+        </button>
+      </template>
+    </AppScreenHeader>
 
     <div ref="scrollEl" class="flex-1 overflow-y-auto px-4 pt-5 pb-4 md:px-8">
       <div class="mx-auto flex w-full max-w-xl flex-col gap-3">
@@ -143,10 +206,13 @@ function useExample(text: string) {
           </div>
         </template>
 
-        <!-- Optimistic just-sent user message -->
+        <!-- Optimistic just-sent user message (stays visible if it failed, for retry) -->
         <div v-if="pendingText" class="flex justify-end">
           <div
-            class="bg-sage-deep text-cream font-body max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap"
+            :class="[
+              'font-body max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap',
+              sendFailed ? 'bg-sage-deep/60 text-cream' : 'bg-sage-deep text-cream',
+            ]"
           >
             {{ pendingText }}
           </div>
@@ -159,6 +225,23 @@ function useExample(text: string) {
           >
             <AppIcon name="sparkles" :size="16" class="text-sage-deep animate-pulse" />
             {{ t('assistant.working') }}
+          </div>
+        </div>
+
+        <!-- Error + retry -->
+        <div v-if="sendFailed" class="flex justify-start">
+          <div
+            class="border-line font-body text-ink-soft flex flex-col items-start gap-2 rounded-2xl border bg-rose-50 px-4 py-2.5 text-sm shadow-sm dark:bg-rose-950/30"
+          >
+            <span>{{ t('assistant.errorTitle') }}</span>
+            <button
+              type="button"
+              class="bg-sage-deep text-cream inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
+              @click="retry"
+            >
+              <AppIcon name="rotateCcw" :size="14" :stroke-width="2.4" />
+              {{ t('assistant.retry') }}
+            </button>
           </div>
         </div>
       </div>
@@ -186,5 +269,103 @@ function useExample(text: string) {
         </button>
       </div>
     </div>
+
+    <!-- History drawer -->
+    <Transition name="fade">
+      <div
+        v-if="showHistory"
+        class="absolute inset-0 z-20 bg-black/30"
+        @click="showHistory = false"
+      />
+    </Transition>
+    <Transition name="slide">
+      <aside
+        v-if="showHistory"
+        class="surface-card border-line absolute inset-y-0 right-0 z-30 flex w-80 max-w-[85%] flex-col border-l shadow-xl"
+      >
+        <div class="border-line flex items-center justify-between border-b px-4 py-4">
+          <h2 class="font-display text-ink text-lg font-extrabold">{{ t('assistant.history') }}</h2>
+          <button
+            type="button"
+            :aria-label="t('a11y.close')"
+            class="text-ink-soft hover:text-ink flex h-9 w-9 cursor-pointer items-center justify-center rounded-full"
+            @click="showHistory = false"
+          >
+            <AppIcon name="x" :size="20" />
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="border-line text-sage-deep font-body hover:bg-sage-tint/50 flex cursor-pointer items-center gap-2 border-b px-4 py-3 text-sm font-semibold"
+          @click="newChat"
+        >
+          <AppIcon name="plus" :size="18" :stroke-width="2.4" />
+          {{ t('assistant.newChat') }}
+        </button>
+
+        <div class="flex-1 overflow-y-auto">
+          <p
+            v-if="!conversations || conversations.length === 0"
+            class="text-ink-faint font-body px-4 py-6 text-center text-sm"
+          >
+            {{ t('assistant.noHistory') }}
+          </p>
+          <ul v-else>
+            <li
+              v-for="c in conversations"
+              :key="c.id"
+              :class="[
+                'border-line flex items-center gap-2 border-b px-3 py-2.5',
+                c.id === activeId ? 'bg-sage-tint/40' : '',
+              ]"
+            >
+              <button
+                type="button"
+                class="font-body text-ink min-w-0 flex-1 cursor-pointer truncate text-left text-sm"
+                @click="selectConversation(c.id)"
+              >
+                {{ c.title || t('assistant.untitled') }}
+              </button>
+              <button
+                type="button"
+                :aria-label="t('assistant.delete')"
+                class="text-ink-faint flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-full hover:text-rose-500"
+                @click="removeConversation(c.id)"
+              >
+                <AppIcon name="trash" :size="16" />
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </Transition>
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.25s ease;
+}
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active,
+  .slide-enter-active,
+  .slide-leave-active {
+    transition: none;
+  }
+}
+</style>

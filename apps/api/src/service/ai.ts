@@ -63,6 +63,18 @@ export function buildAIHandlers(
       }
     },
 
+    async Assistant_deleteConversation(req: FastifyRequest, reply: FastifyReply) {
+      const userId = await getUserId(req)
+      const { id } = req.params as { id: string }
+      const c = await prisma.conversation.findUnique({ where: { id } })
+      if (!c || c.userId !== userId) {
+        return reply.status(404).send({ code: 'not_found', message: 'Conversation not found' })
+      }
+      // Messages cascade-delete via the FK relation.
+      await prisma.conversation.delete({ where: { id } })
+      return reply.status(204).send()
+    },
+
     async Assistant_sendMessage(req: FastifyRequest, reply: FastifyReply) {
       const userId = await getUserId(req)
       const { id } = req.params as { id: string }
@@ -90,6 +102,12 @@ export function buildAIHandlers(
       }))
 
       await prisma.message.create({ data: { conversationId: id, role: 'user', content } })
+
+      // First user turn names the conversation, so the history list is scannable.
+      if (!conv.title && conv.messages.length === 0) {
+        const title = content.trim().slice(0, 80)
+        if (title) await prisma.conversation.update({ where: { id }, data: { title } })
+      }
 
       let result
       try {

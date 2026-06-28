@@ -685,6 +685,9 @@ interface Assistant {
   /** A conversation with its full message history. */
   @route("/conversations/{id}") @get getConversation(@path id: string): ConversationDetail | ApiError;
 
+  /** Delete a conversation and all its messages. */
+  @route("/conversations/{id}") @delete deleteConversation(@path id: string): void | ApiError;
+
   /** Send a user message; the agent acts autonomously and replies. */
   @route("/conversations/{id}/messages") @post sendMessage(
     @path id: string,
