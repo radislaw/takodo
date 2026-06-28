@@ -4,6 +4,58 @@
  */
 
 export interface paths {
+    "/ai/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List the user's conversations, newest first. */
+        get: operations["Assistant_listConversations"];
+        put?: never;
+        /** @description Start a new conversation. */
+        post: operations["Assistant_createConversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/conversations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description A conversation with its full message history. */
+        get: operations["Assistant_getConversation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/conversations/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Send a user message; the agent acts autonomously and replies. */
+        post: operations["Assistant_sendMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -502,6 +554,15 @@ export interface components {
         AddEntry: {
             taskId: string;
         };
+        /**
+         * @description One autonomous action the agent took on an assistant turn (for UI transparency).
+         *     `kind` is the tool name (e.g. "create_task") → mapped to a localized chip on the web.
+         */
+        AgentAction: {
+            kind: string;
+            taskId?: string;
+            title?: string;
+        };
         ApiError: {
             /**
              * @description Stable machine code. Auth values: `invalid_credentials`, `email_taken`,
@@ -521,6 +582,20 @@ export interface components {
              * @description Units left before earning (e.g. days remaining for a streak badge).
              */
             remaining?: number;
+        };
+        /** @description A chat thread with the autonomous task assistant. */
+        Conversation: {
+            id: string;
+            title?: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ConversationDetail: {
+            id: string;
+            title?: string;
+            /** Format: date-time */
+            createdAt: string;
+            messages: components["schemas"]["Message"][];
         };
         DailyEntry: {
             id: string;
@@ -642,6 +717,22 @@ export interface components {
         LogoutRequest: {
             refreshToken: string;
         };
+        /** @description One conversation turn. */
+        Message: {
+            id: string;
+            /** @description "user" | "assistant". */
+            role: string;
+            content: string;
+            /** @description Actions taken on this turn (assistant turns only). */
+            actions?: components["schemas"]["AgentAction"][];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        /** @description The assistant's reply plus the actions it took autonomously. */
+        MessageTurn: {
+            assistantMessage: components["schemas"]["Message"];
+            actions: components["schemas"]["AgentAction"][];
+        };
         /** @description Callback payload from the provider redirect (code/state, or Apple form_post). */
         OAuthCallbackRequest: {
             code: string;
@@ -750,6 +841,15 @@ export interface components {
              * @description Full missed days before today; present only in comeback state (>= 2).
              */
             comebackDays?: number;
+        };
+        SendMessage: {
+            content: string;
+            /**
+             * Format: date
+             * @description Client's local day (`YYYY-MM-DD`) so the agent schedules onto the right "today".
+             *     Must be within ±1 day of server UTC; defaults to server today.
+             */
+            today?: string;
         };
         SignupRequest: {
             email: string;
@@ -871,6 +971,112 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    Assistant_listConversations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conversation"][];
+                };
+            };
+        };
+    };
+    Assistant_createConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conversation"];
+                };
+            };
+        };
+    };
+    Assistant_getConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationDetail"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    Assistant_sendMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendMessage"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageTurn"];
+                };
+            };
+            /** @description An unexpected error response. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
     Auth_login: {
         parameters: {
             query?: never;

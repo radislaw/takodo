@@ -99,7 +99,7 @@ describe('AppLayout', () => {
     const wrapper = await mountLayout('/today')
     const sidebar = wrapper.findComponent({ name: 'AppSidebar' })
     const items = sidebar.props('items') as { id: string }[]
-    expect(items.map((i) => i.id)).toEqual(['today', 'tasks', 'frequent', 'rewards'])
+    expect(items.map((i) => i.id)).toEqual(['today', 'assistant', 'tasks', 'frequent', 'rewards'])
     expect((sidebar.props('footerItem') as { id: string }).id).toBe('profile')
   })
 

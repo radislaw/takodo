@@ -51,6 +51,7 @@ watch(
 
 const navItems = computed<{ id: string; icon: IconName; label: string }[]>(() => [
   { id: 'today', icon: 'home', label: t('nav.today') },
+  { id: 'assistant', icon: 'sparkles', label: t('nav.assistant') },
   { id: 'tasks', icon: 'layers', label: t('nav.tasks') },
   { id: 'frequent', icon: 'repeat', label: t('nav.frequent') },
   { id: 'rewards', icon: 'award', label: t('nav.rewards') },
@@ -58,6 +59,7 @@ const navItems = computed<{ id: string; icon: IconName; label: string }[]>(() =>
 ])
 
 const activeTab = computed(() => {
+  if (route.path.startsWith('/assistant')) return 'assistant'
   if (route.path.startsWith('/tasks')) return 'tasks'
   if (route.path.startsWith('/frequent')) return 'frequent'
   if (route.path.startsWith('/rewards')) return 'rewards'

@@ -103,6 +103,7 @@ export function usePomodoro({ onFlush, onComplete }: UsePomodoroOptions) {
     progress,
     start,
     pause,
+    flush,
     reset,
   }
 }

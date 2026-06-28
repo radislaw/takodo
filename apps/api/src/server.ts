@@ -6,6 +6,7 @@ import { createTokenService } from './auth/tokens.js'
 import { getUserIdFromRequest, makeBearerGuard } from './auth/guard.js'
 import { buildProviderRegistry } from './auth/providers/index.js'
 import { createOAuthStateStore } from './auth/oauth-state.js'
+import { createAgentRunner } from './ai/runner.js'
 
 const PORT = Number(process.env.PORT ?? 3001)
 const HOST = process.env.HOST ?? '127.0.0.1'
@@ -14,6 +15,7 @@ const OAUTH_REDIRECT_BASE = process.env.OAUTH_REDIRECT_BASE ?? 'http://localhost
 const tokens = createTokenService(loadAuthConfig(), prisma)
 
 const scheduler = buildScheduler(prisma)
+const agentRunner = createAgentRunner(prisma)
 const app = buildApp({
   logger: true,
   prisma,
@@ -25,6 +27,7 @@ const app = buildApp({
     stateStore: createOAuthStateStore(),
     redirectUri: `${OAUTH_REDIRECT_BASE}/auth/callback`,
   },
+  agentRunner,
 })
 
 async function shutdown(): Promise<void> {

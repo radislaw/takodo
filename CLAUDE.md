@@ -106,9 +106,41 @@ read the user via `getUserId(req)` (the guard sets `req.userId`); never trust a 
 id. Passwords are argon2id; refresh tokens are sha256/HMAC-hashed, rotated on every use, and a reused
 token revokes its whole family. OAuth account-linking happens only on a provider-verified email.
 
-Known accepted debt (MVP): no rate limiting on `/auth/*` (add `@fastify/rate-limit` before any
-non-localhost deployment); refresh tokens live in `localStorage` (XSS exposure → add a CSP later);
-in-memory OAuth state store (lost on restart → move to an `OAuthState` table for durability).
+Known accepted debt (MVP): no rate limiting on `/auth/*` (add `@fastify/rate-limit`
+before any non-localhost deployment); refresh tokens live in `localStorage` (XSS exposure → add a
+CSP later); in-memory OAuth state store (lost on restart → move to an `OAuthState` table for
+durability).
+
+The expensive agent endpoint `POST /ai/conversations/{id}/messages` **is** rate-limited
+(`@fastify/rate-limit`, opt-in per route via an `onRoute` hook in `app.ts` — reads stay unthrottled):
+default 20 requests / 5 min, tunable via `AI_RATE_MAX` / `AI_RATE_WINDOW`. Limit key is `req.userId`
+with an IP fallback (the bearer guard's `onRequest` runs after the limiter, so multi-user per-user
+keying needs the guard to set `userId` earlier — IP fallback is the MVP compromise). The limiter
+throws; `app.setErrorHandler` normalizes it to a `429 { code: 'rate_limited', message }`.
+
+## AI assistant (autonomous agent)
+
+The `/ai/*` namespace is an autonomous task agent: the user chats, the agent calls tools to edit
+their tasks (`apps/api/src/ai/`), then reports. It is **provider-agnostic, OpenAI-compatible**
+(`openai` SDK pointed at `LLM_BASE_URL`); default provider is **Groq** (free), swappable via the
+three `LLM_*` env vars only. Invariants when touching `ai/`:
+
+- **Tools wrap `userId`-scoped ops** (`apps/api/src/ops/*`, shared with the HTTP handlers) — the
+  agent can never reach another user's data, even under prompt injection.
+- **Reversible actions only.** No `deleteTask` in the toolset; full autonomy must never destroy.
+- **Bounded loop.** Hard cap on tool-call rounds per turn; failed tool calls are fed back as results
+  (repair path) so weaker open models can self-correct.
+- **Topic gate (abuse guard).** Two layers keep the agent from being used as a free general chatbot:
+  (1) a scope section in the system prompt (`ai/prompt.ts`) that refuses off-topic requests, and
+  (2) an **isolated-context LLM classifier** (`makeClassifier` in `ai/agent.ts`) that runs BEFORE the
+  snapshot/tool loop and short-circuits off-topic messages to the canned `OFF_TOPIC_REPLY` (no LLM
+  generates the refusal → it can't be jailbroken). The classifier is a separate `classify` seam on
+  `AgentDeps` (inject a fake in tests). It **fails open** (a hiccup or empty/ambiguous answer lets the
+  message through — the prompt guard + rate limit are the backstops). Caveat: reasoning models
+  (GLM-4.x-Flash) burn the token budget "thinking", so the classifier call uses `max_tokens: 512` —
+  too small truncates `content` to empty and the gate silently fails open. The gate adds one LLM call
+  per user message (counts against the same free-tier/rate-limit budget).
+- The `complete` seam (`ai/client.ts`) is the external boundary — mock it in tests, like Prisma.
 
 ## TDD (mandatory)
 
