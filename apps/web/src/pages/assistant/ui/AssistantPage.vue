@@ -77,7 +77,9 @@ async function dispatch(content: string) {
 
 function send() {
   const content = draft.value.trim()
-  if (!content) return
+  // Guard before clearing the draft, so a click before the conversation is
+  // ready (activeId still loading) keeps the text instead of swallowing it.
+  if (!content || !activeId.value || isSending.value) return
   draft.value = ''
   void dispatch(content)
 }
