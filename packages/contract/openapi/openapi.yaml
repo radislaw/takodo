@@ -1582,6 +1582,7 @@ components:
       properties:
         content:
           type: string
+          minLength: 1
           maxLength: 4000
         today:
           type: string

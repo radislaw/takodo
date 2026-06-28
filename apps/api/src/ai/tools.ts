@@ -1,6 +1,6 @@
 import type OpenAI from 'openai'
 import type { PrismaClient } from '@prisma/client'
-import { listTasks, createTask, completeTask, reopenTask } from '../ops/tasks.js'
+import { listTasks, createTask, completeTask, reopenTask, splitTask } from '../ops/tasks.js'
 import {
   getDailyByDate,
   ensureDailyList,
@@ -206,20 +206,19 @@ const TOOLS: ToolImpl[] = [
         throw new OpError('bad_args', 400, 'steps must be a non-empty array of step titles')
       }
 
-      const created = []
-      for (const title of steps) {
-        created.push(await createTask(prisma, ctx.userId, { title, parentId: parentTaskId }))
-      }
-
-      // Put the first step on today so the user can start immediately.
-      await ensureDailyList(prisma, ctx.userId, ctx.today)
-      const first = created[0]!
-      await addEntry(prisma, ctx.userId, ctx.today, first.id)
+      // One transactional op: all subtasks + the today-scheduling either land
+      // together or not at all (no half-built split on a mid-loop failure).
+      const { created, firstStepOnToday } = await splitTask(prisma, ctx.userId, {
+        parentTaskId,
+        steps,
+        today: ctx.today,
+      })
+      const first = created.find((t) => t.id === firstStepOnToday)!
 
       return {
         result: {
           created: created.map((t) => ({ id: t.id, title: t.title, parentId: t.parentId })),
-          firstStepOnToday: first.id,
+          firstStepOnToday,
         },
         actions: [
           ...created.map((t) => ({ kind: 'create_task', taskId: t.id, title: t.title })),

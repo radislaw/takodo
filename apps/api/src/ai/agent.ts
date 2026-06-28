@@ -159,7 +159,19 @@ export async function runAgent(deps: AgentDeps, input: AgentRunInput): Promise<A
   }
 
   // Iteration cap reached: force a closing text answer without more tool calls.
-  return { text: await forceText(), actions }
+  // forceText can come back empty (provider hiccup on the closing call) — never
+  // store a blank assistant turn; fall back to a message honest about whether any
+  // action actually landed this turn.
+  const closing = await forceText()
+  return { text: closing || fallbackReply(actions), actions }
+}
+
+/** Last-resort assistant text when the model produced none. Honest about state:
+ *  mentions changes only if tools actually ran this turn. Russian (product UI). */
+function fallbackReply(actions: AgentAction[]): string {
+  return actions.length > 0
+    ? 'Готово — внёс изменения, загляни в свои задачи. Если что-то не так, напиши, и поправлю.'
+    : 'Кажется, я немного завис и пока ничего не изменил. Давай попробуем ещё раз — опиши задачу чуть подробнее?'
 }
 
 /**

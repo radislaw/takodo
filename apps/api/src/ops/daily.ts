@@ -85,6 +85,13 @@ export async function addEntry(
     })
     if (!list) throw notFound('Daily list not found')
 
+    // Idempotent: a task already on this day's list is returned as-is rather than
+    // duplicated. There is no DB-level unique on (dailyListId, taskId), so a retry
+    // or a re-issued "add to today" (the agent's repair path) would otherwise
+    // create a second entry for the same task.
+    const existing = list.entries.find((e) => e.taskId === taskId)
+    if (existing) return existing
+
     const maxOrder = list.entries.reduce((m, e) => Math.max(m, e.order), -1)
     return tx.dailyEntry.create({
       data: { dailyListId: list.id, taskId, isMIT: false, order: maxOrder + 1 },

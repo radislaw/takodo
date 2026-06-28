@@ -3,7 +3,8 @@ import { normalizeTitle } from '../domain/normalize.js'
 import { assembleTree } from '../domain/tree.js'
 import { bubbleUp, reopenTask as reopenTaskTree, reopenAncestors } from '../domain/task-status.js'
 import { taskToDomain, type TaskNode } from '../domain/types.js'
-import { notFound } from './errors.js'
+import { parseDate } from '../domain/date.js'
+import { OpError, notFound } from './errors.js'
 
 /**
  * Task operations: the single implementation shared by the HTTP handlers
@@ -170,4 +171,94 @@ export async function reopenTask(
   })
 
   return toTaskResponse(result!)
+}
+
+export interface SplitTaskInput {
+  parentTaskId: string
+  steps: string[]
+  /** Client's local day (`YYYY-MM-DD`) the first step is scheduled onto. */
+  today: string
+}
+
+export interface SplitTaskResult {
+  created: TaskResponse[]
+  firstStepOnToday: string
+}
+
+/**
+ * Split one task into ordered sub-steps and schedule the first step on `today`,
+ * all in a single transaction. Atomic by design: a failure on step N must not
+ * leave steps 1…N-1 orphaned (the tool's previous per-step `createTask` loop
+ * could). Mirrors `createTask`'s reopen-on-done-parent behaviour.
+ */
+export async function splitTask(
+  prisma: PrismaClient,
+  userId: string,
+  input: SplitTaskInput,
+): Promise<SplitTaskResult> {
+  const { parentTaskId, steps, today } = input
+  if (steps.length === 0) {
+    throw new OpError('bad_args', 400, 'steps must be a non-empty array of step titles')
+  }
+  const dateVal = parseDate(today)
+
+  const result = await prisma.$transaction(async (tx) => {
+    const parent = await tx.task.findUnique({ where: { id: parentTaskId } })
+    if (!parent || parent.userId !== userId) throw notFound('Parent task not found')
+
+    const created: Task[] = []
+    for (const title of steps) {
+      created.push(
+        await tx.task.create({
+          data: { userId, title, parentId: parentTaskId, normalizedTitle: normalizeTitle(title) },
+        }),
+      )
+    }
+    const first = created[0]!
+
+    // A split under a done parent reopens the parent chain (same as createTask).
+    if (parent.status === 'done') {
+      const allTasks = await tx.task.findMany({ where: { userId } })
+      const domainTasks = allTasks.map(taskToDomain)
+      const afterReopen = reopenAncestors(domainTasks, first.id)
+      const reopenedIds = afterReopen
+        .filter((after) => {
+          const before = domainTasks.find((t) => t.id === after.id)
+          return before && before.status === 'done' && after.status === 'open'
+        })
+        .map((t) => t.id)
+      if (reopenedIds.length > 0) {
+        await tx.task.updateMany({
+          where: { id: { in: reopenedIds } },
+          data: { status: 'open', completedAt: null },
+        })
+      }
+    }
+
+    // Put the first step on today so the user can start immediately.
+    const list = await tx.dailyList.upsert({
+      where: { userId_date: { userId, date: dateVal } },
+      create: { userId, date: dateVal },
+      update: {},
+    })
+    const last = await tx.dailyEntry.findFirst({
+      where: { dailyListId: list.id },
+      orderBy: { order: 'desc' },
+    })
+    await tx.dailyEntry.create({
+      data: {
+        dailyListId: list.id,
+        taskId: first.id,
+        isMIT: false,
+        order: (last?.order ?? -1) + 1,
+      },
+    })
+
+    return { created, firstStepId: first.id }
+  })
+
+  return {
+    created: result.created.map(toTaskResponse),
+    firstStepOnToday: result.firstStepId,
+  }
 }

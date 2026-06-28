@@ -105,12 +105,12 @@ describe('runAgent', () => {
 
   it('split_task creates subtasks under the parent and schedules the first step', async () => {
     // Parent ownership + child ownership checks both read a user-owned task.
-    prisma.task.findUnique.mockResolvedValue(makeTask())
-    prisma.task.findMany.mockResolvedValue([]) // in-tx parent-done check: nothing to reopen
+    prisma.task.findUnique.mockResolvedValue(makeTask()) // parent, open → no reopen
     prisma.task.create
       .mockResolvedValueOnce(makeTask({ id: 's1', title: 'Шаг 1', parentId: 'task-1' }))
       .mockResolvedValueOnce(makeTask({ id: 's2', title: 'Шаг 2', parentId: 'task-1' }))
-    prisma.dailyList.findUnique.mockResolvedValue({ id: 'dl-1', entries: [] } as never)
+    prisma.dailyList.upsert.mockResolvedValue({ id: 'dl-1' } as never)
+    prisma.dailyEntry.findFirst.mockResolvedValue(null)
     prisma.dailyEntry.create.mockResolvedValue({
       id: 'e-1',
       taskId: 's1',
@@ -321,5 +321,22 @@ describe('runAgent', () => {
     expect(res.text).toBe('Готово на сегодня.')
     // 3 looping iterations + 1 forced closing call
     expect(calls).toBe(4)
+  })
+
+  it('never returns empty text: empty closing completion → honest fallback', async () => {
+    prisma.task.create.mockResolvedValue(makeTask({ id: 'n1', title: 'купить хлеб' }))
+    // One create, then every closing/forced completion comes back blank.
+    const complete = vi.fn(
+      async (body: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming) =>
+        body.tool_choice === 'none'
+          ? completion('')
+          : completion(null, [{ name: 'create_task', args: JSON.stringify({ title: 'x' }) }]),
+    ) as unknown as CompleteFn
+
+    const res = await runAgent(deps(complete, 2), { ctx, history: [], userMessage: 'спам' })
+    // Action did land, so the fallback acknowledges the change rather than blanking.
+    expect(res.text).not.toBe('')
+    expect(res.actions.length).toBeGreaterThan(0)
+    expect(res.text).toContain('изменения')
   })
 })

@@ -155,6 +155,24 @@ describe('Daily routes', () => {
       )
     })
 
+    it('is idempotent: a task already on the list is not duplicated', async () => {
+      const existing = makeEntry({ id: 'entry-1', taskId: 'task-1' })
+      const list = { ...makeList(), entries: [existing] }
+      prisma.task.findUnique.mockResolvedValue(makeTask())
+      prisma.dailyList.findUnique.mockResolvedValue(
+        list as Parameters<typeof prisma.dailyList.findUnique.mockResolvedValue>[0],
+      )
+      const res = await app.inject({
+        method: 'POST',
+        url: '/daily/2024-01-15/entries',
+        payload: { taskId: 'task-1' },
+      })
+      expect(res.statusCode).toBe(200)
+      expect(res.json()).toMatchObject({ id: 'entry-1', taskId: 'task-1' })
+      // No second row created for the same task.
+      expect(prisma.dailyEntry.create).not.toHaveBeenCalled()
+    })
+
     it('returns 404 when task not found', async () => {
       prisma.task.findUnique.mockResolvedValue(null)
       const res = await app.inject({
