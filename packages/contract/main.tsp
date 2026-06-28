@@ -658,6 +658,7 @@ model ConversationDetail {
 }
 
 model SendMessage {
+  @minLength(1)
   @maxLength(4000)
   content: string;
 
