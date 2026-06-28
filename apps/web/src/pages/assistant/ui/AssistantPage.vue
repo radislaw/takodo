@@ -124,6 +124,27 @@ async function confirmDelete() {
   }
 }
 
+// Resend the last user turn. Covers the common open-model case where the
+// request succeeds (200) but the agent apologises about an internal failure —
+// the transport never errored, so the catch-based retry below won't show.
+const lastUserContent = computed(
+  () => [...messages.value].reverse().find((m) => m.role === 'user')?.content ?? '',
+)
+const canRegenerate = computed(
+  () =>
+    !isSending.value &&
+    !sendFailed.value &&
+    !pendingText.value &&
+    Boolean(activeId.value) &&
+    Boolean(lastUserContent.value) &&
+    // After a reply (regenerate) or after an unanswered user turn (orphaned
+    // when the previous request died mid-flight).
+    messages.value.length > 0,
+)
+function regenerate() {
+  if (lastUserContent.value) void dispatch(lastUserContent.value)
+}
+
 const examples = computed(() => [t('assistant.example1'), t('assistant.example2')])
 function useExample(text: string) {
   draft.value = text
@@ -248,6 +269,18 @@ function useExample(text: string) {
               {{ t('assistant.retry') }}
             </button>
           </div>
+        </div>
+
+        <!-- Regenerate the last answer (always available after a reply) -->
+        <div v-if="canRegenerate" class="flex justify-start">
+          <button
+            type="button"
+            class="text-ink-soft hover:text-ink border-line font-body inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold"
+            @click="regenerate"
+          >
+            <AppIcon name="repeat" :size="14" :stroke-width="2.4" />
+            {{ t('assistant.retry') }}
+          </button>
         </div>
       </div>
     </div>
