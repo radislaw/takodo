@@ -17,7 +17,93 @@ tags:
   - name: Quests
   - name: Push
   - name: Frequent
+  - name: Assistant
 paths:
+  /ai/conversations:
+    post:
+      operationId: Assistant_createConversation
+      description: Start a new conversation.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+      tags:
+        - Assistant
+    get:
+      operationId: Assistant_listConversations
+      description: List the user's conversations, newest first.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Conversation'
+      tags:
+        - Assistant
+  /ai/conversations/{id}:
+    get:
+      operationId: Assistant_getConversation
+      description: A conversation with its full message history.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDetail'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Assistant
+  /ai/conversations/{id}/messages:
+    post:
+      operationId: Assistant_sendMessage
+      description: Send a user message; the agent acts autonomously and replies.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageTurn'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
   /auth/login:
     post:
       operationId: Auth_login
@@ -925,6 +1011,21 @@ components:
       properties:
         taskId:
           type: string
+    AgentAction:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
+        taskId:
+          type: string
+        title:
+          type: string
+          maxLength: 500
+      description: |-
+        One autonomous action the agent took on an assistant turn (for UI transparency).
+        `kind` is the tool name (e.g. "create_task") → mapped to a localized chip on the web.
     ApiError:
       type: object
       required:
@@ -955,6 +1056,40 @@ components:
           format: int32
           description: Units left before earning (e.g. days remaining for a streak badge).
       description: Achievement badge. Title/description live in web i18n, keyed by id.
+    Conversation:
+      type: object
+      required:
+        - id
+        - createdAt
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          maxLength: 200
+        createdAt:
+          type: string
+          format: date-time
+      description: A chat thread with the autonomous task assistant.
+    ConversationDetail:
+      type: object
+      required:
+        - id
+        - createdAt
+        - messages
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          maxLength: 200
+        createdAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
     DailyEntry:
       type: object
       required:
@@ -1188,6 +1323,44 @@ components:
         refreshToken:
           type: string
           maxLength: 512
+    Message:
+      type: object
+      required:
+        - id
+        - role
+        - content
+        - createdAt
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          description: '"user" | "assistant".'
+        content:
+          type: string
+          maxLength: 8000
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentAction'
+          description: Actions taken on this turn (assistant turns only).
+        createdAt:
+          type: string
+          format: date-time
+      description: One conversation turn.
+    MessageTurn:
+      type: object
+      required:
+        - assistantMessage
+        - actions
+      properties:
+        assistantMessage:
+          $ref: '#/components/schemas/Message'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentAction'
+      description: The assistant's reply plus the actions it took autonomously.
     OAuthCallbackRequest:
       type: object
       required:
@@ -1402,6 +1575,20 @@ components:
           type: integer
           format: int32
           description: Full missed days before today; present only in comeback state (>= 2).
+    SendMessage:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          maxLength: 4000
+        today:
+          type: string
+          format: date
+          description: |-
+            Client's local day (`YYYY-MM-DD`) so the agent schedules onto the right "today".
+            Must be within ±1 day of server UTC; defaults to server today.
     SignupRequest:
       type: object
       required:

@@ -17,3 +17,6 @@ design/
 *.png
 # Tauri app icons must be committed (build inputs) despite the *.png rule above
 !apps/web/src-tauri/icons/*.png
+
+# Local tooling
+.mimocode/

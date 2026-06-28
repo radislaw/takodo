@@ -129,4 +129,26 @@ describe('usePomodoro', () => {
     wrapper.unmount()
     expect(onFlush).toHaveBeenCalledWith(15, undefined)
   })
+
+  it('flush() sends accumulated time without resetting', () => {
+    const onFlush = vi.fn()
+    const { result } = mountPomodoro({ onFlush, onComplete: vi.fn() })
+    result().start()
+    vi.advanceTimersByTime(30_000)
+    result().flush()
+    expect(onFlush).toHaveBeenCalledWith(30, undefined)
+    expect(result().status.value).toBe('running')
+    expect(result().remaining.value).toBe(FOCUS_SECONDS - 30)
+  })
+
+  it('flush() does not double-count after pause', () => {
+    const onFlush = vi.fn()
+    const { result } = mountPomodoro({ onFlush, onComplete: vi.fn() })
+    result().start()
+    vi.advanceTimersByTime(20_000)
+    result().pause()
+    result().flush()
+    expect(onFlush).toHaveBeenCalledTimes(1)
+    expect(onFlush).toHaveBeenCalledWith(20, undefined)
+  })
 })

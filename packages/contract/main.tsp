@@ -613,3 +613,80 @@ interface Frequent {
   /** Tasks that stayed undone in >= minDays days (matched by normalizedTitle). */
   @get list(@query minDays?: int32): FrequentTask[];
 }
+
+// ─── Assistant (autonomous AI agent) ────────────────────────────
+
+/** A chat thread with the autonomous task assistant. */
+model Conversation {
+  id: string;
+
+  @maxLength(200)
+  title?: string;
+
+  createdAt: utcDateTime;
+}
+
+/** One autonomous action the agent took on an assistant turn (for UI transparency).
+ *  `kind` is the tool name (e.g. "create_task") → mapped to a localized chip on the web. */
+model AgentAction {
+  kind: string;
+  taskId?: string;
+
+  @maxLength(500)
+  title?: string;
+}
+
+/** One conversation turn. */
+model Message {
+  id: string;
+
+  /** "user" | "assistant". */
+  role: string;
+
+  @maxLength(8000)
+  content: string;
+
+  /** Actions taken on this turn (assistant turns only). */
+  actions?: AgentAction[];
+
+  createdAt: utcDateTime;
+}
+
+model ConversationDetail {
+  ...Conversation;
+  messages: Message[];
+}
+
+model SendMessage {
+  @maxLength(4000)
+  content: string;
+
+  /** Client's local day (`YYYY-MM-DD`) so the agent schedules onto the right "today".
+   *  Must be within ±1 day of server UTC; defaults to server today. */
+  today?: plainDate;
+}
+
+/** The assistant's reply plus the actions it took autonomously. */
+model MessageTurn {
+  assistantMessage: Message;
+  actions: AgentAction[];
+}
+
+@route("/ai")
+@tag("Assistant")
+interface Assistant {
+  /** Start a new conversation. */
+  @route("/conversations") @post createConversation(): Conversation;
+
+  /** List the user's conversations, newest first. */
+  @route("/conversations") @get listConversations(): Conversation[];
+
+  /** A conversation with its full message history. */
+  @route("/conversations/{id}") @get getConversation(@path id: string): ConversationDetail | ApiError;
+
+  /** Send a user message; the agent acts autonomously and replies. */
+  @route("/conversations/{id}/messages") @post sendMessage(
+    @path id: string,
+    @body body: SendMessage,
+  ): MessageTurn | ApiError;
+}

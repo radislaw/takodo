@@ -33,6 +33,7 @@ model User {
   feedback          Feedback[]
   authIdentities    AuthIdentity[]
   refreshTokens     RefreshToken[]
+  conversations     Conversation[]
 }
 
 /** One linked external provider account (google | yandex | apple). */
@@ -160,6 +161,33 @@ model DailyEntry {
 enum TaskStatus {
   open
   done
+}
+
+/** One AI-assistant chat thread for a user. */
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([userId])
+}
+
+/** One turn in a conversation. `actions` is the structured list of autonomous
+ *  agent actions (tool calls) taken on an assistant turn, for UI transparency. */
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  // 'user' | 'assistant'
+  role           String
+  content        String
+  actions        Json?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
 }
 
 model AnalyticsEvent {

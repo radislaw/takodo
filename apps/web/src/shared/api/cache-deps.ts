@@ -33,5 +33,14 @@ export function useCacheInvalidate() {
       queryCache.invalidateQueries({ key: ['tasks'], exact: false })
       queryCache.invalidateQueries({ key: ['rewards'], exact: false })
     },
+    // The agent can touch tasks, today's list and frequent in one turn — refresh
+    // everything its tools may have changed so the manual screens stay in sync.
+    agentActions() {
+      queryCache.invalidateQueries({ key: ['tasks'], exact: false })
+      queryCache.invalidateQueries({ key: ['daily', todayDate()], exact: true })
+      queryCache.invalidateQueries({ key: ['frequent'], exact: false })
+      queryCache.invalidateQueries({ key: ['rewards'], exact: false })
+      queryCache.invalidateQueries({ key: ['quests'], exact: false })
+    },
   }
 }

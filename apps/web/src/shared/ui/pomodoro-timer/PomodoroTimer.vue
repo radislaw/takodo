@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AppButton, AppIcon } from '@/shared/ui'
 import { useRecordFocus } from '@/shared/api'
@@ -20,7 +20,36 @@ const { mutate: recordFocus } = useRecordFocus()
 const rippling = ref(false)
 let rippleTimer: ReturnType<typeof setTimeout> | null = null
 
+// Optimistic local tracking: show flushed data immediately without waiting for server.
+// serverBaseline = last confirmed server value; localOffset = sent but not yet confirmed.
+// Display = baseline + offset. When server prop exceeds baseline+offset, the server caught up.
+const serverFocusBaseline = ref(props.focusSeconds)
+const serverPomodorosBaseline = ref(props.pomodoros)
+const localFocusOffset = ref(0)
+const localPomodorosOffset = ref(0)
+
+watch(
+  () => props.focusSeconds,
+  (newVal) => {
+    if (newVal >= serverFocusBaseline.value + localFocusOffset.value) {
+      serverFocusBaseline.value = newVal
+      localFocusOffset.value = 0
+    }
+  },
+)
+watch(
+  () => props.pomodoros,
+  (newVal) => {
+    if (newVal >= serverPomodorosBaseline.value + localPomodorosOffset.value) {
+      serverPomodorosBaseline.value = newVal
+      localPomodorosOffset.value = 0
+    }
+  },
+)
+
 function handleFlush(seconds: number, pomodoro?: boolean) {
+  localFocusOffset.value += seconds
+  if (pomodoro) localPomodorosOffset.value += 1
   recordFocus({ id: props.taskId, seconds, pomodoro })
 }
 
@@ -37,7 +66,7 @@ function handleComplete() {
   }
 }
 
-const { status, remaining, progress, start, pause, reset } = usePomodoro({
+const { status, remaining, progress, start, pause, flush, reset } = usePomodoro({
   onFlush: handleFlush,
   onComplete: handleComplete,
 })
@@ -55,12 +84,14 @@ const ringGradient = computed(() => {
 
 const MAX_TOMATOES = 5
 
-const hasStats = computed(() => props.focusSeconds > 0 || props.pomodoros > 0)
-const visibleTomatoes = computed(() => Math.min(props.pomodoros, MAX_TOMATOES))
-const tomatoOverflow = computed(() => Math.max(props.pomodoros - MAX_TOMATOES, 0))
+const totalFocusSeconds = computed(() => serverFocusBaseline.value + localFocusOffset.value)
+const totalPomodoros = computed(() => serverPomodorosBaseline.value + localPomodorosOffset.value)
+const hasStats = computed(() => totalFocusSeconds.value > 0 || totalPomodoros.value > 0)
+const visibleTomatoes = computed(() => Math.min(totalPomodoros.value, MAX_TOMATOES))
+const tomatoOverflow = computed(() => Math.max(totalPomodoros.value - MAX_TOMATOES, 0))
 const overflowText = computed(() => `+${tomatoOverflow.value}`)
 const focusTimeText = computed(() =>
-  props.focusSeconds > 0 ? formatFocusDuration(props.focusSeconds, t) : '',
+  totalFocusSeconds.value > 0 ? formatFocusDuration(totalFocusSeconds.value, t) : '',
 )
 
 function toggleStartPause() {
@@ -81,7 +112,7 @@ function handleReset() {
   reset()
 }
 
-defineExpose({ flushAndReset: handleReset })
+defineExpose({ flush, flushAndReset: handleReset })
 </script>
 
 <template>
@@ -143,9 +174,9 @@ defineExpose({ flushAndReset: handleReset })
       class="font-body text-ink-soft flex items-center gap-3 text-sm font-semibold"
     >
       <span
-        v-if="pomodoros > 0"
+        v-if="totalPomodoros > 0"
         role="img"
-        :aria-label="t('do.pomodoro.count', pomodoros)"
+        :aria-label="t('do.pomodoro.count', totalPomodoros)"
         class="text-apricot-deep flex items-center gap-1"
       >
         <AppIcon

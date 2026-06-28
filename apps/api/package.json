@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
+    "@fastify/rate-limit": "^11.0.0",
     "@prisma/client": "^6.9.0",
     "ajv-formats": "^3.0.1",
     "argon2": "^0.44.0",
@@ -27,6 +28,7 @@
     "fastify-openapi-glue": "^4.11.3",
     "jose": "^6.2.3",
     "node-schedule": "^2.1.1",
+    "openai": "^6.45.0",
     "web-push": "^3.6.7"
   },
   "devDependencies": {

@@ -208,4 +208,32 @@ describe('PomodoroTimer', () => {
       expect.objectContaining({ id: 'task-1', seconds: 60 }),
     )
   })
+
+  it('calls recordFocus with pomodoro=true on natural timer completion', async () => {
+    const wrapper = mountTimer()
+    await wrapper.find('[aria-label="Старт"]').trigger('click')
+    vi.advanceTimersByTime(1500 * 1000)
+    await flushPromises()
+    expect(mockRecordFocus).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'task-1', seconds: 1500, pomodoro: true }),
+    )
+  })
+
+  it('stats block updates optimistically on flush without waiting for server', async () => {
+    const wrapper = mountTimer({ focusSeconds: 0, pomodoros: 0 })
+    await wrapper.find('[aria-label="Старт"]').trigger('click')
+    vi.advanceTimersByTime(60_000)
+    await wrapper.vm.$nextTick()
+    await wrapper.find('[aria-label="Пауза"]').trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toContain('1 мин')
+  })
+
+  it('stats show updated pomodoro count immediately after timer end', async () => {
+    const wrapper = mountTimer({ focusSeconds: 0, pomodoros: 0 })
+    await wrapper.find('[aria-label="Старт"]').trigger('click')
+    vi.advanceTimersByTime(1500 * 1000)
+    await wrapper.vm.$nextTick()
+    expect(wrapper.findAll('[name="tomato"]')).toHaveLength(1)
+  })
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, type ComponentPublicInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { AppIcon, AppButton, PomodoroTimer, AppCheckbox, AppInput } from '@/shared/ui'
@@ -27,6 +27,12 @@ const { mutate: reopenTask } = useReopenTask()
 const { mutate: completeSubtask } = useCompleteTask()
 const { mutateAsync: createSubtask } = useCreateTask()
 const { mutate: deleteSubtask } = useDeleteTask()
+
+type PomodoroTimerExposed = ComponentPublicInstance & {
+  flush: () => void
+  flushAndReset: () => void
+}
+const pomodoroTimerRef = ref<PomodoroTimerExposed | null>(null)
 
 const addingSubtask = ref(false)
 const newSubtaskTitle = ref('')
@@ -119,6 +125,7 @@ function handleSubtaskKeydown(e: KeyboardEvent) {
 async function handleDone() {
   const id = current.value?.taskId
   if (!id) return
+  pomodoroTimerRef.value?.flush()
   completingIds.value = [...completingIds.value, id]
   try {
     await completeTaskAsync(id)
@@ -134,6 +141,7 @@ function handleSkip() {
 }
 
 function goBack() {
+  pomodoroTimerRef.value?.flush()
   router.push('/today')
 }
 </script>
@@ -188,6 +196,7 @@ function goBack() {
           <PomodoroTimer
             v-if="currentTask"
             :key="currentTask.id"
+            ref="pomodoroTimerRef"
             :task-id="currentTask.id"
             :focus-seconds="currentTask.focusSeconds ?? 0"
             :pomodoros="currentTask.pomodoros ?? 0"
