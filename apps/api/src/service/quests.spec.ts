@@ -233,6 +233,14 @@ describe('Quests routes', () => {
       const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
       const quests = selectDailyQuests('user-1', yesterday)
       mockStats({ completed: 5, mit: 3, entries: 5, beforeNoon: 5 })
+      // mockStats stamps completions in *today's* morning, but this claim queries `yesterday`:
+      // loadDayStats counts before-noon against yesterday's noon, so re-stamp them in yesterday's
+      // morning. Otherwise the test flakes on days whose quest seed puts `before_noon` first.
+      prisma.task.findMany.mockResolvedValue(
+        Array.from({ length: 5 }, () => ({
+          completedAt: new Date(`${yesterday}T09:00:00Z`),
+        })) as never,
+      )
       prisma.questClaim.findUnique.mockResolvedValue(null)
       prisma.questClaim.create.mockResolvedValue(makeClaim(quests[0]!.id))
 
