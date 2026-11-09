@@ -5,6 +5,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- **GitHub Pages demo + dependency refresh.**
+  - _Static demo build_: `VITE_DEMO=true` swaps the API client's `fetch` for an in-browser implementation of the whole contract (`apps/web/src/api/demo/demoFetch.ts`) — tasks, daily lists, quests, rewards, profile; AI/push are canned. Data lives in `localStorage`; the session is auto-created. The flag is build-time, so regular builds don't ship the demo code.
+  - _Subpath deploy_: `VITE_BASE` (e.g. `/takodo/`) now drives Vite `base`, the router history, the service worker scope, the web manifest and the 401→login redirect. `.github/workflows/pages.yml` builds on push to `main`, adds the SPA `404.html` fallback and deploys via `actions/deploy-pages`.
+  - _Fix_: `pnpm build` in `apps/web` called a non-existent `type-check` script (now `typecheck`).
+  - _Dependencies_: everything bumped to latest except TypeScript (stays `~6.0`: typescript-eslint, vue-tsc and openapi-typescript don't support 7 yet) and Prisma (stays 6.x: 7 needs a config/adapter migration). `TodayPage` spec now unmounts pages between tests.
+
 - **AI assistant — chat controls + new agent capabilities.**
   - _Conversation management_: delete a conversation (`DELETE /ai/conversations/{id}`, cascade-deletes messages, ownership-checked → 404 otherwise), start a new chat, and a history drawer to switch between past conversations. First user message auto-titles the conversation so the list is scannable. `useDeleteConversation` composable; delete confirmed via an `AppActionSheet` bottom sheet (no native `confirm`).
   - _Retry / regenerate_: a "Повторить запрос" button under the last reply resends the last user turn — covers both transport failures and the open-model case where the request succeeds (200) but the agent apologises about an internal failure (the catch-based retry never fires there).

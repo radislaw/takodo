@@ -2,8 +2,17 @@ import createClient from 'openapi-fetch'
 
 import type { paths } from '../../../../packages/contract/openapi/types.gen'
 import { type AuthTokens, getTokens, setTokens, clearTokens } from '@/shared/lib/authStorage'
+import { demoFetch } from './demo/demoFetch'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+
+// Static demo build (GitHub Pages): no backend, the API is emulated in-browser.
+// The flag is a build-time constant, so the demo code is tree-shaken out of
+// regular builds.
+const DEMO = import.meta.env.VITE_DEMO === 'true'
+if (DEMO && !getTokens()) {
+  setTokens({ accessToken: 'demo-access', refreshToken: 'demo-refresh' })
+}
 
 function isAuthRoute(url: string): boolean {
   return new URL(url, API_BASE_URL).pathname.startsWith('/auth/')
@@ -40,9 +49,16 @@ async function refreshSession(): Promise<boolean> {
 }
 
 function redirectToLogin(): void {
-  if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-    const redirect = encodeURIComponent(window.location.pathname + window.location.search)
-    window.location.assign(`/login?redirect=${redirect}`)
+  if (typeof window === 'undefined') return
+  // The app may be served from a subpath (GitHub Pages), so work with
+  // app-relative paths and re-attach the base only for the hard navigation.
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+  const path = window.location.pathname.startsWith(base)
+    ? window.location.pathname.slice(base.length) || '/'
+    : window.location.pathname
+  if (!path.startsWith('/login')) {
+    const redirect = encodeURIComponent(path + window.location.search)
+    window.location.assign(`${base}/login?redirect=${redirect}`)
   }
 }
 
@@ -72,4 +88,7 @@ const authFetch: typeof fetch = async (input, init) => {
   return res
 }
 
-export const apiClient = createClient<paths>({ baseUrl: API_BASE_URL, fetch: authFetch })
+export const apiClient = createClient<paths>({
+  baseUrl: API_BASE_URL,
+  fetch: DEMO ? demoFetch : authFetch,
+})

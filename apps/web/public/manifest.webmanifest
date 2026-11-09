@@ -2,7 +2,7 @@
   "name": "TakoDo",
   "short_name": "TakoDo",
   "description": "Приложение задач для людей с ADHD — выгружай мысли, дели до атомарного уровня.",
-  "start_url": "/today",
+  "start_url": "today",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#7c9a92",
@@ -10,13 +10,13 @@
   "lang": "ru",
   "icons": [
     {
-      "src": "/logo.svg",
+      "src": "logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/logo.svg",
+      "src": "logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
@@ -27,8 +27,8 @@
     {
       "name": "Сегодня",
       "short_name": "Сегодня",
-      "url": "/today",
-      "icons": [{ "src": "/logo.svg", "sizes": "any" }]
+      "url": "today",
+      "icons": [{ "src": "logo.svg", "sizes": "any" }]
     }
   ]
 }
