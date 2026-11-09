@@ -26,7 +26,7 @@
     "argon2": "^0.45.2",
     "fastify": "^5.12.8",
     "fastify-openapi-glue": "^4.12.0",
-    "jose": "^6.2.16",
+    "jose": "^6.2.3",
     "node-schedule": "^2.1.2",
     "openai": "^7.53.0",
     "web-push": "^4.0.0"
@@ -39,7 +39,7 @@
     "tsx": "^4.23.15",
     "typescript": "~6.0.0",
     "vitest": "^5.1.0",
-    "vitest-mock-extended": "^6.0.0"
+    "vitest-mock-extended": "^5.0.0"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

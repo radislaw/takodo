@@ -30,14 +30,6 @@
     "pre-commit": "pnpm exec lint-staged",
     "commit-msg": "pnpm exec commitlint --edit"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/client",
-      "@prisma/engines",
-      "prisma",
-      "simple-git-hooks"
-    ]
-  },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
