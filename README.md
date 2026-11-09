@@ -3,6 +3,8 @@
 A todo app for people with ADHD: a daily brain dump plus recursive task splitting down to a level
 where the brain stops resisting. CBT mechanics + dopamine feedback.
 
+**Live demo:** https://radislaw.github.io/takodo/ (runs fully in the browser, no backend).
+
 ## Structure (pnpm monorepo)
 
 - `apps/web` — Vue 3 + Vite + TypeScript.
