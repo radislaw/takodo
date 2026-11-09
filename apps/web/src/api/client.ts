@@ -2,8 +2,17 @@ import createClient from 'openapi-fetch'
 
 import type { paths } from '../../../../packages/contract/openapi/types.gen'
 import { type AuthTokens, getTokens, setTokens, clearTokens } from '@/shared/lib/authStorage'
+import { demoFetch } from './demo/demoFetch'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+
+// Static demo build (GitHub Pages): no backend, the API is emulated in-browser.
+// The flag is a build-time constant, so the demo code is tree-shaken out of
+// regular builds.
+const DEMO = import.meta.env.VITE_DEMO === 'true'
+if (DEMO && !getTokens()) {
+  setTokens({ accessToken: 'demo-access', refreshToken: 'demo-refresh' })
+}
 
 function isAuthRoute(url: string): boolean {
   return new URL(url, API_BASE_URL).pathname.startsWith('/auth/')
@@ -79,4 +88,7 @@ const authFetch: typeof fetch = async (input, init) => {
   return res
 }
 
-export const apiClient = createClient<paths>({ baseUrl: API_BASE_URL, fetch: authFetch })
+export const apiClient = createClient<paths>({
+  baseUrl: API_BASE_URL,
+  fetch: DEMO ? demoFetch : authFetch,
+})

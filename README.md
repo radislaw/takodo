@@ -21,6 +21,17 @@ pnpm contract:build   # compile the TypeSpec contract → openapi/openapi.yaml
 
 API: `GET /health`, `GET /api/hello`.
 
+## GitHub Pages demo
+
+Pushing to `main` deploys a backend-less demo of the web app (`.github/workflows/pages.yml`).
+Enable it once: repo **Settings → Pages → Source: GitHub Actions**. The site is served from
+`https://<user>.github.io/<repo>/`; the API is emulated in the browser (`VITE_DEMO=true`, data in
+`localStorage`). Try it locally:
+
+```bash
+VITE_BASE=/takodo/ VITE_DEMO=true pnpm --filter @takodo/web build
+```
+
 ## Docs
 
 - Implementation plan: `~/.claude/plans/todo-stateful-lynx.md`
