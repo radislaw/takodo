@@ -1,4 +1,6 @@
 const CACHE = 'tootoo-shell-v1'
+// The app may live under a subpath (GitHub Pages), so derive URLs from the SW scope.
+const SCOPE = self.registration.scope
 // The cache name never rotates between deploys, so hashed assets from old
 // builds would accumulate forever — cap the cache and evict oldest-first.
 const MAX_ASSET_ENTRIES = 60
@@ -14,7 +16,7 @@ async function putBounded(request, response) {
 
 self.addEventListener('install', (e) => {
   self.skipWaiting()
-  e.waitUntil(caches.open(CACHE).then((c) => c.add('/')))
+  e.waitUntil(caches.open(CACHE).then((c) => c.add(SCOPE)))
 })
 
 self.addEventListener('activate', (e) =>
@@ -32,7 +34,7 @@ self.addEventListener('fetch', (e) => {
 
   if (e.request.mode === 'navigate') {
     // SPA navigation: network first, fall back to cached shell.
-    e.respondWith(fetch(e.request).catch(() => caches.match('/')))
+    e.respondWith(fetch(e.request).catch(() => caches.match(SCOPE)))
     return
   }
 
@@ -65,7 +67,7 @@ self.addEventListener('push', (e) => {
     self.registration.showNotification(data.title || 'tootoo', {
       body: data.body || '',
       tag: data.tag,
-      icon: '/logo.svg',
+      icon: SCOPE + 'logo.svg',
     }),
   )
 })
@@ -75,6 +77,6 @@ self.addEventListener('notificationclick', (e) => {
   e.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((list) => (list[0] ? list[0].focus() : self.clients.openWindow('/'))),
+      .then((list) => (list[0] ? list[0].focus() : self.clients.openWindow(SCOPE))),
   )
 })

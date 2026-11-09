@@ -40,9 +40,16 @@ async function refreshSession(): Promise<boolean> {
 }
 
 function redirectToLogin(): void {
-  if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-    const redirect = encodeURIComponent(window.location.pathname + window.location.search)
-    window.location.assign(`/login?redirect=${redirect}`)
+  if (typeof window === 'undefined') return
+  // The app may be served from a subpath (GitHub Pages), so work with
+  // app-relative paths and re-attach the base only for the hard navigation.
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+  const path = window.location.pathname.startsWith(base)
+    ? window.location.pathname.slice(base.length) || '/'
+    : window.location.pathname
+  if (!path.startsWith('/login')) {
+    const redirect = encodeURIComponent(path + window.location.search)
+    window.location.assign(`${base}/login?redirect=${redirect}`)
   }
 }
 
