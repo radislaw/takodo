@@ -1,0 +1,24 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# Build scripts allowed to run on install (moved from package.json "pnpm" field,
+# which pnpm 11+ no longer reads). argon2/esbuild ship prebuilt binaries.
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - prisma
+  - simple-git-hooks
+ignoredBuiltDependencies:
+  - argon2
+  - esbuild
+
+# Same policy in the pnpm 11+ format (`allowBuilds`); keep both while CI and
+# local setups can be on different majors.
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  prisma: true
+  simple-git-hooks: true
+  argon2: false
+  esbuild: false

@@ -1,0 +1,231 @@
+import { gapDays, isComeback } from './comeback.js'
+import { toDateStr } from './date.js'
+
+export interface CompletedTaskInfo {
+  completedAt: Date
+  pomodoros: number
+}
+
+export interface DayActivityResult {
+  date: string
+  active: boolean
+  shielded?: boolean
+}
+
+export interface BadgeResult {
+  id: string
+  earned: boolean
+  remaining?: number
+}
+
+export interface RewardsSummaryResult {
+  streak: number
+  longestStreak: number
+  shields: number
+  shieldUsedRecently: boolean
+  week: DayActivityResult[]
+  badges: BadgeResult[]
+  xp: number
+  level: number
+  /** Full missed days before today — present only in comeback state (>= 2). */
+  comebackDays?: number
+}
+
+const SHIELD_EARN_EVERY = 5
+const SHIELD_CAP = 2
+const SHIELD_RECENT_DAYS = 7
+
+function mondayOf(date: Date): Date {
+  const d = new Date(date)
+  d.setUTCHours(0, 0, 0, 0)
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7))
+  return d
+}
+
+interface StreakReplay {
+  streak: number
+  longest: number
+  shields: number
+  shieldedDays: Set<string>
+}
+
+/**
+ * Shield-aware calendar replay from the first active day to nowDate.
+ * Active day → streak grows; every 5th streak day earns a shield (cap 2).
+ * Inactive past day → consumes a shield (streak preserved) or resets the streak.
+ * Today inactive → grace: the day is still in progress, nothing is consumed.
+ */
+function replayStreak(activeDays: Set<string>, nowDate: Date): StreakReplay {
+  const result: StreakReplay = { streak: 0, longest: 0, shields: 0, shieldedDays: new Set() }
+  if (activeDays.size === 0) return result
+
+  const todayStr = toDateStr(nowDate)
+  const firstDay = [...activeDays].sort()[0]!
+  const cursor = new Date(firstDay + 'T00:00:00Z')
+  const end = new Date(todayStr + 'T00:00:00Z')
+
+  let streak = 0
+  let shields = 0
+  while (cursor.getTime() <= end.getTime()) {
+    const dayStr = toDateStr(cursor)
+    if (activeDays.has(dayStr)) {
+      streak++
+      if (streak % SHIELD_EARN_EVERY === 0 && shields < SHIELD_CAP) shields++
+      result.longest = Math.max(result.longest, streak)
+    } else if (dayStr !== todayStr) {
+      if (shields > 0) {
+        shields--
+        result.shieldedDays.add(dayStr)
+      } else {
+        streak = 0
+      }
+    }
+    cursor.setUTCDate(cursor.getUTCDate() + 1)
+  }
+
+  result.streak = streak
+  result.shields = shields
+  return result
+}
+
+/** XP from pre-aggregated totals — lets callers use DB aggregates instead of row scans. */
+export function computeXPFromTotals(
+  completedCount: number,
+  pomodoroSum: number,
+  mitCompletions: number,
+): number {
+  return completedCount * 10 + mitCompletions * 5 + pomodoroSum * 5
+}
+
+export function computeXP(tasks: CompletedTaskInfo[], mitCompletions: number): number {
+  const pomodoroSum = tasks.reduce((sum, t) => sum + t.pomodoros, 0)
+  return computeXPFromTotals(tasks.length, pomodoroSum, mitCompletions)
+}
+
+export interface HeatmapDayResult {
+  date: string
+  count: number
+  shielded?: boolean
+}
+
+export interface HeatmapResult {
+  days: HeatmapDayResult[]
+  max: number
+}
+
+const HEATMAP_DEFAULT_WEEKS = 12
+
+/**
+ * GitHub-style activity grid: `weeks` Monday-aligned columns ending on the
+ * Sunday of the week containing `nowDate`. Each cell counts tasks completed
+ * that day; shielded gap-days (streak preserved) are flagged for annotation.
+ */
+export function computeHeatmap(
+  completedTasks: CompletedTaskInfo[],
+  nowDate: Date,
+  weeks = HEATMAP_DEFAULT_WEEKS,
+): HeatmapResult {
+  const counts = new Map<string, number>()
+  for (const t of completedTasks) {
+    const key = toDateStr(t.completedAt)
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  const { shieldedDays } = replayStreak(new Set(counts.keys()), nowDate)
+
+  const sunday = mondayOf(nowDate)
+  sunday.setUTCDate(sunday.getUTCDate() + 6)
+  const cursor = new Date(sunday)
+  cursor.setUTCDate(cursor.getUTCDate() - (weeks * 7 - 1))
+
+  let max = 0
+  const days: HeatmapDayResult[] = []
+  while (cursor.getTime() <= sunday.getTime()) {
+    const dateStr = toDateStr(cursor)
+    const count = counts.get(dateStr) ?? 0
+    if (count > max) max = count
+    days.push({
+      date: dateStr,
+      count,
+      ...(shieldedDays.has(dateStr) ? { shielded: true } : {}),
+    })
+    cursor.setUTCDate(cursor.getUTCDate() + 1)
+  }
+
+  return { days, max }
+}
+
+export function computeLevel(xp: number): number {
+  return Math.floor(Math.sqrt(xp / 100)) + 1
+}
+
+export function computeRewards(
+  completedTasks: CompletedTaskInfo[],
+  nowDate: Date,
+  gentleMoves = 0,
+  mitCompletions = 0,
+  questXp = 0,
+): RewardsSummaryResult {
+  const activeDays = new Set(completedTasks.map((t) => toDateStr(t.completedAt)))
+  const { streak, longest, shields, shieldedDays } = replayStreak(activeDays, nowDate)
+
+  const todayMs = new Date(toDateStr(nowDate) + 'T00:00:00Z').getTime()
+  const shieldUsedRecently = [...shieldedDays].some(
+    (day) => (todayMs - new Date(day + 'T00:00:00Z').getTime()) / 86400000 <= SHIELD_RECENT_DAYS,
+  )
+
+  // week: Mon–Sun of the ISO week containing nowDate
+  const monday = mondayOf(nowDate)
+  const week: DayActivityResult[] = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday)
+    d.setUTCDate(d.getUTCDate() + i)
+    const dateStr = toDateStr(d)
+    return {
+      date: dateStr,
+      active: activeDays.has(dateStr),
+      ...(shieldedDays.has(dateStr) ? { shielded: true } : {}),
+    }
+  })
+
+  const totalCompleted = completedTasks.length
+  const streakBadge = (id: string, threshold: number): BadgeResult => ({
+    id,
+    earned: longest >= threshold,
+    ...(longest < threshold ? { remaining: Math.max(0, threshold - streak) } : {}),
+  })
+  const badges: BadgeResult[] = [
+    { id: 'first_step', earned: totalCompleted >= 1 },
+    streakBadge('streak_5', 5),
+    streakBadge('streak_7', 7),
+    streakBadge('streak_21', 21),
+    {
+      id: 'gentle_mode',
+      earned: gentleMoves >= 3,
+      ...(gentleMoves < 3 ? { remaining: 3 - gentleMoves } : {}),
+    },
+  ]
+
+  const xp = computeXP(completedTasks, mitCompletions) + questXp
+  const level = computeLevel(xp)
+
+  // Comeback: gap counted from the last active day before today, so the
+  // banner stays for the whole return day even after the first completion.
+  const todayStr = toDateStr(nowDate)
+  const lastBeforeToday =
+    [...activeDays]
+      .filter((d) => d < todayStr)
+      .sort()
+      .pop() ?? null
+  const gap = gapDays(lastBeforeToday, todayStr)
+
+  return {
+    streak,
+    longestStreak: longest,
+    shields,
+    shieldUsedRecently,
+    week,
+    badges,
+    xp,
+    level,
+    ...(isComeback(gap) ? { comebackDays: gap } : {}),
+  }
+}

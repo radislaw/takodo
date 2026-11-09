@@ -1,0 +1,10 @@
+.omc
+.remember
+pnpm-lock.yaml
+node_modules
+coverage
+dist
+*.local
+packages/contract/openapi
+apps/api/prisma/migrations
+.playwright-mcp

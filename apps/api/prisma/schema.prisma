@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  name              String             @default("")
+  // Null for OAuth-only accounts; set for email+password sign-ups.
+  passwordHash      String?
+  // Set once an email is provider- or self-verified.
+  emailVerified     DateTime?
+  theme             String             @default("light")
+  gentleMoves       Int                @default(0)
+  notifMorning      Boolean            @default(true)
+  notifEvening      Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  // Voluntary self-report survey (all optional)
+  gender            String?
+  birthDate         String?
+  timezone          String?
+  adhdStatus        String?
+  language          String?
+  tasks             Task[]
+  dailyLists        DailyList[]
+  questClaims       QuestClaim[]
+  pushSubscriptions PushSubscription[]
+  feedback          Feedback[]
+  authIdentities    AuthIdentity[]
+  refreshTokens     RefreshToken[]
+  conversations     Conversation[]
+}
+
+/** One linked external provider account (google | yandex | apple). */
+model AuthIdentity {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  // Provider-reported email at link time (may be a private relay for Apple).
+  email             String?
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+/** Rotating refresh token (sha256-hashed). A reused token revokes its whole family. */
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  // sha256 of the opaque refresh token — never store the plaintext.
+  tokenHash   String    @unique
+  // Rotation lineage: all tokens derived from one login share a familyId.
+  familyId    String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  // Set when this token was rotated → its successor's id (reuse detection).
+  replacedBy  String?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String
+  message   String
+  rating    Int?
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum QuestTier {
+  common
+  rare
+  epic
+}
+
+model QuestClaim {
+  id        String    @id @default(cuid())
+  userId    String
+  date      DateTime  @db.Date
+  questId   String
+  tier      QuestTier
+  xp        Int
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date, questId])
+}
+
+model Task {
+  id                 String       @id @default(cuid())
+  userId             String
+  parentId           String?
+  title              String
+  note               String?
+  resistanceResolved Boolean      @default(false)
+  estimateMinutes    Int?
+  status             TaskStatus   @default(open)
+  category           String?
+  completedAt        DateTime?
+  normalizedTitle    String
+  focusSeconds       Int          @default(0)
+  pomodoros          Int          @default(0)
+  createdAt          DateTime     @default(now())
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent             Task?        @relation("TaskChildren", fields: [parentId], references: [id], onDelete: SetNull)
+  children           Task[]       @relation("TaskChildren")
+  dailyEntries       DailyEntry[]
+}
+
+model DailyList {
+  id        String       @id @default(cuid())
+  userId    String
+  date      DateTime     @db.Date
+  note      String?
+  createdAt DateTime     @default(now())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries   DailyEntry[]
+
+  @@unique([userId, date])
+}
+
+model DailyEntry {
+  id          String    @id @default(cuid())
+  dailyListId String
+  taskId      String
+  isMIT       Boolean   @default(false)
+  order       Int
+  dailyList   DailyList @relation(fields: [dailyListId], references: [id], onDelete: Cascade)
+  task        Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+enum TaskStatus {
+  open
+  done
+}
+
+/** One AI-assistant chat thread for a user. */
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([userId])
+}
+
+/** One turn in a conversation. `actions` is the structured list of autonomous
+ *  agent actions (tool calls) taken on an assistant turn, for UI transparency. */
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  // 'user' | 'assistant'
+  role           String
+  content        String
+  actions        Json?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+model AnalyticsEvent {
+  id           String   @id @default(cuid())
+  pseudonymId  String
+  eventType    String
+  payload      Json
+  createdAt    DateTime @default(now())
+
+  @@index([pseudonymId])
+  @@index([eventType])
+}

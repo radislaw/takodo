@@ -1,0 +1,1838 @@
+openapi: 3.0.0
+info:
+  title: TakoDo API
+  description: |-
+    TakoDo API — the single source of truth contract.
+    Auth: JWT bearer. Every operation is protected by default (`@useAuth(BearerAuth)`
+    at the namespace); the `Auth` interface opts out with `@useAuth(NoAuth)`.
+    Changes happen only here → regen OpenAPI/types. Do not edit generated output by hand.
+  version: 0.0.0
+tags:
+  - name: Auth
+  - name: Tasks
+  - name: Daily
+  - name: Profile
+  - name: Feedback
+  - name: Rewards
+  - name: Quests
+  - name: Push
+  - name: Frequent
+  - name: Assistant
+paths:
+  /ai/conversations:
+    post:
+      operationId: Assistant_createConversation
+      description: Start a new conversation.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+      tags:
+        - Assistant
+    get:
+      operationId: Assistant_listConversations
+      description: List the user's conversations, newest first.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Conversation'
+      tags:
+        - Assistant
+  /ai/conversations/{id}:
+    get:
+      operationId: Assistant_getConversation
+      description: A conversation with its full message history.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDetail'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Assistant
+    delete:
+      operationId: Assistant_deleteConversation
+      description: Delete a conversation and all its messages.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Assistant
+  /ai/conversations/{id}/messages:
+    post:
+      operationId: Assistant_sendMessage
+      description: Send a user message; the agent acts autonomously and replies.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageTurn'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessage'
+  /auth/login:
+    post:
+      operationId: Auth_login
+      description: Log in with email + password.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      security:
+        - {}
+  /auth/logout:
+    post:
+      operationId: Auth_logout
+      description: Revoke the supplied refresh token (and its family).
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      security:
+        - {}
+  /auth/refresh:
+    post:
+      operationId: Auth_refresh
+      description: Rotate a refresh token → new session. Reuse of a rotated token revokes the family.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      security:
+        - {}
+  /auth/signup:
+    post:
+      operationId: Auth_signup
+      description: Register with email + password. Returns a fresh session.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      security:
+        - {}
+  /auth/{provider}/callback:
+    post:
+      operationId: Auth_oauthCallback
+      description: Complete an OAuth flow; exchanges the code and returns a session.
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthCallbackRequest'
+      security:
+        - {}
+  /auth/{provider}/start:
+    get:
+      operationId: Auth_oauthStart
+      description: Begin an OAuth flow for `provider` (google | yandex | apple).
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthStartResponse'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Auth
+      security:
+        - {}
+  /daily:
+    post:
+      operationId: Daily_create
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyList'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DailyListCreate'
+  /daily/{date}:
+    get:
+      operationId: Daily_getByDate
+      description: List for a date with its entries (history = past dates).
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyListDetail'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+  /daily/{date}/done:
+    post:
+      operationId: Daily_logDone
+      description: 'Log an already-done task: creates a done task + entry on this day. Counts toward stats.'
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyEntry'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogDoneEntry'
+  /daily/{date}/entries:
+    post:
+      operationId: Daily_addEntry
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyEntry'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddEntry'
+  /daily/{date}/entries/{entryId}:
+    patch:
+      operationId: Daily_updateEntry
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyEntry'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntryUpdate'
+    delete:
+      operationId: Daily_removeEntry
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+  /daily/{date}/entries/{entryId}/move-to-tomorrow:
+    post:
+      operationId: Daily_moveToTomorrow
+      description: Move an entry from this day to tomorrow atomically. Increments the user's gentleMoves counter.
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyEntry'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+  /daily/{date}/note:
+    put:
+      operationId: Daily_setNote
+      description: Set the day's journal note. Creates the day if missing.
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyListDetail'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Daily
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DailyNoteUpdate'
+  /feedback:
+    post:
+      operationId: FeedbackApi_create
+      description: Submit feedback from the current user (review / wish / support).
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackCreate'
+  /frequent:
+    get:
+      operationId: Frequent_list
+      description: Tasks that stayed undone in >= minDays days (matched by normalizedTitle).
+      parameters:
+        - name: minDays
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FrequentTask'
+      tags:
+        - Frequent
+  /me:
+    get:
+      operationId: Me_get
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+      tags:
+        - Profile
+    patch:
+      operationId: Me_update
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+  /push/subscribe:
+    post:
+      operationId: Push_subscribe
+      description: Register a browser PushSubscription. Idempotent (upserts by endpoint).
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Push
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushSubscribeBody'
+    delete:
+      operationId: Push_unsubscribe
+      description: Remove a browser PushSubscription.
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Push
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushUnsubscribeBody'
+  /push/vapid-key:
+    get:
+      operationId: Push_getVapidKey
+      description: VAPID public key for the web client to create a PushSubscription.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VapidPublicKey'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Push
+  /quests:
+    get:
+      operationId: Quests_list
+      description: |-
+        Today's three deterministic quests (hash of userId+date) with live progress.
+        `date` is the client's local day (timezones differ from server UTC);
+        must be within ±1 day of server UTC today. Defaults to server UTC today.
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quest'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Quests
+  /quests/{id}/claim:
+    post:
+      operationId: Quests_claim
+      description: 'Claim a completed quest: server validates progress, rolls tier, awards XP. Same `date` semantics as list.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quest'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Quests
+  /rewards:
+    get:
+      operationId: Rewards_get
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardsSummary'
+      tags:
+        - Rewards
+  /rewards/heatmap:
+    get:
+      operationId: Rewards_heatmap
+      description: Activity heatmap; `weeks` window (default 12), `date` is the client's local day.
+      parameters:
+        - name: weeks
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeatmapSummary'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Rewards
+  /tasks:
+    get:
+      operationId: Tasks_list
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+      tags:
+        - Tasks
+    post:
+      operationId: Tasks_create
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+  /tasks/{id}:
+    get:
+      operationId: Tasks_read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+    patch:
+      operationId: Tasks_update
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+    delete:
+      operationId: Tasks_del
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+  /tasks/{id}/complete:
+    post:
+      operationId: Tasks_complete
+      description: Mark as done; the server bubbles up (all children done → parent done).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+  /tasks/{id}/focus:
+    post:
+      operationId: Tasks_recordFocus
+      description: Record focused time (and optionally a completed Pomodoro) on the task.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FocusRecord'
+  /tasks/{id}/reopen:
+    post:
+      operationId: Tasks_reopen
+      description: Return to open (server handles recursive down/up as needed).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+  /tasks/{id}/resolve-resistance:
+    post:
+      operationId: Tasks_resolveResistance
+      description: '"No resistance, I can do it" → resistanceResolved = true.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+  /tasks/{id}/tree:
+    get:
+      operationId: Tasks_tree
+      description: Full subtree of the task.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskNode'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      tags:
+        - Tasks
+security:
+  - BearerAuth: []
+components:
+  schemas:
+    AddEntry:
+      type: object
+      required:
+        - taskId
+      properties:
+        taskId:
+          type: string
+    AgentAction:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
+        taskId:
+          type: string
+        title:
+          type: string
+          maxLength: 500
+      description: |-
+        One autonomous action the agent took on an assistant turn (for UI transparency).
+        `kind` is the tool name (e.g. "create_task") → mapped to a localized chip on the web.
+    ApiError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: |-
+            Stable machine code. Auth values: `invalid_credentials`, `email_taken`,
+            `token_expired`, `token_invalid`, `refresh_reuse_detected`, `oauth_state_mismatch`,
+            `oauth_exchange_failed`, `provider_unsupported`, `unauthenticated`.
+        message:
+          type: string
+    Badge:
+      type: object
+      required:
+        - id
+        - earned
+      properties:
+        id:
+          type: string
+          description: Stable id → maps to localized copy on the web.
+        earned:
+          type: boolean
+        remaining:
+          type: integer
+          format: int32
+          description: Units left before earning (e.g. days remaining for a streak badge).
+      description: Achievement badge. Title/description live in web i18n, keyed by id.
+    Conversation:
+      type: object
+      required:
+        - id
+        - createdAt
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          maxLength: 200
+        createdAt:
+          type: string
+          format: date-time
+      description: A chat thread with the autonomous task assistant.
+    ConversationDetail:
+      type: object
+      required:
+        - id
+        - createdAt
+        - messages
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          maxLength: 200
+        createdAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    DailyEntry:
+      type: object
+      required:
+        - id
+        - taskId
+        - isMIT
+        - order
+      properties:
+        id:
+          type: string
+        taskId:
+          type: string
+        isMIT:
+          type: boolean
+          description: One of the "3 most important tasks today" (MIT). Limit of 3 is server behavior.
+        order:
+          type: integer
+          format: int32
+    DailyList:
+      type: object
+      required:
+        - id
+        - date
+        - createdAt
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+    DailyListCreate:
+      type: object
+      required:
+        - date
+      properties:
+        date:
+          type: string
+          format: date
+    DailyListDetail:
+      type: object
+      required:
+        - id
+        - date
+        - createdAt
+        - entries
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyEntry'
+        note:
+          type: string
+          description: Free-text journal of the day's thoughts and events.
+    DailyNoteUpdate:
+      type: object
+      required:
+        - note
+      properties:
+        note:
+          type: string
+          maxLength: 5000
+      description: Set the day's free-text journal note.
+    DayActivity:
+      type: object
+      required:
+        - date
+        - active
+      properties:
+        date:
+          type: string
+          format: date
+        active:
+          type: boolean
+          description: User completed at least one task that day.
+        shielded:
+          type: boolean
+          description: Inactive day covered by a streak shield (streak preserved).
+      description: One day cell in the weekly streak strip.
+    EntryUpdate:
+      type: object
+      properties:
+        isMIT:
+          type: boolean
+        order:
+          type: integer
+          format: int32
+    Feedback:
+      type: object
+      required:
+        - id
+        - kind
+        - message
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        message:
+          type: string
+          maxLength: 5000
+        rating:
+          type: integer
+          format: int32
+        status:
+          type: string
+          description: '"new" | "read" | "resolved".'
+        createdAt:
+          type: string
+          format: date-time
+      description: Feedback (read shape). Status is server-managed for the future admin triage view.
+    FeedbackCreate:
+      type: object
+      required:
+        - kind
+        - message
+      properties:
+        kind:
+          type: string
+          description: '"review" | "wish" | "support".'
+        message:
+          type: string
+          maxLength: 5000
+        rating:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          description: Optional 1–5 rating (reviews).
+    FocusRecord:
+      type: object
+      required:
+        - seconds
+      properties:
+        seconds:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 7200
+          description: Focused seconds to add (1–7200).
+        pomodoro:
+          type: boolean
+          description: True when a full 25-min Pomodoro was completed → increments counter.
+    FrequentTask:
+      type: object
+      required:
+        - normalizedTitle
+        - title
+        - undoneDays
+      properties:
+        normalizedTitle:
+          type: string
+        title:
+          type: string
+        undoneDays:
+          type: integer
+          format: int32
+          description: In how many past days the task stayed undone.
+    HeatmapDay:
+      type: object
+      required:
+        - date
+        - count
+      properties:
+        date:
+          type: string
+          format: date
+        count:
+          type: integer
+          format: int32
+          description: Tasks completed that day.
+        shielded:
+          type: boolean
+          description: Inactive day covered by a streak shield (streak preserved).
+      description: One day cell in the activity heatmap.
+    HeatmapSummary:
+      type: object
+      required:
+        - days
+        - max
+      properties:
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/HeatmapDay'
+          description: Exactly weeks×7 cells, ending on the Sunday of the current week.
+        max:
+          type: integer
+          format: int32
+          description: Highest single-day count in the window (for intensity scaling); 0 if empty.
+      description: GitHub-style activity grid, oldest→newest, Monday-aligned.
+    LogDoneEntry:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          maxLength: 500
+      description: Log a task that was already done but never added to the list.
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          maxLength: 254
+        password:
+          type: string
+          minLength: 8
+          maxLength: 200
+    LogoutRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          maxLength: 512
+    Message:
+      type: object
+      required:
+        - id
+        - role
+        - content
+        - createdAt
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          description: '"user" | "assistant".'
+        content:
+          type: string
+          maxLength: 8000
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentAction'
+          description: Actions taken on this turn (assistant turns only).
+        createdAt:
+          type: string
+          format: date-time
+      description: One conversation turn.
+    MessageTurn:
+      type: object
+      required:
+        - assistantMessage
+        - actions
+      properties:
+        assistantMessage:
+          $ref: '#/components/schemas/Message'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentAction'
+      description: The assistant's reply plus the actions it took autonomously.
+    OAuthCallbackRequest:
+      type: object
+      required:
+        - code
+        - state
+      properties:
+        code:
+          type: string
+          maxLength: 2048
+        state:
+          type: string
+          maxLength: 512
+      description: Callback payload from the provider redirect (code/state, or Apple form_post).
+    OAuthStartResponse:
+      type: object
+      required:
+        - authorizeUrl
+        - state
+      properties:
+        authorizeUrl:
+          type: string
+        state:
+          type: string
+          description: Opaque CSRF/state value the callback must echo.
+      description: Server-built provider authorize URL the client redirects to.
+    Profile:
+      type: object
+      required:
+        - name
+        - theme
+        - notifMorning
+        - notifEvening
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: Display name used in the greeting.
+        theme:
+          $ref: '#/components/schemas/Theme'
+        notifMorning:
+          type: boolean
+          description: Opt-in morning reminder (~9 AM).
+        notifEvening:
+          type: boolean
+          description: Opt-in evening reminder (~8 PM).
+        gender:
+          type: string
+          maxLength: 20
+          description: 'Voluntary self-report: "female" | "male".'
+        birthDate:
+          type: string
+          maxLength: 10
+          description: Voluntary self-report birth date, ISO format "YYYY-MM-DD".
+        timezone:
+          type: string
+          maxLength: 100
+          description: IANA timezone identifier, e.g. "Europe/Moscow".
+        adhdStatus:
+          type: string
+          maxLength: 20
+          description: 'Voluntary self-report: "diagnosed" | "suspected" | "no" | "na".'
+        language:
+          type: string
+          maxLength: 5
+          description: 'UI language preference: "ru" | "en".'
+    ProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        theme:
+          allOf:
+            - $ref: '#/components/schemas/Theme'
+          description: Rejected with 403 `theme_locked` when the theme is not unlocked at the user's level.
+        notifMorning:
+          type: boolean
+        notifEvening:
+          type: boolean
+        gender:
+          type: string
+          maxLength: 20
+          description: '"female" | "male".'
+        birthDate:
+          type: string
+          maxLength: 10
+          description: ISO date "YYYY-MM-DD".
+        timezone:
+          type: string
+          maxLength: 100
+          description: IANA timezone identifier.
+        adhdStatus:
+          type: string
+          maxLength: 20
+        language:
+          type: string
+          maxLength: 5
+          description: '"ru" | "en".'
+    PushSubscribeBody:
+      type: object
+      required:
+        - endpoint
+        - p256dh
+        - auth
+      properties:
+        endpoint:
+          type: string
+          maxLength: 2048
+        p256dh:
+          type: string
+          maxLength: 256
+        auth:
+          type: string
+          maxLength: 64
+    PushUnsubscribeBody:
+      type: object
+      required:
+        - endpoint
+      properties:
+        endpoint:
+          type: string
+          maxLength: 2048
+    Quest:
+      type: object
+      required:
+        - id
+        - target
+        - progress
+        - done
+        - claimed
+      properties:
+        id:
+          type: string
+          description: Stable quest definition id → maps to localized copy on the web.
+        target:
+          type: integer
+          format: int32
+        progress:
+          type: integer
+          format: int32
+        done:
+          type: boolean
+          description: progress >= target — the quest can be claimed.
+        claimed:
+          type: boolean
+        tier:
+          allOf:
+            - $ref: '#/components/schemas/QuestTier'
+          description: Rolled server-side on claim (70/25/5).
+        xp:
+          type: integer
+          format: int32
+          description: XP awarded on claim, by tier.
+      description: Daily quest with live progress. Title/description live in web i18n, keyed by id.
+    QuestTier:
+      type: string
+      enum:
+        - common
+        - rare
+        - epic
+    RefreshRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          maxLength: 512
+    RewardsSummary:
+      type: object
+      required:
+        - streak
+        - longestStreak
+        - shields
+        - shieldUsedRecently
+        - week
+        - badges
+        - xp
+        - level
+      properties:
+        streak:
+          type: integer
+          format: int32
+        longestStreak:
+          type: integer
+          format: int32
+        shields:
+          type: integer
+          format: int32
+          description: Streak shields available (earned every 5 active streak days, max 2).
+        shieldUsedRecently:
+          type: boolean
+          description: A shield was consumed within the last 7 days.
+        week:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayActivity'
+          description: Last 7 days, Monday-first.
+        badges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Badge'
+        xp:
+          type: integer
+          format: int32
+          description: Total experience points accumulated (done×10, MIT×5, pomodoro×5).
+        level:
+          type: integer
+          format: int32
+          description: 'Current level, 1-based: level = floor(sqrt(xp/100)) + 1.'
+        comebackDays:
+          type: integer
+          format: int32
+          description: Full missed days before today; present only in comeback state (>= 2).
+    SendMessage:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        today:
+          type: string
+          format: date
+          description: |-
+            Client's local day (`YYYY-MM-DD`) so the agent schedules onto the right "today".
+            Must be within ±1 day of server UTC; defaults to server today.
+    SignupRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          maxLength: 254
+        password:
+          type: string
+          minLength: 8
+          maxLength: 200
+        name:
+          type: string
+          maxLength: 100
+          description: Optional display name; defaults from the email local part.
+    Task:
+      type: object
+      required:
+        - id
+        - parentId
+        - title
+        - resistanceResolved
+        - status
+        - completedAt
+        - normalizedTitle
+        - focusSeconds
+        - pomodoros
+        - createdAt
+      properties:
+        id:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+          description: Parent in the tree; null = root.
+        title:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 5000
+        resistanceResolved:
+          type: boolean
+          description: User pressed "I can do this" → task became an executable leaf.
+        estimateMinutes:
+          type: integer
+          format: int32
+          description: 'Time estimate, minutes (CBT: externalize time).'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        category:
+          $ref: '#/components/schemas/TaskCategory'
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        normalizedTitle:
+          type: string
+          description: lower+trim of the title — used to match "frequently undone" tasks.
+        focusSeconds:
+          type: integer
+          format: int32
+          description: Accumulated focused seconds (from Pomodoro sessions). Server-set.
+        pomodoros:
+          type: integer
+          format: int32
+          description: Completed 25-minute Pomodoros. Server-set.
+        createdAt:
+          type: string
+          format: date-time
+      description: Task (read shape). Fields not client-writable are set by the server.
+    TaskCategory:
+      type: string
+      enum:
+        - home
+        - health
+        - work
+        - self
+    TaskCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 5000
+        parentId:
+          type: string
+          description: Parent when splitting; absent = root task of the day.
+        estimateMinutes:
+          type: integer
+          format: int32
+        category:
+          $ref: '#/components/schemas/TaskCategory'
+    TaskNode:
+      type: object
+      required:
+        - id
+        - parentId
+        - title
+        - resistanceResolved
+        - status
+        - completedAt
+        - normalizedTitle
+        - focusSeconds
+        - pomodoros
+        - createdAt
+        - children
+      properties:
+        id:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+          description: Parent in the tree; null = root.
+        title:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 5000
+        resistanceResolved:
+          type: boolean
+          description: User pressed "I can do this" → task became an executable leaf.
+        estimateMinutes:
+          type: integer
+          format: int32
+          description: 'Time estimate, minutes (CBT: externalize time).'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        category:
+          $ref: '#/components/schemas/TaskCategory'
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        normalizedTitle:
+          type: string
+          description: lower+trim of the title — used to match "frequently undone" tasks.
+        focusSeconds:
+          type: integer
+          format: int32
+          description: Accumulated focused seconds (from Pomodoro sessions). Server-set.
+        pomodoros:
+          type: integer
+          format: int32
+          description: Completed 25-minute Pomodoros. Server-set.
+        createdAt:
+          type: string
+          format: date-time
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskNode'
+      description: Task with its recursive subtree (unbounded depth).
+    TaskStatus:
+      type: string
+      enum:
+        - open
+        - done
+    TaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 500
+        note:
+          type: string
+          maxLength: 5000
+        estimateMinutes:
+          type: integer
+          format: int32
+        category:
+          $ref: '#/components/schemas/TaskCategory'
+    Theme:
+      type: string
+      enum:
+        - light
+        - lavender
+        - eco
+        - ocean
+        - silent
+        - high-contrast
+        - high-contrast-dark
+        - dark
+        - forest
+        - lavender-dark
+        - ocean-dark
+        - silent-dark
+        - amber
+        - amber-dark
+        - cyberpunk
+        - amoled
+      description: Matches data-theme attribute values in tokens.css.
+    TokenPair:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+        - expiresIn
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int32
+          description: Access-token lifetime, seconds.
+      description: 'Issued session: short-lived access + rotating refresh.'
+    VapidPublicKey:
+      type: object
+      required:
+        - publicKey
+      properties:
+        publicKey:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: Bearer

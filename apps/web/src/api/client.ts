@@ -1,0 +1,94 @@
+import createClient from 'openapi-fetch'
+
+import type { paths } from '../../../../packages/contract/openapi/types.gen'
+import { type AuthTokens, getTokens, setTokens, clearTokens } from '@/shared/lib/authStorage'
+import { demoFetch } from './demo/demoFetch'
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+
+// Static demo build (GitHub Pages): no backend, the API is emulated in-browser.
+// The flag is a build-time constant, so the demo code is tree-shaken out of
+// regular builds.
+const DEMO = import.meta.env.VITE_DEMO === 'true'
+if (DEMO && !getTokens()) {
+  setTokens({ accessToken: 'demo-access', refreshToken: 'demo-refresh' })
+}
+
+function isAuthRoute(url: string): boolean {
+  return new URL(url, API_BASE_URL).pathname.startsWith('/auth/')
+}
+
+// Single-flight refresh: concurrent 401s share one refresh round-trip.
+let refreshInFlight: Promise<boolean> | null = null
+
+async function refreshSession(): Promise<boolean> {
+  const tokens = getTokens()
+  if (!tokens) return false
+  refreshInFlight ??= (async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ refreshToken: tokens.refreshToken }),
+      })
+      if (!res.ok) {
+        clearTokens()
+        return false
+      }
+      const pair = (await res.json()) as AuthTokens
+      setTokens(pair)
+      return true
+    } catch {
+      clearTokens()
+      return false
+    } finally {
+      refreshInFlight = null
+    }
+  })()
+  return refreshInFlight
+}
+
+function redirectToLogin(): void {
+  if (typeof window === 'undefined') return
+  // The app may be served from a subpath (GitHub Pages), so work with
+  // app-relative paths and re-attach the base only for the hard navigation.
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+  const path = window.location.pathname.startsWith(base)
+    ? window.location.pathname.slice(base.length) || '/'
+    : window.location.pathname
+  if (!path.startsWith('/login')) {
+    const redirect = encodeURIComponent(path + window.location.search)
+    window.location.assign(`${base}/login?redirect=${redirect}`)
+  }
+}
+
+/** Attach the bearer token; on 401, refresh once and retry, else bounce to /login. */
+const authFetch: typeof fetch = async (input, init) => {
+  const base = new Request(input as RequestInfo, init)
+  const authRoute = isAuthRoute(base.url)
+
+  const withBearer = (token?: string): Request => {
+    const req = base.clone()
+    if (token && !authRoute) req.headers.set('authorization', `Bearer ${token}`)
+    return req
+  }
+
+  const tokens = getTokens()
+  let res = await fetch(withBearer(tokens?.accessToken))
+
+  if (res.status === 401 && !authRoute && tokens) {
+    const refreshed = await refreshSession()
+    if (refreshed) {
+      res = await fetch(withBearer(getTokens()?.accessToken))
+    } else {
+      redirectToLogin()
+    }
+  }
+
+  return res
+}
+
+export const apiClient = createClient<paths>({
+  baseUrl: API_BASE_URL,
+  fetch: DEMO ? demoFetch : authFetch,
+})

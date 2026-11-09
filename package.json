@@ -1,0 +1,50 @@
+{
+  "name": "takodo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ADHD-friendly todo app — monorepo (apps/web Vue, apps/api Fastify)",
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:web": "pnpm --filter @takodo/web dev",
+    "dev:api": "pnpm --filter @takodo/api dev",
+    "desktop:dev": "pnpm --filter @takodo/web tauri:dev",
+    "desktop:build": "pnpm --filter @takodo/web tauri:build",
+    "contract:build": "pnpm --filter @takodo/contract build",
+    "contract:watch": "pnpm --filter @takodo/contract watch",
+    "contract:gen": "openapi-typescript packages/contract/openapi/openapi.yaml -o packages/contract/openapi/types.gen.ts",
+    "build": "pnpm -r build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter @takodo/web test:e2e",
+    "verify": "pnpm contract:build && pnpm contract:gen && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged",
+    "commit-msg": "pnpm exec commitlint --edit"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@eslint/js": "^10.0.1",
+    "@intlify/eslint-plugin-vue-i18n": "^4.5.1",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.12.0",
+    "globals": "^17.14.0",
+    "lint-staged": "^17.6.0",
+    "openapi-typescript": "^7.13.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "simple-git-hooks": "^2.14.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1"
+  }
+}

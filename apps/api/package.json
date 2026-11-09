@@ -1,0 +1,47 @@
+{
+  "name": "@takodo/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "start": "tsx --env-file=.env src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.4.1",
+    "@fastify/rate-limit": "^11.2.2",
+    "@prisma/client": "^6.19.3",
+    "ajv-formats": "^3.0.1",
+    "argon2": "^0.45.2",
+    "fastify": "^5.12.8",
+    "fastify-openapi-glue": "^4.12.0",
+    "jose": "^6.2.3",
+    "node-schedule": "^2.1.2",
+    "openai": "^7.53.0",
+    "web-push": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/node-schedule": "^2.1.8",
+    "@types/web-push": "^3.6.4",
+    "prisma": "^6.19.3",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.0",
+    "vitest": "^5.1.0",
+    "vitest-mock-extended": "^5.0.0"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

@@ -1,0 +1,22 @@
+node_modules/
+dist/
+coverage/
+*.local
+.DS_Store
+.omc/
+.env
+# Playwright
+.playwright-mcp
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+design/
+*.png
+# Tauri app icons must be committed (build inputs) despite the *.png rule above
+!apps/web/src-tauri/icons/*.png
+
+# Local tooling
+.mimocode/

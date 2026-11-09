@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AppCheckbox > matches snapshot 1`] = `"<label class="inline-flex cursor-pointer items-center gap-2 select-none" style="min-height: 44px;"><input type="checkbox" class="sr-only"><span style="width: 27px; height: 27px;" class="inline-flex flex-shrink-0 items-center justify-center rounded-full border-line-strong surface-card border-2" aria-hidden="true"><!--v-if--></span></label>"`;
