@@ -31,9 +31,9 @@ describe('manifest.webmanifest', () => {
     expect(typeof manifest.short_name).toBe('string')
   })
 
-  it('start_url is /today', () => {
+  it('start_url points at today (relative, so it works under a subpath)', () => {
     manifest = JSON.parse(readFileSync(`${PUBLIC}/manifest.webmanifest`, 'utf-8')) as Manifest
-    expect(manifest.start_url).toBe('/today')
+    expect(manifest.start_url).toBe('today')
   })
 
   it('display is standalone', () => {
@@ -90,9 +90,10 @@ describe('sw.js', () => {
     expect(sw).toContain('origin')
   })
 
-  it('has SPA navigation fallback to /', () => {
+  it('has SPA navigation fallback to the scope root', () => {
     sw = readFileSync(`${PUBLIC}/sw.js`, 'utf-8')
-    expect(sw).toContain("'/'")
+    expect(sw).toContain('self.registration.scope')
+    expect(sw).toContain('caches.match(SCOPE)')
     expect(sw).toContain('navigate')
   })
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { ref, nextTick } from 'vue'
 import TodayPage from './TodayPage.vue'
 import { useErrorToast } from '@/shared/lib/useErrorToast'
@@ -60,6 +60,10 @@ vi.mock('@/shared/api', () => ({
 function mountPage() {
   return mount(TodayPage, { shallow: false })
 }
+
+// Mounted pages keep live watchers on the shared rewards ref; unmount them so a
+// previous test's page can't fire celebrate() during the next test.
+enableAutoUnmount(afterEach)
 
 beforeEach(() => {
   vi.clearAllMocks()
